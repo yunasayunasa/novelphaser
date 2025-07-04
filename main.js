@@ -183,7 +183,8 @@ class GameScene extends Phaser.Scene {
 // --- Phaserのゲーム設定 ---
 // --- Phaserのゲーム設定 ---
 const config = {
-    type: Phaser.AUTO,
+    // ★★★ typeを強制的にCANVASに変更 ★★★
+    type: Phaser.CANVAS,
     scale: {
         mode: Phaser.Scale.FIT, // 縦横比を維持したまま、親要素（ブラウザウィンドウ）にフィットさせる
         parent: 'phaser-game',  // ゲームキャンバスを入れるdivのID（HTML側で追加）
