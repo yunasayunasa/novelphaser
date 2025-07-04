@@ -10,13 +10,22 @@ class ScenarioManager {
         this.currentLine = 0;       // 現在実行中の行番号
         this.isWaitingClick = false; // クリック待ち状態かどうかのフラグ
 
-        // 画面に表示するテキストオブジェクト
-        this.textObject = this.scene.add.text(50, 400, '', {
-            font: '24px sans-serif',
+       // ゲーム画面の幅と高さをスケールマネージャーから取得
+    const gameWidth = this.scene.scale.width;
+    const gameHeight = this.scene.scale.height;
+
+    // テキストオブジェクトを画面下部に配置
+    this.textObject = this.scene.add.text(
+        gameWidth * 0.1, // 画面幅の10%の位置から
+        gameHeight * 0.7, // 画面高さの70%の位置から
+        '',
+        {
+            font: '36px sans-serif', // スマホなので少しフォントサイズを大きく
             fill: '#ffffff',
-            wordWrap: { width: SCREEN_WIDTH - 100 }
-        }).setOrigin(0, 0);
-    }
+            wordWrap: { width: gameWidth * 0.8 } // 折り返し幅も画面幅の80%に
+        }
+    );
+}
 
     // シナリオデータをセットアップするメソッド
     load(scenarioKey) {
@@ -129,11 +138,17 @@ class GameScene extends Phaser.Scene {
 
 
 // --- Phaserのゲーム設定 ---
+// --- Phaserのゲーム設定 ---
 const config = {
     type: Phaser.AUTO,
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
-    scene: [GameScene] // シーンをクラスで指定
+    scale: {
+        mode: Phaser.Scale.FIT, // 縦横比を維持したまま、親要素（ブラウザウィンドウ）にフィットさせる
+        parent: 'phaser-game',  // ゲームキャンバスを入れるdivのID（HTML側で追加）
+        autoCenter: Phaser.Scale.CENTER_BOTH, // 縦横両方で中央揃え
+        width: 720,  // "基準"となる幅（例：スマホ縦持ちを想定）
+        height: 1280 // "基準"となる高さ
+    },
+    scene: [GameScene]
 };
 
 // ゲームインスタンスの作成
