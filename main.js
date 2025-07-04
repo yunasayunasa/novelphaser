@@ -1,4 +1,4 @@
-// --- グローバル変数・定数 ---
+す// --- グローバル変数・定数 ---
 const SCREEN_WIDTH = 800;
 const SCREEN_HEIGHT = 600;
 
