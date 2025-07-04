@@ -5,37 +5,47 @@ const SCREEN_HEIGHT = 600;
 // --- ゲームエンジンの中核クラス ---
 class ScenarioManager {
     constructor(scene) {
-        this.scene = scene;         // Phaserのシーンオブジェクト
-        this.scenario = [];         // シナリオ全体を格納する配列
-        this.currentLine = 0;       // 現在実行中の行番号
-        this.isWaitingClick = false; // クリック待ち状態かどうかのフラグ
+    this.scene = scene;
+    this.scenario = [];
+    this.currentLine = 0;
+    this.isWaitingClick = false;
 
-       // ゲーム画面の幅と高さをスケールマネージャーから取得
     const gameWidth = this.scene.scale.width;
-const gameHeight = this.scene.scale.height;
+    const gameHeight = this.scene.scale.height;
 
-// テキストを表示する「箱」のサイズと位置を定義
-const padding = gameWidth * 0.1; // 左右の余白
-const textBoxWidth = gameWidth - (padding * 2); // 箱の幅
-const textBoxHeight = gameHeight * 0.25; // 箱の高さ（画面高さの25%を確保）
-const textBoxY = gameHeight - textBoxHeight - (gameHeight * 0.05); // 箱を画面下から5%の位置に配置
+    const padding = gameWidth * 0.1;
+    const textBoxWidth = gameWidth - (padding * 2);
+    const textBoxHeight = gameHeight * 0.25;
+    const textBoxY = gameHeight - textBoxHeight - (gameHeight * 0.05);
 
-this.textObject = this.scene.add.text(
-    padding, // X座標
-    textBoxY,  // Y座標
-    '',
-    {
-        font: '36px sans-serif',
-        fill: '#ffffff',
-        wordWrap: { 
-            width: textBoxWidth // 箱の幅で折り返す
-        },
-        // ★★★ ここが重要 ★★★
-        fixedWidth: textBoxWidth,   // テキストオブジェクトの幅を固定
-        fixedHeight: textBoxHeight  // テキストオブジェクトの高さを固定
-    }
+    this.textObject = this.scene.add.text(
+        padding,
+        textBoxY,
+        '',
+        {
+            font: '36px sans-serif',
+            fill: '#ffffff',
+            wordWrap: { 
+                width: textBoxWidth
+            },
+            fixedWidth: textBoxWidth,
+            fixedHeight: textBoxHeight
+        }
     );
+
+    // --- ここからデバッグ用のコード ---
+    const graphics = this.scene.add.graphics();
+    graphics.lineStyle(2, 0xff0000, 1); // 線の太さ2px, 色は赤, 透明度1
+    // textObjectと同じ位置、同じサイズの四角形を描画
+    graphics.strokeRect(
+        this.textObject.x,
+        this.textObject.y,
+        this.textObject.width,
+        this.textObject.height
+    );
+    // --- デバッグ用のコードここまで ---
 }
+
 
     // シナリオデータをセットアップするメソッド
     load(scenarioKey) {
