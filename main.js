@@ -26,7 +26,7 @@ class ScenarioManager {
             font: '36px sans-serif',
             fill: '#ffffff',
             wordWrap: { 
-                width: textBoxWidth
+                width: textBoxWidth,
                 useAdvanced: true 
             },
             fixedWidth: textBoxWidth,
