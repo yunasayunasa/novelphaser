@@ -15,7 +15,7 @@ class ScenarioManager {
 
     const padding = gameWidth * 0.1;
     const textBoxWidth = gameWidth - (padding * 2);
-    const textBoxHeight = gameHeight * 0.25;
+    const textBoxHeight = gameHeight * 0.30;
     const textBoxY = gameHeight - textBoxHeight - (gameHeight * 0.05);
 
     this.textObject = this.scene.add.text(
