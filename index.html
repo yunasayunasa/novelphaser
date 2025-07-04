@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <title>My Novel Engine</title>
-    <!-- Phaser.jsライブラリをインターネット経由で読み込む -->
+
+    <!-- ★★★ Google Fontsを読み込むコードを追加 ★★★ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    
     <script src="//cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
     <style>
         body {
@@ -14,7 +19,6 @@
     </style>
 </head>
 <body>
-    <!-- Phaserがこのdivの中にゲーム画面を生成する -->
     <div id="phaser-game"></div>
     <script src="main.js"></script>
 </body>
