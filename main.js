@@ -27,6 +27,7 @@ class ScenarioManager {
             fill: '#ffffff',
             wordWrap: { 
                 width: textBoxWidth
+                useAdvanced: true 
             },
             fixedWidth: textBoxWidth,
             fixedHeight: textBoxHeight
