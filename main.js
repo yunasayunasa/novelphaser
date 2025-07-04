@@ -157,8 +157,9 @@ class GameScene extends Phaser.Scene {
             textBoxY,
             testString,
             {
-                font: '36px sans-serif',
-                fill: '#ffffff',
+                fontFamily: '"Noto Sans JP", sans-serif',
+    fontSize: '36px',
+    fill: '#ffffff',
                 wordWrap: {
                     width: textBoxWidth,
                     useAdvanced: true
