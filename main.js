@@ -1,4 +1,4 @@
-す// --- グローバル変数・定数 ---
+// --- グローバル変数・定数 ---
 const SCREEN_WIDTH = 800;
 const SCREEN_HEIGHT = 600;
 
@@ -131,6 +131,8 @@ class ScenarioManager {
 class GameScene extends Phaser.Scene {
     // GameSceneクラスのcreate関数を、以下の内容に差し替えてください
 
+// GameSceneクラスのcreate関数を、以下の内容に差し替えてください
+
 create() {
     console.log("Create: 【デバッグモード】テキスト折り返し機能の単体テスト");
     this.cameras.main.setBackgroundColor('#000000');
@@ -140,16 +142,13 @@ create() {
     const gameWidth = this.scale.width;
     const gameHeight = this.scale.height;
 
-    // 1. テキストボックスの領域を定義します
     const padding = gameWidth * 0.1;
     const textBoxWidth = gameWidth - (padding * 2);
-    const textBoxHeight = gameHeight * 0.4; // 高さを40%に増やして十分に確保
-    const textBoxY = gameHeight * 0.5;      // 画面の中央あたりに配置
+    const textBoxHeight = gameHeight * 0.4;
+    const textBoxY = gameHeight * 0.5;
 
-    // 2. テスト用の、スペースを含まない長い日本語文章を用意します
     const testString = "これは、Phaserのテキスト折り返し機能を単体でテストするための非常に長い文章です。この文章が、指定された幅で正しく折り返され、複数行にわたって表示されるかを確認します。";
 
-    // 3. シナリオと関係なく、テキストオブジェクトを1つだけ作成します
     this.add.text(
         padding,
         textBoxY,
@@ -159,25 +158,35 @@ create() {
             fill: '#ffffff',
             wordWrap: {
                 width: textBoxWidth,
-                useAdvanced: true // 文字単位での折り返しを強制
+                useAdvanced: true
             },
             fixedWidth: textBoxWidth,
             fixedHeight: textBoxHeight
         }
     );
 
-    // 4. デバッグ用に、テキストボックスの領域を赤枠で可視化します
     const graphics = this.add.graphics();
-    graphics.lineStyle(2, 0xff0000, 1.0); // 赤色、太さ2px、不透明
+    graphics.lineStyle(2, 0xff0000, 1.0);
     graphics.strokeRect(padding, textBoxY, textBoxWidth, textBoxHeight);
 
     // --- ↑↑↑ ここまでデバッグ専用コード ↑↑↑ ---
 
-    // ※ 元のScenarioManager関連のコードは、このテスト中は実行されません
-    // this.scenarioManager = new ScenarioManager(this);
-    // this.scenarioManager.load('scene1');
-    // this.input.on('pointerdown', () => { ... });
-    // this.scenarioManager.next();
+    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+    // ★★★  ここから下の、元のコードをコメントアウトしてください  ★★★
+    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+    /*
+    // シナリオマネージャーを生成
+    this.scenarioManager = new ScenarioManager(this);
+    this.scenarioManager.load('scene1');
+
+    // クリックイベントの設定
+    this.input.on('pointerdown', () => {
+        this.scenarioManager.onClick();
+    });
+    
+    // 最初の行を実行開始
+    this.scenarioManager.next();
+    */
 }
 
     preload() {
