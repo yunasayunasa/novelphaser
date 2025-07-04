@@ -12,18 +12,28 @@ class ScenarioManager {
 
        // ゲーム画面の幅と高さをスケールマネージャーから取得
     const gameWidth = this.scene.scale.width;
-    const gameHeight = this.scene.scale.height;
+const gameHeight = this.scene.scale.height;
 
-    // テキストオブジェクトを画面下部に配置
-    this.textObject = this.scene.add.text(
-        gameWidth * 0.1, // 画面幅の10%の位置から
-        gameHeight * 0.7, // 画面高さの70%の位置から
-        '',
-        {
-            font: '36px sans-serif', // スマホなので少しフォントサイズを大きく
-            fill: '#ffffff',
-            wordWrap: { width: gameWidth * 0.8 } // 折り返し幅も画面幅の80%に
-        }
+// テキストを表示する「箱」のサイズと位置を定義
+const padding = gameWidth * 0.1; // 左右の余白
+const textBoxWidth = gameWidth - (padding * 2); // 箱の幅
+const textBoxHeight = gameHeight * 0.25; // 箱の高さ（画面高さの25%を確保）
+const textBoxY = gameHeight - textBoxHeight - (gameHeight * 0.05); // 箱を画面下から5%の位置に配置
+
+this.textObject = this.scene.add.text(
+    padding, // X座標
+    textBoxY,  // Y座標
+    '',
+    {
+        font: '36px sans-serif',
+        fill: '#ffffff',
+        wordWrap: { 
+            width: textBoxWidth // 箱の幅で折り返す
+        },
+        // ★★★ ここが重要 ★★★
+        fixedWidth: textBoxWidth,   // テキストオブジェクトの幅を固定
+        fixedHeight: textBoxHeight  // テキストオブジェクトの高さを固定
+    }
     );
 }
 
