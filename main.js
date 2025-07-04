@@ -18,7 +18,7 @@ const game = new Phaser.Game(config);
 function preload() {
     console.log("Preload: 準備中...");
     // ここでシナリオファイルを読み込む
-    this.load.text('scene1', 'scenario/scene1.ks'); // 'scenario'フォルダの'scene1.ks'を'scene1'という名前で読み込む
+    this.load.text('scene1', 'assets/scene1.ks'); // 'scenario'フォルダの'scene1.ks'を'scene1'という名前で読み込む
 }
 
 // create: ゲーム画面が作られた時に一度だけ呼ばれる関数
