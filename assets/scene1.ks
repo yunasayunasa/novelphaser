@@ -20,7 +20,7 @@
 
 ; 右に表示
 [chara_show name="yuna" pos="right" time=500]
-「右に登場！」
+「右に登場！」してタイプですおらとばせるかなどをかくにんしてなください
 [p]
 
 [chara_hide name="yuna" time=500]
