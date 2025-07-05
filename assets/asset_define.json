@@ -1,7 +1,8 @@
 {
   "images": {
     "message_window": "assets/message_window.png",
-    "yuna_smile": "assets/yuna_smile.png"
+    "yuna_smile": "assets/yuna_smile.png",
+     "bog_schol": "assets/bog_schol.jpg" 
   },
   "sounds": {},
   "characters": {
