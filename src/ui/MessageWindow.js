@@ -36,34 +36,29 @@ export default class MessageWindow extends Container{
             }
         );
 
-        // ★★★ 自身（コンテナ）に、作った要素を追加する ★★★
-        this.add([this.windowImage, this.textObject]);
-    // ★★★ テロップ表示用のプロパティを追加 ★★★
-        this.charByCharTimer = null; // 文字ごとのタイマーイベント
-        this.isTyping = false;       // 現在テロップ表示中かどうかのフラグ
-        // ★★★ シーンの表示リストに自身を追加する ★★★
-        scene.add.existing(this);
+        // ★★★ ここからデバッグ ★★★
 
-         // ★★★ クリック待ちアイコンを追加 ★★★
-        this.nextArrow = scene.add.image(
-            this.windowImage.x + (this.windowImage.width / 2) - 40, // ウィンドウ右端から少し内側
-            this.windowImage.y + (this.windowImage.height / 2) - 40, // ウィンドウ下端から少し内側
-            'next_arrow'
-        ).setVisible(false); // 最初は非表示
+    // 1. アイコンの座標を、画面中央などの絶対的な位置に固定してみる
+    const iconX = scene.scale.width / 2;
+    const iconY = scene.scale.height / 2;
+    
+    this.nextArrow = scene.add.image(iconX, iconY, 'next_arrow');
 
-        // ★★★ アイコンを自身（コンテナ）に追加 ★★★
-        this.add(this.nextArrow);
-        
-        // ★★★ アイコンのアニメーションを定義 ★★★
-        this.arrowTween = scene.tweens.add({
-            targets: this.nextArrow,
-            y: this.nextArrow.y - 10, // 10px上に移動
-            duration: 400,
-            ease: 'Sine.easeInOut',
-            yoyo: true,      // trueにすると、アニメーション後、元の状態に戻る
-            repeat: -1,      // -1で無限ループ
-            paused: true     // 最初は一時停止しておく
-        });
+    // 2. setVisible(false) を外して、最初から強制的に表示させる
+    // this.nextArrow.setVisible(false); 
+
+    // 3. 念のため、アイコンが一番手前に来るように深度を設定する
+    this.nextArrow.setDepth(100); 
+
+    // 4. アニメーションの定義を一時的にコメントアウトする
+    /*
+    this.arrowTween = scene.tweens.add({ ... });
+    */
+
+    this.add(this.nextArrow);
+    scene.add.existing(this);
+
+    // ★★★ デバッグここまで ★★★
     }
     
        // ★★★ アイコンを制御するメソッドを追加 ★★★
@@ -71,21 +66,16 @@ export default class MessageWindow extends Container{
      * クリック待ちアイコンを表示し、アニメーションを開始する
      */
     showNextArrow() {
-        this.nextArrow.setVisible(true);
-        if (this.arrowTween.isPaused()) {
-            this.arrowTween.resume();
-        }
-    }
-    
-    /**
-     * クリック待ちアイコンを非表示にし、アニメーションを停止する
-     */
-    hideNextArrow() {
-        this.nextArrow.setVisible(false);
-        if (this.arrowTween.isPlaying()) {
-            this.arrowTween.pause();
-        }
-    }
+    console.log("showNextArrow 呼び出し");
+    // this.nextArrow.setVisible(true);
+    // if (this.arrowTween.isPaused()) { this.arrowTween.resume(); }
+}
+
+hideNextArrow() {
+    console.log("hideNextArrow 呼び出し");
+    // this.nextArrow.setVisible(false);
+    // if (this.arrowTween.isPlaying()) { this.arrowTween.pause(); }
+}
 
     /**
      * テキストを設定するメソッド (大改造)
