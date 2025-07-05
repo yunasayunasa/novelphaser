@@ -49,25 +49,20 @@ export default class ScenarioManager {
         this.parse(line);
     }
     
-       onClick() {
-         console.log(`--- onClick! ---`);
-    console.log(`isTyping: ${this.messageWindow.isTyping}`);
-    console.log(`isWaitingClick: ${this.isWaitingClick}`);
-        // ★★★ テロップ表示中かどうかを最初にチェック ★★★
+         onClick() {
+        // ★★★ アイコン非表示 ★★★
+        this.messageWindow.hideNextArrow();
+
         if (this.messageWindow.isTyping) {
             this.messageWindow.skipTyping();
-            return; // スキップしただけなので、シナリオは進めない
+            // スキップした場合は、テロップ完了時にアイコンが表示されるので、
+            // ここでは何もしなくてOK
+            return;
         }
         
         if (this.isWaitingClick) {
             this.isWaitingClick = false;
-            // メッセージをクリアする必要はない。次のセリフで上書きされる。
-            // this.messageWindow.setText(''); 
             this.next();
-        } else {
-            // isWaitingClickがfalseの時は、次のセリフに進む（高速オートモード用）
-            // 今は何もしないでおく
-            // this.next(); 
         }
     }
 
@@ -75,11 +70,22 @@ export default class ScenarioManager {
 
     parse(line) {
         const trimedLine = line.trim();
-        if (trimedLine.startsWith('*') || trimedLine.startsWith(';')) {
-            this.next();
+  if (!trimedLine.startsWith('[')) {
+            const wrappedLine = this.manualWrap(trimedLine);
+            
+            this.isWaitingClick = true; 
+            this.messageWindow.setText(wrappedLine, true, () => {
+                // ★★★ テロップ完了後にアイコン表示 ★★★
+                this.messageWindow.showNextArrow();
+            });
             return;
         }
-
+  if (trimedLine === '[p]') {
+            this.isWaitingClick = true;
+            // ★★★ アイコン表示 ★★★
+            this.messageWindow.showNextArrow(); 
+            return;
+  }
            if (!trimedLine.startsWith('[')) {
             const wrappedLine = this.manualWrap(trimedLine);
 
@@ -92,6 +98,7 @@ export default class ScenarioManager {
                 // this.isWaitingClick = false; 
             });
             return; // ★★★重要★★★ ここでreturnし、next()は呼ばない！
+            
         }
         
         const { tagName, params } = this.parseTag(trimedLine);

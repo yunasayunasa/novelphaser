@@ -43,6 +43,48 @@ export default class MessageWindow extends Container{
         this.isTyping = false;       // 現在テロップ表示中かどうかのフラグ
         // ★★★ シーンの表示リストに自身を追加する ★★★
         scene.add.existing(this);
+
+         // ★★★ クリック待ちアイコンを追加 ★★★
+        this.nextArrow = scene.add.image(
+            this.windowImage.x + (this.windowImage.width / 2) - 40, // ウィンドウ右端から少し内側
+            this.windowImage.y + (this.windowImage.height / 2) - 40, // ウィンドウ下端から少し内側
+            'next_arrow'
+        ).setVisible(false); // 最初は非表示
+
+        // ★★★ アイコンを自身（コンテナ）に追加 ★★★
+        this.add(this.nextArrow);
+        
+        // ★★★ アイコンのアニメーションを定義 ★★★
+        this.arrowTween = scene.tweens.add({
+            targets: this.nextArrow,
+            y: this.nextArrow.y - 10, // 10px上に移動
+            duration: 400,
+            ease: 'Sine.easeInOut',
+            yoyo: true,      // trueにすると、アニメーション後、元の状態に戻る
+            repeat: -1,      // -1で無限ループ
+            paused: true     // 最初は一時停止しておく
+        });
+    }
+    
+       // ★★★ アイコンを制御するメソッドを追加 ★★★
+    /**
+     * クリック待ちアイコンを表示し、アニメーションを開始する
+     */
+    showNextArrow() {
+        this.nextArrow.setVisible(true);
+        if (this.arrowTween.isPaused()) {
+            this.arrowTween.resume();
+        }
+    }
+    
+    /**
+     * クリック待ちアイコンを非表示にし、アニメーションを停止する
+     */
+    hideNextArrow() {
+        this.nextArrow.setVisible(false);
+        if (this.arrowTween.isPlaying()) {
+            this.arrowTween.pause();
+        }
     }
 
     /**
