@@ -109,7 +109,7 @@ class ScenarioManager {
 
     /**
      * 1行のシナリオを解釈（パース）して、適切な処理を呼び出す
-     * @param {string} line - 解釈するシナリオの1行
+     * @param {string} line - 解釈するシナリオの1行.*/
     parse(line) {
         console.log(`実行: ${line}`);
         
