@@ -6,6 +6,7 @@ import { handleCharaHide } from '../handlers/chara_hide.js'; // これを有効�
 import { handlePageBreak } from '../handlers/p.js';
 import { handleWait } from '../handlers/wait.js'; // これも有効にする
 import { handleBg } from '../handlers/bg.js'; // これを追
+import MessageWindow from '../ui/MessageWindow.js';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -13,7 +14,7 @@ export default class GameScene extends Phaser.Scene {
         this.scenarioManager = null;
         this.layer = { background: null, character: null, message: null };
         this.charaDefs = null;
-        
+         this.messageWindow = null;
         // ★★★ 正しい位置はここです！ ★★★
         this.characters = {}; 
     }
@@ -33,7 +34,13 @@ export default class GameScene extends Phaser.Scene {
         this.layer.message = this.add.container(0, 0);
 
         this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs);
-       
+        // ★★★ MessageWindowを生成 ★★★
+        this.messageWindow = new MessageWindow(this);
+        // ★★★ メッセージレイヤーにMessageWindowを追加 ★★★
+        this.layer.message.add(this.messageWindow);
+
+        // ★★★ ScenarioManagerにmessageWindowを渡す ★★★
+        this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow);
         this.scenarioManager.registerTag('chara_show', handleCharaShow);
         this.scenarioManager.registerTag('chara_hide', handleCharaHide); // 有効化
         this.scenarioManager.registerTag('p', handlePageBreak);
