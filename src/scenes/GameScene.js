@@ -1,6 +1,6 @@
 import ScenarioManager from '../core/ScenarioManager.js';
 import { handleCharaShow } from '../handlers/chara_show.js';
-import { handleCharaHide } from '../handlers/chara_hide.js';
+//import { handleCharaHide } from '../handlers/chara_hide.js';
 import { handlePageBreak } from '../handlers/p.js';
 
 export default class GameScene extends Phaser.Scene {
