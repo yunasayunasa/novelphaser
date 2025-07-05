@@ -119,9 +119,12 @@ export default class ScenarioManager {
             console.warn(`未定義のタグです: [${tagName}]`);
             this.next();
         }
+   // ... parse メソッドの終わり
     }
 
-    parseTag(tagString) {
+    // --- 解析・ヘルパーメソッド ---
+
+    parseTag(tagString) { // ★★★ この形式に修正 ★★★
         const content = tagString.substring(1, tagString.length - 1);
         const parts = content.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
         const tagName = parts.shift() || '';
@@ -135,7 +138,7 @@ export default class ScenarioManager {
         return { tagName, params };
     }
     
-    manualWrap(text) {
+    manualWrap(text) { // ★★★ この形式に修正 ★★★
         let wrappedText = '';
         let currentLine = '';
         for (let i = 0; i < text.length; i++) {
