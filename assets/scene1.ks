@@ -1,7 +1,15 @@
-; yunaの定義は chara_define.ks で読み込み済み
+; yunaを表示
 [chara_show name="yuna" time=1000]
 
-「定義ファイルから、storageを指定せずに表示できました！」
+「登場しました！」
+[p]
+「少ししたら、消えます。」
 [p]
 
+; yunaを非表示
 [chara_hide name="yuna" time=1000]
+
+; 1秒待ってからセリフを表示
+[wait time=1000]
+
+「キャラクターが消えていれば成功です！」
