@@ -21,6 +21,8 @@ export default class GameScene extends Phaser.Scene {
         this.load.text('scene1', 'assets/scene1.ks');
         this.load.image('message_window', 'assets/message_window.png');
         this.load.text('chara_define', 'assets/chara_define.ks');
+         this.load.image('yuna_smile', 'assets/yuna_smile.png'); 
+}
     }
 
     // シーンが生成された時に呼ばれるメソッド
