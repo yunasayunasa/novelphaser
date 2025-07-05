@@ -1,12 +1,12 @@
 // --- ゲームエンジンの中核クラス ---
 class ScenarioManager {
-    // constructorの引数にlayersを追加
     constructor(scene, layers) {
         this.scene = scene;
-        this.layers = layers; // シーンから受け取ったレイヤーを保持
+        this.layers = layers;
         this.scenario = [];
         this.currentLine = 0;
         this.isWaitingClick = false;
+        this.tagHandlers = new Map();
 
         const gameWidth = this.scene.scale.width;
         const gameHeight = this.scene.scale.height;
@@ -107,54 +107,66 @@ class ScenarioManager {
         this.parse(line);
     }
 
+     registerTag(tagName, handler) {
+        this.tagHandlers.set(tagName, handler);
+    }
+
+       // ★★★ 汎用的なタグ解析メソッドを追加 ★★★
     /**
-     * 1行のシナリオを解釈（パース）して、適切な処理を呼び出す
-     * @param {string} line - 解釈するシナリオの1行.*/
-    parse(line) {
-        console.log(`実行: ${line}`);
+     * タグ文字列を解析して、タグ名とパラメータのオブジェクトを返す
+     * 例: "[chara_show storage="yuna" x=100]" -> { tagName: "chara_show", params: { storage: "yuna", x: "100" } }
+     * @param {string} tagString - タグの文字列
+     * @returns {{tagName: string, params: Object}}
+     */
+    parseTag(tagString) {
+        const content = tagString.substring(1, tagString.length - 1); // 角括弧[]を削除
+        const parts = content.match(/(?:[^\s"]+|"[^"]*")+/g) || []; // スペースで分割（""内は無視）
         
+        const tagName = parts.shift() || '';
+        const params = {};
+
+        parts.forEach(part => {
+            const [key, value] = part.split('=');
+            if (value) {
+                // 値から引用符 "" を削除
+                params[key] = value.replace(/"/g, '');
+            }
+        });
+
+        return { tagName, params };
+    }
+
+    // ★★★ parseメソッドを全面的に書き換え ★★★
+    parse(line) {
         const trimedLine = line.trim();
 
-        // ★★★ [chara_show] タグの処理を追加 ★★★
-        if (trimedLine.startsWith('[chara_show')) {
-            // 例: [chara_show storage="yuna_smile" x=360 y=800]
-            const storage = this.getTagValue(trimedLine, 'storage');
-            const x = Number(this.getTagValue(trimedLine, 'x'));
-            const y = Number(this.getTagValue(trimedLine, 'y'));
-
-            if (storage) {
-                // キャラクターレイヤーに画像を追加
-                const chara = this.scene.add.image(x, y, storage);
-                this.layers.character.add(chara);
-            }
-            this.next(); // すぐに次の行へ
+        // ラベル行やコメント行の処理（先頭で判定）
+        if (trimedLine.startsWith('*') || trimedLine.startsWith(';')) {
+            console.log("ラベルまたはコメントをスキップ:", trimedLine);
+            this.next();
             return;
         }
 
-        // [p] タグの処理
-        if (trimedLine === '[p]') {
-            this.isWaitingClick = true;
-            return;
+        // セリフ行の処理
+        if (!trimedLine.startsWith('[')) {
+            const wrappedLine = this.manualWrap(trimedLine);
+            this.textObject.setText(wrappedLine);
+            return; // セリフの場合はここで処理終了
         }
         
-        // その他のタグ（今は何もしない）
-        if (trimedLine.startsWith('[')) {
-            console.log("タグを検出（未実装）:", line);
-            this.next();
-            return;
-        }
+        // タグ行の処理
+        const { tagName, params } = this.parseTag(trimedLine);
+        const handler = this.tagHandlers.get(tagName);
 
-        // ラベル（*で始まる行）の処理（今は何もしない）
-        if (trimedLine.startsWith('*')) {
-            console.log("ラベルを検出（未実装）:", line);
-            this.next();
-            return;
+        if (handler) {
+            console.log(`タグ[${tagName}]を実行, パラメータ:`, params);
+            handler(this, params); // 登録された関数を実行
+        } else {
+            console.warn(`未定義のタグです: [${tagName}]`);
+            this.next(); // 不明なタグは無視して次に進む
         }
-
-        // セリフ表示
-        const wrappedLine = this.manualWrap(line);
-        this.textObject.setText(wrappedLine);
     }
+    
     
     // ★★★ タグの属性値を取得するためのヘルパー関数を追加 ★★★
     getTagValue(tagString, attribute) {
@@ -225,27 +237,23 @@ class GameScene extends Phaser.Scene {
      startGame() {
         console.log("Create: ゲーム開始！");
         this.cameras.main.setBackgroundColor('#000000');
-
-        // ★★★ レイヤーを作成する ★★★
-        // Phaserのコンテナ機能を使って、オブジェクトをまとめる入れ物を作る
-        // 作成順がそのまま重なり順になる（後から作ったものが上に来る）
         this.layer.background = this.add.container(0, 0);
         this.layer.character = this.add.container(0, 0);
         this.layer.message = this.add.container(0, 0);
 
-        // シナリオマネージャーを生成（引数にレイヤーを渡す）
         this.scenarioManager = new ScenarioManager(this, this.layer);
-        this.scenarioManager.load('scene1');
-
-        // クリックイベントの設定
-        this.input.on('pointerdown', () => {
-            this.scenarioManager.onClick();
-        });
         
-        // 最初の行を実行開始
+        // ★★★ ここでタグをエンジンに登録する ★★★
+        this.scenarioManager.registerTag('chara_show', handleCharaShow);
+        this.scenarioManager.registerTag('p', handlePageBreak);
+        // 新しいタグを追加する時は、ここに一行追加するだけでOK！
+
+        this.scenarioManager.load('scene1');
+        this.input.on('pointerdown', () => { this.scenarioManager.onClick(); });
         this.scenarioManager.next();
     }
 }
+
 
 
 // --- Phaserのゲーム設定 ---
