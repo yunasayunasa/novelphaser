@@ -1,5 +1,5 @@
 ; まず背景を表示
-[bg storage="bg_school" time=1500]
+[bg storage="bog_schol" time=1500]
 
 「背景が表示されました。」
 [p]
