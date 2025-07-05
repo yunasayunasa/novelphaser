@@ -36,46 +36,57 @@ export default class MessageWindow extends Container{
             }
         );
 
-        // ★★★ ここからデバッグ ★★★
+       // ★★★ ここからがアイコンの修正 ★★★
 
-    // 1. アイコンの座標を、画面中央などの絶対的な位置に固定してみる
-    const iconX = scene.scale.width / 2;
-    const iconY = scene.scale.height / 2;
+    // 1. アイコンの基準座標を計算
+    const iconX = (gameWidth / 2) + (this.windowImage.width / 2) - 60; // ウィンドウ右端から60px内側
+    const iconY = windowY + (this.windowImage.height / 2) - 50;       // ウィンドウ下端から50px内側
     
+    // 2. アイコンを生成し、サイズを調整
     this.nextArrow = scene.add.image(iconX, iconY, 'next_arrow');
+    this.nextArrow.setScale(0.5); // ★★★ サイズを半分にする ★★★
+    this.nextArrow.setVisible(false);
 
-    // 2. setVisible(false) を外して、最初から強制的に表示させる
-    // this.nextArrow.setVisible(false); 
+    // 3. アニメーションの定義
+    // yoyoで戻る距離も、スケールに合わせて小さくする
+    const arrowMoveDistance = 10 * this.nextArrow.scaleY; 
+    this.arrowTween = scene.tweens.add({
+        targets: this.nextArrow,
+        y: this.nextArrow.y - arrowMoveDistance, // 少しだけ上に移動
+        duration: 400,
+        ease: 'Sine.easeInOut',
+        yoyo: true,
+        repeat: -1,
+        paused: true
+    });
 
-    // 3. 念のため、アイコンが一番手前に来るように深度を設定する
-    this.nextArrow.setDepth(100); 
+    // 4. すべての要素をコンテナに追加
+    this.add([this.windowImage, this.textObject, this.nextArrow]);
 
-    // 4. アニメーションの定義を一時的にコメントアウトする
-    /*
-    this.arrowTween = scene.tweens.add({ ... });
-    */
-
-    this.add(this.nextArrow);
+    // 5. シーンに自身を登録
     scene.add.existing(this);
-
-    // ★★★ デバッグここまで ★★★
-    }
+}
     
        // ★★★ アイコンを制御するメソッドを追加 ★★★
     /**
      * クリック待ちアイコンを表示し、アニメーションを開始する
      */
     showNextArrow() {
-    console.log("showNextArrow 呼び出し");
-    // this.nextArrow.setVisible(true);
-    // if (this.arrowTween.isPaused()) { this.arrowTween.resume(); }
-}
-
-hideNextArrow() {
-    console.log("hideNextArrow 呼び出し");
-    // this.nextArrow.setVisible(false);
-    // if (this.arrowTween.isPlaying()) { this.arrowTween.pause(); }
-}
+        this.nextArrow.setVisible(true);
+        if (this.arrowTween.isPaused()) {
+            this.arrowTween.resume();
+        }
+    }
+    
+    /**
+     * クリック待ちアイコンを非表示にし、アニメーションを停止する
+     */
+    hideNextArrow() {
+        this.nextArrow.setVisible(false);
+        if (this.arrowTween.isPlaying()) {
+            this.arrowTween.pause();
+        }
+    }
 
     /**
      * テキストを設定するメソッド (大改造)
