@@ -14,6 +14,19 @@ export function handleCharaShow(manager, params) {
         return;
     }
 
+    // ★★★ キャラクター定義を取得 ★★★
+    const def = manager.characterDefs[name];
+    if (!def) {
+        console.warn(`キャラクター[${name}]の定義が見つかりません。chara_define.ksを確認してください。`);
+        manager.next();
+        return;
+    }
+    
+    // ★★★ storageが指定されていなければ、定義情報を使う ★★★
+    // これにより、表情差分なども [chara_show name="yuna" storage="yuna_angry.png"] のように上書きできる
+    const storage = params.storage || def.storage;
+
+
     const x = Number(params.x) || manager.scene.scale.width / 2;
     const y = Number(params.y) || manager.scene.scale.height / 2;
     const time = Number(params.time) || 0; // フェードインの時間（ミリ秒）

@@ -1,7 +1,7 @@
-これはテストです。
-[chara_show storage="yuna_smile" x=360 y=800 time=1000]
-一行ずつ表示されるはずです。
+; yunaの定義は chara_define.ks で読み込み済み
+[chara_show name="yuna" time=1000]
+
+「定義ファイルから、storageを指定せずに表示できました！」
 [p]
-クリックを待ってから、次の行が表示されます。長文テストです。これらのテキストが完璧に表示されていれば成功です。
-*end
-ゲームの終わり。
+
+[chara_hide name="yuna" time=1000]

@@ -20,7 +20,7 @@ export default class GameScene extends Phaser.Scene {
         this.load.script('webfont', 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js');
         this.load.text('scene1', 'assets/scene1.ks');
         this.load.image('message_window', 'assets/message_window.png');
-        this.load.image('yuna_smile', 'assets/yuna_smile.png');
+        this.load.text('chara_define', 'assets/chara_define.ks');
     }
 
     // シーンが生成された時に呼ばれるメソッド
@@ -49,13 +49,17 @@ export default class GameScene extends Phaser.Scene {
         // シナリオマネージャーを生成
         this.scenarioManager = new ScenarioManager(this, this.layer);
         
-        // タグハンドラを登録
+         // タグハンドラを登録
         this.scenarioManager.registerTag('chara_show', handleCharaShow);
+        this.scenarioManager.registerTag('chara_hide', handleCharaHide); // chara_hideも忘れずに
         this.scenarioManager.registerTag('p', handlePageBreak);
+        // ★★★ chara_new タグを追加 ★★★
+        this.scenarioManager.registerTag('chara_new', handleCharaNew);
+
+        // ★★★ ゲーム開始前に、キャラクター定義を読み込ませる ★★★
+        this.scenarioManager.loadDefinitions('chara_define');
 
         // シナリオを読み込んで開始
         this.scenarioManager.load('scene1');
-        this.input.on('pointerdown', () => { this.scenarioManager.onClick(); });
-        this.scenarioManager.next();
     }
 }

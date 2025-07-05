@@ -9,6 +9,7 @@ export default class ScenarioManager {
         this.currentLine = 0;
         this.isWaitingClick = false;
         this.tagHandlers = new Map();
+        this.characterDefs = {};
 
         const gameWidth = this.scene.scale.width;
         const gameHeight = this.scene.scale.height;
@@ -108,6 +109,32 @@ export default class ScenarioManager {
         this.scenario = rawText.split(/\r\n|\n|\r/).filter(line => line.trim() !== '');
         this.currentLine = 0;
         console.log("シナリオを解析しました:", this.scenario);
+    }
+
+     // ★★★ 定義ファイル専用の解析メソッドを追加 ★★★
+    /**
+     * 定義ファイルなどを解析し、定義情報を登録する
+     * @param {string} scenarioKey - 読み込んだ定義ファイルのキー
+     */
+    loadDefinitions(scenarioKey) {
+        const rawText = this.scene.cache.text.get(scenarioKey);
+        if (!rawText) return;
+
+        const lines = rawText.split(/\r\n|\n|\r/);
+        for (const line of lines) {
+            const trimedLine = line.trim();
+            if (trimedLine.startsWith('[chara_new')) {
+                const { tagName, params } = this.parseTag(trimedLine);
+                const handler = this.tagHandlers.get(tagName);
+                if (handler) {
+                    handler(this, params);
+                }
+            }
+            // *stop で解析を終了
+            if (trimedLine.startsWith('*stop')) {
+                break;
+            }
+        }
     }
 
     next() {
