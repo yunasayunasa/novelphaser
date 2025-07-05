@@ -252,7 +252,7 @@ class GameScene extends Phaser.Scene {
 const config = {
     type: Phaser.AUTO, // WebGLが使えるならWebGLを、そうでなければCanvasを使う
     scale: {
-        mode: Phaser.Scale.ENVELOP,
+        mode: Phaser.Scale.FIT,
         parent: 'phaser-game',
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: 720,  // "基準"となる幅（スマホ縦持ちを想定）
