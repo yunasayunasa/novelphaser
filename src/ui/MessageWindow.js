@@ -69,40 +69,36 @@ export default class MessageWindow extends Container{
         this.isTyping = true;
         let index = 0;
         
-      // ★★★ タイマーに、後で使う情報を追加 ★★★
-        const timerConfig = {
+       // ★★★ タイマーイベントを作成 ★★★
+        this.charByCharTimer = this.scene.time.addEvent({
             delay: 50,
             callback: () => {
-                // callbackScope(this)から全文を取得して、表示テキストに追加
-                this.textObject.text += timerConfig.fullText[index];
+                // ★★★ this.charByCharTimer から直接 fullText を参照する ★★★
+                this.textObject.text += this.charByCharTimer.fullText[index];
                 index++;
-                if (index === timerConfig.fullText.length) {
+
+                if (index === this.charByCharTimer.fullText.length) {
                     this.charByCharTimer.remove();
                     this.isTyping = false;
                     onComplete();
                 }
             },
             callbackScope: this,
-            loop: true,
-            
-            // ★★★ カスタムプロパティとして全文を保存 ★★★
-            fullText: text 
-        };
+            loop: true
+        });
         
-        this.charByCharTimer = this.scene.time.addEvent(timerConfig);
+        // ★★★ 作成したタイマーオブジェクトに、後からプロパティを追加する ★★★
+        this.charByCharTimer.fullText = text;
     }
     
     skipTyping() {
         if (!this.isTyping) return;
 
-        // タイマーに保存した全文を取得
-        const fullText = this.charByCharTimer.getConfig().fullText;
-        
+        // ★★★ タイマーオブジェクトから直接 fullText プロパティを取得 ★★★
+        this.textObject.setText(this.charByCharTimer.fullText);
+
         this.charByCharTimer.remove();
         this.isTyping = false;
-        this.textObject.setText(fullText);
-        // ★★★ スキップ時は完了コールバックを呼ばないのが一般的 ★★★
-        // なぜなら、次の行に進んでしまうとプレイヤーが文章を読む時間がないため。
     }
 
     /**
