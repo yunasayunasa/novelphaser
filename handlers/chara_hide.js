@@ -1,5 +1,8 @@
-// src/handlers/chara_hide.js
-
+/**
+ * [chara_hide] タグの処理
+ * @param {ScenarioManager} manager - シナリオマネージャーのインスタンス
+ * @param {Object} params - {name, time}
+ */
 export function handleCharaHide(manager, params) {
     const name = params.name;
     if (!name) {
