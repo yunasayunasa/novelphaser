@@ -147,7 +147,7 @@ class GameScene extends Phaser.Scene {
     preload() {
         console.log("Preload: 準備中...");
         this.load.script('webfont', 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js');
-        this.load.text('scene1', 'assets/scene1.js');
+        this.load.text('scene1', 'assets/scene1.ks');
         this.load.image('message_window', 'assets/message_window.png');
         this.load.image('yuna_smile', 'assets/yuna_smile.png');
     }
