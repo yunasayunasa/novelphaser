@@ -7,6 +7,8 @@ import { handlePageBreak } from '../handlers/p.js';
 import { handleWait } from '../handlers/wait.js'; // これも有効にする
 import { handleBg } from '../handlers/bg.js'; // これを追
 import MessageWindow from '../ui/MessageWindow.js';
+import { Layout } from '../core/Layout.js'; // これを追加
+
 
 export default class GameScene extends Phaser.Scene {
     constructor() {

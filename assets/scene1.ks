@@ -1,17 +1,26 @@
 ; まず背景を表示
-[bg storage="bog_schol" time=1500]
+[bg storage="bog_schol" time=500]
+[wait time=500]
 
-「背景が表示されました。」
+; センターに表示
+[chara_show name="yuna" pos="center" time=500]
+「センターに登場！」
 [p]
 
-; キャラクターを表示
-[chara_show name="yuna" time=1000]
+[chara_hide name="yuna" time=500]
+[wait time=500]
 
-「背景の前に、キャラクターが表示されていれば成功です。」
+; 左に表示
+[chara_show name="yuna" pos="left" time=500]
+「左に登場！」
 [p]
 
-[chara_hide name="yuna" time=1000]
+[chara_hide name="yuna" time=500]
+[wait time=500]
 
-; (もし別の背景画像があれば、ここで切り替えテスト)
-; [bg storage="bg_sunset" time=1500]
-; 「背景がクロスフェードで切り替わりましたか？」
+; 右に表示
+[chara_show name="yuna" pos="right" time=500]
+「右に登場！」
+[p]
+
+[chara_hide name="yuna" time=500]

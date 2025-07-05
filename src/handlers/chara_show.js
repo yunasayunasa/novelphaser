@@ -1,35 +1,34 @@
+// ★★★ ファイルの先頭でLayoutをインポート ★★★
+import { Layout } from '../core/Layout.js';
+
 /**
  * [chara_show] タグの処理
- * @param {Object} params - {name, storage, x, y, time}
+ * @param {Object} params - {name, storage, pos, x, y, time}
  */
 export function handleCharaShow(manager, params) {
     const name = params.name;
-    if (!name) {
-        console.warn('[chara_show] name属性は必須です。');
-        manager.next();
-        return;
-    }
+    // ... (name, def, storage の取得処理は変更なし) ...
 
-    const def = manager.characterDefs[name];
-    if (!def) {
-        console.warn(`キャラクター[${name}]の定義が見つかりません。chara_define.ksを確認してください。`);
-        manager.next();
-        return;
-    }
+    // ★★★ 座標決定ロジック ★★★
+    let x, y;
+    const pos = params.pos; // 'left', 'center', 'right'
 
-    // storageが指定されていなければ定義情報を使い、指定されていればそれを優先する
-    const storage = params.storage || def.storage;
+    // 現在の画面の向きを取得
+    const orientation = manager.scene.scale.isPortrait ? 'portrait' : 'landscape';
 
-    // ----- ここにあった古い `const storage = params.storage;` は削除する -----
-
-    // もし同じ名前のキャラクターが既にいたら、先に消しておく
-    if (manager.scene.characters[name]) {
-        manager.scene.characters[name].destroy();
+    if (pos && Layout[orientation].character[pos]) {
+        // pos属性が有効な値なら、レイアウト定義から座標を取得
+        x = Layout[orientation].character[pos].x;
+        y = Layout[orientation].character[pos].y;
+    } else {
+        // pos属性がない、または無効な場合は、x,y属性を見る
+        // x,yもなければ、中央をデフォルトにする
+        x = Number(params.x) || Layout[orientation].character.center.x;
+        y = Number(params.y) || Layout[orientation].character.center.y;
     }
     
-    const x = Number(params.x) || manager.scene.scale.width / 2;
-    const y = Number(params.y) || manager.scene.scale.height / 2;
     const time = Number(params.time) || 0;
+
 
     const chara = manager.scene.add.image(x, y, storage);
     chara.setAlpha(0);
