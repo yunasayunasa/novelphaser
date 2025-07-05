@@ -23,44 +23,31 @@ export default class GameScene extends Phaser.Scene {
 
     // アセットのプリロードを行うメソッド
     // preloadメソッドは大幅にスリム化
+     // ★★★ preloadからWebフォント関連を削除 ★★★
     preload() {
         console.log("GameScene: 準備中...");
-        // アセットはPreloadSceneで読み込み済みなので、ここではシナリオだけ
         this.load.text('scene1', 'assets/scene1.ks');
     }
 
-    create() {
-        // WebFontの読み込みは、GameSceneが始まる時点では完了しているはずなので、
-        // PreloadSceneに移動させるのがベターだが、一旦ここに残してもOK
-        WebFont.load({
-            google: { families: ['Noto Sans JP'] },
-            active: () => this.startGame(),
-            inactive: () => this.startGame()
-        });
-    }
-
-
-    // ゲームのメインロジックを開始するメソッド
-    startGame() {
-        console.log("Create: ゲーム開始！");
+    // ★★★ createをstartGameに統合し、シンプルにする ★★★
+    create(data) {
+        // initメソッドはcreateの前に呼ばれるので、this.charaDefsはここで使える
+        console.log("GameScene: ゲーム開始！");
         this.cameras.main.setBackgroundColor('#000000');
         
-        // レイヤーを生成
         this.layer.background = this.add.container(0, 0);
         this.layer.character = this.add.container(0, 0);
         this.layer.message = this.add.container(0, 0);
 
-        // シナリオマネージャーを生成
-         this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs);
-         // ★★★ タグ登録からchara_newを削除 ★★★
+        this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs);
+        
         this.scenarioManager.registerTag('chara_show', handleCharaShow);
         this.scenarioManager.registerTag('chara_hide', handleCharaHide);
         this.scenarioManager.registerTag('p', handlePageBreak);
 
-        // loadDefinitionsの呼び出しは削除
         this.scenarioManager.load('scene1');
-
-        // シナリオを読み込んで開始
-        this.scenarioManager.load('scene1');
+        
+        this.input.on('pointerdown', () => { this.scenarioManager.onClick(); });
+        this.scenarioManager.next();
     }
 }

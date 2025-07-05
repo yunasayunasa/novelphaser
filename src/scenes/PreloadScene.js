@@ -5,9 +5,14 @@ export default class PreloadScene extends Phaser.Scene {
 
     preload() {
         console.log("PreloadScene: 準備中...");
-        // まずはアセット定義ファイルだけを読み込む
+           // ★★★ ここでWebフォントローダーを読み込む ★★★
+        this.load.script('webfont', 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js');
+
+        // アセット定義ファイルも読み込む
         this.load.json('asset_define', 'assets/asset_define.json');
     }
+       
+    
 
     create() {
         console.log("PreloadScene: アセット定義を読み込み、ロードを開始します。");
