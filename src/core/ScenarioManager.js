@@ -6,7 +6,8 @@ export default class ScenarioManager {
         this.currentLine = 0;
         this.isWaitingClick = false;
         this.tagHandlers = new Map();
-        this.characterDefs = {};
+         // ★★★ GameSceneから直接受け取る ★★★
+    this.characterDefs = charaDefs || {};
 
         const gameWidth = this.scene.scale.width;
         const gameHeight = this.scene.scale.height;

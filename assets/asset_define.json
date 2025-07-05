@@ -1,0 +1,13 @@
+{
+  "images": {
+    "message_window": "assets/message_window.png",
+    "yuna_smile": "assets/yuna_smile.png"
+  },
+  "sounds": {},
+  "characters": {
+    "yuna": {
+      "jname": "優奈",
+      "storage": "yuna_smile"
+    }
+  }
+}

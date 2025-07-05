@@ -1,8 +1,8 @@
 // 必要なモジュールをインポート
 import ScenarioManager from '../core/ScenarioManager.js';
 import { handleCharaShow } from '../handlers/chara_show.js';
+import { handleCharaHide } from '../handlers/chara_hide.js';
 import { handlePageBreak } from '../handlers/p.js';
-
 // GameSceneクラスを定義し、デフォルトとしてエクスポート
 export default class GameScene extends Phaser.Scene {
    constructor() {
@@ -14,29 +14,31 @@ export default class GameScene extends Phaser.Scene {
         this.layer = { background: null, character: null, message: null };
     }
 
-    // アセットのプリロードを行うメソッド
-    preload() {
-        console.log("Preload: 準備中...");
-        this.load.script('webfont', 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js');
-        this.load.text('scene1', 'assets/scene1.ks');
-        this.load.image('message_window', 'assets/message_window.png');
-        this.load.text('chara_define', 'assets/chara_define.ks');
-         this.load.image('yuna_smile', 'assets/yuna_smile.png'); 
-}
-    
+    // ★★★ initメソッドを追加 ★★★
+    // 他のシーンからデータを受け取るためのメソッド
+    init(data) {
+        // PreloadSceneから渡されたキャラクター定義を受け取る
+        this.charaDefs = data.charaDefs;
+    }
 
-    // シーンが生成された時に呼ばれるメソッド
+    // アセットのプリロードを行うメソッド
+    // preloadメソッドは大幅にスリム化
+    preload() {
+        console.log("GameScene: 準備中...");
+        // アセットはPreloadSceneで読み込み済みなので、ここではシナリオだけ
+        this.load.text('scene1', 'assets/scene1.ks');
+    }
+
     create() {
-        // Webフォントの読み込みを待ってからゲームを開始する
+        // WebFontの読み込みは、GameSceneが始まる時点では完了しているはずなので、
+        // PreloadSceneに移動させるのがベターだが、一旦ここに残してもOK
         WebFont.load({
             google: { families: ['Noto Sans JP'] },
             active: () => this.startGame(),
-            inactive: () => {
-                console.error("Webフォントの読み込みに失敗しました。");
-                this.startGame();
-            }
+            inactive: () => this.startGame()
         });
     }
+
 
     // ゲームのメインロジックを開始するメソッド
     startGame() {
@@ -49,17 +51,14 @@ export default class GameScene extends Phaser.Scene {
         this.layer.message = this.add.container(0, 0);
 
         // シナリオマネージャーを生成
-        this.scenarioManager = new ScenarioManager(this, this.layer);
-        
-         // タグハンドラを登録
+         this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs);
+         // ★★★ タグ登録からchara_newを削除 ★★★
         this.scenarioManager.registerTag('chara_show', handleCharaShow);
-        this.scenarioManager.registerTag('chara_hide', handleCharaHide); // chara_hideも忘れずに
+        this.scenarioManager.registerTag('chara_hide', handleCharaHide);
         this.scenarioManager.registerTag('p', handlePageBreak);
-        // ★★★ chara_new タグを追加 ★★★
-        this.scenarioManager.registerTag('chara_new', handleCharaNew);
 
-        // ★★★ ゲーム開始前に、キャラクター定義を読み込ませる ★★★
-        this.scenarioManager.loadDefinitions('chara_define');
+        // loadDefinitionsの呼び出しは削除
+        this.scenarioManager.load('scene1');
 
         // シナリオを読み込んで開始
         this.scenarioManager.load('scene1');
