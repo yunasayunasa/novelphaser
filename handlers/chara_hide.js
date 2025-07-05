@@ -1,9 +1,5 @@
-/**
- * [chara_hide] タグの処理
- * 指定された名前のキャラクターを非表示にする
- * @param {ScenarioManager} manager - シナリオマネージャーのインスタンス
- * @param {Object} params - {name, time}
- */
+// src/handlers/chara_hide.js
+
 export function handleCharaHide(manager, params) {
     const name = params.name;
     if (!name) {
