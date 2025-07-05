@@ -12,9 +12,11 @@ export function handleBg(manager, params) {
         return;
     }
 
-    const time = Number(params.time) || 0;
+      const time = Number(params.time) || 0;
     const scene = manager.scene;
     const bgLayer = manager.layers.background;
+    const gameWidth = scene.scale.width;
+    const gameHeight = scene.scale.height;
 
        // 新しい背景画像を作成
     const newBg = scene.add.image(gameWidth / 2, gameHeight / 2, storage);
