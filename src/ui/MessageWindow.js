@@ -1,8 +1,8 @@
-// PhaserのContainerクラスをインポート
-import Container = Phaser.GameObjects.Container;
+// ★★★ 先頭の import 文を削除し、この行を代わりに追加 ★★★
+const Container = Phaser.GameObjects.Container;
 
 // MessageWindowクラスを定義し、エクスポート
-export default class MessageWindow extends Container {
+export default class MessageWindow extends Container{
 
     constructor(scene) {
         // 親クラス(Container)のコンストラクタを呼び出す
