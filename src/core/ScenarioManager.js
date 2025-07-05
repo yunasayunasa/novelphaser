@@ -49,13 +49,22 @@ export default class ScenarioManager {
         this.parse(line);
     }
     
-    onClick() {
+       onClick() {
+        // ★★★ テロップ表示中かどうかを最初にチェック ★★★
+        if (this.messageWindow.isTyping) {
+            this.messageWindow.skipTyping();
+            return; // スキップしただけなので、シナリオは進めない
+        }
+        
         if (this.isWaitingClick) {
             this.isWaitingClick = false;
-            this.messageWindow.setText('');
+            // メッセージをクリアする必要はない。次のセリフで上書きされる。
+            // this.messageWindow.setText(''); 
             this.next();
         } else {
-            this.next();
+            // isWaitingClickがfalseの時は、次のセリフに進む（高速オートモード用）
+            // 今は何もしないでおく
+            // this.next(); 
         }
     }
 
@@ -68,10 +77,18 @@ export default class ScenarioManager {
             return;
         }
 
-        if (!trimedLine.startsWith('[')) {
+           if (!trimedLine.startsWith('[')) {
             const wrappedLine = this.manualWrap(trimedLine);
-            this.messageWindow.setText(wrappedLine);
-            return;
+
+            // ★★★ テロップ表示をリクエストし、完了したらnextを呼ぶようにする ★★★
+            // isWaitingClickをtrueにして、テロップ表示中はクリックしても進まないようにする
+            this.isWaitingClick = true; 
+            this.messageWindow.setText(wrappedLine, true, () => {
+                // テロップ完了後、クリック待ち状態を解除
+                // ただし、[p]タグの挙動と合わせるため、ここでは解除しないでおく
+                // this.isWaitingClick = false; 
+            });
+            return; // ★★★重要★★★ ここでreturnし、next()は呼ばない！
         }
         
         const { tagName, params } = this.parseTag(trimedLine);
