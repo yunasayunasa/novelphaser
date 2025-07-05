@@ -50,6 +50,9 @@ export default class ScenarioManager {
     }
     
        onClick() {
+         console.log(`--- onClick! ---`);
+    console.log(`isTyping: ${this.messageWindow.isTyping}`);
+    console.log(`isWaitingClick: ${this.isWaitingClick}`);
         // ★★★ テロップ表示中かどうかを最初にチェック ★★★
         if (this.messageWindow.isTyping) {
             this.messageWindow.skipTyping();
