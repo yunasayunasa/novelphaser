@@ -1,5 +1,5 @@
-export default class ScenarioManager {export default class ScenarioManager {
-    /**
+export default class ScenarioManager {
+    
      * @param {Phaser.Scene} scene - このマネージャーが属するPhaserのシーン
      * @param {Object} layers - ゲームの各レイヤー（コンテナ）
      * @param {Object} charaDefs - キャラクター定義情報
