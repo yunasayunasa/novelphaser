@@ -68,49 +68,55 @@ export default class ScenarioManager {
 
     // --- 解析・ヘルパーメソッド ---
 
+     /**
+     * 1行のシナリオを解釈（パース）して、適切な処理を呼び出す
+     * @param {string} line - 解釈するシナリオの1行
+     */
     parse(line) {
         const trimedLine = line.trim();
-  if (!trimedLine.startsWith('[')) {
-            const wrappedLine = this.manualWrap(trimedLine);
-            
-            this.isWaitingClick = true; 
-            this.messageWindow.setText(wrappedLine, true, () => {
-                // ★★★ テロップ完了後にアイコン表示 ★★★
-                this.messageWindow.showNextArrow();
-            });
+
+        // 1. 無視する行の判定 (コメント、ラベル)
+        if (trimedLine.startsWith(';') || trimedLine.startsWith('*')) {
+            // 何もせず、すぐに次の行の処理へ
+            this.next();
             return;
         }
-  if (trimedLine === '[p]') {
-            this.isWaitingClick = true;
-            // ★★★ アイコン表示 ★★★
-            this.messageWindow.showNextArrow(); 
-            return;
-  }
-           if (!trimedLine.startsWith('[')) {
-            const wrappedLine = this.manualWrap(trimedLine);
 
-            // ★★★ テロップ表示をリクエストし、完了したらnextを呼ぶようにする ★★★
-            // isWaitingClickをtrueにして、テロップ表示中はクリックしても進まないようにする
-            this.isWaitingClick = true; 
-            this.messageWindow.setText(wrappedLine, true, () => {
-                // テロップ完了後、クリック待ち状態を解除
-                // ただし、[p]タグの挙動と合わせるため、ここでは解除しないでおく
-                // this.isWaitingClick = false; 
-            });
-            return; // ★★★重要★★★ ここでreturnし、next()は呼ばない！
-            
+        // 2. [p] タグの判定 (クリック待ち)
+        if (trimedLine === '[p]') {
+            this.isWaitingClick = true;
+            this.messageWindow.showNextArrow();
+            return;
         }
         
-        const { tagName, params } = this.parseTag(trimedLine);
-        const handler = this.tagHandlers.get(tagName);
-
-        if (handler) {
-            console.log(`タグ[${tagName}]を実行, パラメータ:`, params);
-            handler(this, params);
-        } else {
-            console.warn(`未定義のタグです: [${tagName}]`);
-            this.next();
+        // 3. その他のタグの判定
+        if (trimedLine.startsWith('[')) {
+            const { tagName, params } = this.parseTag(trimedLine);
+            const handler = this.tagHandlers.get(tagName);
+    
+            if (handler) {
+                // 登録済みのタグハンドラを実行
+                console.log(`タグ[${tagName}]を実行, パラメータ:`, params);
+                handler(this, params);
+            } else {
+                // 未定義のタグは警告を出し、無視して次に進む
+                console.warn(`未定義のタグです: [${tagName}]`);
+                this.next();
+            }
+            // タグの処理が完了したので、ここで終了
+            return;
         }
+
+        // 4. 上記のいずれでもなければセリフ行と確定
+        const wrappedLine = this.manualWrap(trimedLine);
+        
+        // テロップ表示中はクリックしても進まないようにする
+        this.isWaitingClick = true; 
+        
+        // テロップ表示をリクエストし、完了したら矢印を出すコールバックを渡す
+        this.messageWindow.setText(wrappedLine, true, () => {
+            this.messageWindow.showNextArrow();
+        });
     }
 
     parseTag(tagString) {
