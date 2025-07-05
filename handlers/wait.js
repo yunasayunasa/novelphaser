@@ -6,9 +6,8 @@
 export function handleWait(manager, params) {
     const time = Number(params.time) || 0;
     if (time > 0) {
-        // Phaserのタイマー機能を使う
         manager.scene.time.delayedCall(time, () => {
-            manager.next(); // 指定時間後に次の行へ
+            manager.next();
         });
     } else {
         manager.next();
