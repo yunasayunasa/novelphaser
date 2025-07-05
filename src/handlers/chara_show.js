@@ -1,19 +1,46 @@
+// src/handlers/chara_show.js
+
 /**
  * [chara_show] タグの処理
+ * キャラクターを表示し、time属性があればフェードインさせる
  * @param {ScenarioManager} manager - シナリオマネージャーのインスタンス
- * @param {Object} params - タグのパラメータ
+ * @param {Object} params - タグのパラメータ {storage, x, y, time}
  */
 export function handleCharaShow(manager, params) {
     const storage = params.storage;
-    // パラメータが指定されていない場合のデフォルト値を設定
+    if (!storage) {
+        console.warn('[chara_show] storage属性は必須です。');
+        manager.next();
+        return;
+    }
+
     const x = Number(params.x) || manager.scene.scale.width / 2;
     const y = Number(params.y) || manager.scene.scale.height / 2;
+    const time = Number(params.time) || 0; // フェードインの時間（ミリ秒）
 
-    if (storage) {
-        const chara = manager.scene.add.image(x, y, storage);
-        manager.layers.character.add(chara);
+    // まずは透明な状態でキャラクターを配置
+    const chara = manager.scene.add.image(x, y, storage);
+    chara.setAlpha(0); // 透明度を0（完全に見えない）に設定
+    manager.layers.character.add(chara);
+
+    // timeが0より大きい場合、フェードインのTweenを実行
+    if (time > 0) {
+        manager.scene.tweens.add({
+            targets: chara,      // 対象オブジェクト
+            alpha: 1,            // 目標の透明度 (1 = 完全に見える)
+            duration: time,      // アニメーション時間
+            ease: 'Linear',      // イージング（変化の仕方）、今回は一定速度
+            
+            // ★★★ アニメーション完了時に呼ばれるコールバック ★★★
+            onComplete: () => {
+                console.log('フェードイン完了');
+                // アニメーションが終わったら、次のシナリオ行へ進む
+                manager.next();
+            }
+        });
+    } else {
+        // timeが指定されていない、または0の場合は、すぐに表示して次に進む
+        chara.setAlpha(1);
+        manager.next();
     }
-    
-    // このタグは待たずに次の行へ進む
-    manager.next();
 }
