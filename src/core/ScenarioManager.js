@@ -1,13 +1,15 @@
 export default class ScenarioManager {
-    constructor(scene, layers) {
+     constructor(scene, layers, charaDefs) { // ★★★ 引数に charaDefs を追加 ★★★
         this.scene = scene;
         this.layers = layers;
         this.scenario = [];
         this.currentLine = 0;
         this.isWaitingClick = false;
         this.tagHandlers = new Map();
-         // ★★★ GameSceneから直接受け取る ★★★
-    this.characterDefs = charaDefs || {};
+        
+        // ★★★ これで正しく受け取れる ★★★
+        this.characterDefs = charaDefs || {}; 
+
 
         const gameWidth = this.scene.scale.width;
         const gameHeight = this.scene.scale.height;
