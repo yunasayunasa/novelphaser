@@ -1,39 +1,44 @@
 // --- ゲームエンジンの中核クラス ---
 class ScenarioManager {
-    constructor(scene) {
-        this.scene = scene;         // Phaserのシーンオブジェクト
-        this.scenario = [];         // シナリオ全体を格納する配列
-        this.currentLine = 0;       // 現在実行中の行番号
-        this.isWaitingClick = false; // クリック待ち状態かどうかのフラグ
+    // constructorの引数にlayersを追加
+    constructor(scene, layers) {
+        this.scene = scene;
+        this.layers = layers; // シーンから受け取ったレイヤーを保持
+        this.scenario = [];
+        this.currentLine = 0;
+        this.isWaitingClick = false;
 
-        // ゲーム画面の幅と高さをスケールマネージャーから取得
         const gameWidth = this.scene.scale.width;
         const gameHeight = this.scene.scale.height;
-
-        // テキストを表示する「箱」のサイズと位置を定義
-        const padding = gameWidth * 0.1; // 左右の余白
-        const textBoxWidth = gameWidth - (padding * 2); // 箱の幅
-        const textBoxHeight = gameHeight * 0.30; // 箱の高さ（画面高さの30%を確保）
-        const textBoxY = gameHeight - textBoxHeight - (gameHeight * 0.05); // 箱を画面下から5%の位置に配置
         
-        // テキストボックスの幅をプロパティとして保持
+        // --- メッセージウィンドウの表示 ---
+        const msgWindowY = gameHeight * 0.65; // ウィンドウのY座標
+        // メッセージレイヤーにウィンドウ画像を追加
+        const msgWindow = this.scene.add.image(gameWidth / 2, msgWindowY, 'message_window');
+        this.layers.message.add(msgWindow); // コンテナに追加
+
+        // --- テキストオブジェクトの配置 ---
+        // テキストの座標をウィンドウに合わせる
+        const padding = 80;
+        const textBoxWidth = msgWindow.width - (padding * 2);
+        const textBoxHeight = msgWindow.height - (padding * 1.5);
         this.textBoxWidth = textBoxWidth;
 
-        // 画面に表示するテキストオブジェクト
         this.textObject = this.scene.add.text(
-            padding,
-            textBoxY,
+            msgWindow.x - (msgWindow.width / 2) + padding,
+            msgWindow.y - (msgWindow.height / 2) + (padding / 2),
             '',
             {
                 fontFamily: '"Noto Sans JP", sans-serif',
                 fontSize: '36px',
                 fill: '#ffffff',
-                // wordWrapは使わない
                 fixedWidth: textBoxWidth,
                 fixedHeight: textBoxHeight
             }
         );
+        this.layers.message.add(this.textObject); // テキストもメッセージレイヤーに追加
     }
+
 
     /**
      * 手動で改行コードを挿入するメソッド
@@ -105,34 +110,58 @@ class ScenarioManager {
     /**
      * 1行のシナリオを解釈（パース）して、適切な処理を呼び出す
      * @param {string} line - 解釈するシナリオの1行
-     */
     parse(line) {
         console.log(`実行: ${line}`);
+        
+        const trimedLine = line.trim();
+
+        // ★★★ [chara_show] タグの処理を追加 ★★★
+        if (trimedLine.startsWith('[chara_show')) {
+            // 例: [chara_show storage="yuna_smile" x=360 y=800]
+            const storage = this.getTagValue(trimedLine, 'storage');
+            const x = Number(this.getTagValue(trimedLine, 'x'));
+            const y = Number(this.getTagValue(trimedLine, 'y'));
+
+            if (storage) {
+                // キャラクターレイヤーに画像を追加
+                const chara = this.scene.add.image(x, y, storage);
+                this.layers.character.add(chara);
+            }
+            this.next(); // すぐに次の行へ
+            return;
+        }
 
         // [p] タグの処理
-        if (line.trim() === '[p]') {
+        if (trimedLine === '[p]') {
             this.isWaitingClick = true;
             return;
         }
         
         // その他のタグ（今は何もしない）
-        if (line.trim().startsWith('[')) {
+        if (trimedLine.startsWith('[')) {
             console.log("タグを検出（未実装）:", line);
-            this.next(); // すぐに次の行へ
+            this.next();
             return;
         }
 
         // ラベル（*で始まる行）の処理（今は何もしない）
-        if (line.trim().startsWith('*')) {
+        if (trimedLine.startsWith('*')) {
             console.log("ラベルを検出（未実装）:", line);
-            this.next(); // すぐに次の行へ
+            this.next();
             return;
         }
 
-        // 上記のいずれでもなければ、セリフとして表示
-        // ★★★ 自作の改行処理を呼び出す ★★★
+        // セリフ表示
         const wrappedLine = this.manualWrap(line);
         this.textObject.setText(wrappedLine);
+    }
+    
+    // ★★★ タグの属性値を取得するためのヘルパー関数を追加 ★★★
+    getTagValue(tagString, attribute) {
+        // 正規表現で "attr=value" の部分を検索
+        const regex = new RegExp(`${attribute}\\s*=\\s*"?([^"\\s\\]]+)"?`);
+        const match = tagString.match(regex);
+        return match ? match[1] : null;
     }
 
     /**
@@ -156,14 +185,22 @@ class GameScene extends Phaser.Scene {
     constructor() {
         super('GameScene');
         this.scenarioManager = null;
+        // レイヤーをプロパティとして保持
+        this.layer = {
+            background: null,
+            character: null,
+            message: null
+        };
     }
 
     preload() {
         console.log("Preload: 準備中...");
-        // WebFont Loaderのスクリプトを読み込む
         this.load.script('webfont', 'https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js');
-        // シナリオファイルを読み込む
         this.load.text('scene1', 'assets/scene1.ks');
+        
+        // ★★★ 画像アセットを読み込む ★★★
+        this.load.image('message_window', 'assets/message_window.png');
+        this.load.image('yuna_smile', 'assets/yuna_smile.png'); // keyとファイル名を指定
     }
 
     create() {
@@ -185,15 +222,22 @@ class GameScene extends Phaser.Scene {
     }
 
     // ゲームの本体を開始する関数
-    startGame() {
+     startGame() {
         console.log("Create: ゲーム開始！");
         this.cameras.main.setBackgroundColor('#000000');
 
-        // シナリオマネージャーを生成
-        this.scenarioManager = new ScenarioManager(this);
+        // ★★★ レイヤーを作成する ★★★
+        // Phaserのコンテナ機能を使って、オブジェクトをまとめる入れ物を作る
+        // 作成順がそのまま重なり順になる（後から作ったものが上に来る）
+        this.layer.background = this.add.container(0, 0);
+        this.layer.character = this.add.container(0, 0);
+        this.layer.message = this.add.container(0, 0);
+
+        // シナリオマネージャーを生成（引数にレイヤーを渡す）
+        this.scenarioManager = new ScenarioManager(this, this.layer);
         this.scenarioManager.load('scene1');
 
-        // クリック（タップ）イベントの設定
+        // クリックイベントの設定
         this.input.on('pointerdown', () => {
             this.scenarioManager.onClick();
         });
