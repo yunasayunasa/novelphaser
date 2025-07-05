@@ -44,7 +44,8 @@ export default class GameScene extends Phaser.Scene {
         this.scenarioManager.registerTag('chara_show', handleCharaShow);
       //  this.scenarioManager.registerTag('chara_hide', handleCharaHide);
         this.scenarioManager.registerTag('p', handlePageBreak);
-
+  // ★★★ 表示中のキャラクターを名前で管理するオブジェクトを追加 ★★★
+        this.characters = {}; 
         this.scenarioManager.load('scene1');
         
         this.input.on('pointerdown', () => { this.scenarioManager.onClick(); });
