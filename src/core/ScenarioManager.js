@@ -1,7 +1,4 @@
 export default class ScenarioManager {
-   
-// --- ゲームエンジンの中核クラス ---
-
     constructor(scene, layers) {
         this.scene = scene;
         this.layers = layers;
@@ -38,43 +35,83 @@ export default class ScenarioManager {
         this.layers.message.add(this.textObject);
     }
 
+    // --- タグ・シナリオ管理メソッド ---
+
     registerTag(tagName, handler) {
         this.tagHandlers.set(tagName, handler);
     }
 
-    parseTag(tagString) {
-        const content = tagString.substring(1, tagString.length - 1);
-        const parts = content.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
-        
-        const tagName = parts.shift() || '';
-        const params = {};
+    load(scenarioKey) {
+        const rawText = this.scene.cache.text.get(scenarioKey);
+        if (!rawText) {
+            console.error(`シナリオファイル [${scenarioKey}] が見つからないか、中身が空です。`);
+            return;
+        }
+        this.scenario = rawText.split(/\r\n|\n|\r/).filter(line => line.trim() !== '');
+        this.currentLine = 0;
+        console.log("シナリオを解析しました:", this.scenario);
+    }
 
-        parts.forEach(part => {
-            const [key, value] = part.split('=');
-            if (value) {
-                params[key] = value.replace(/"/g, '');
+    loadDefinitions(scenarioKey) {
+        const rawText = this.scene.cache.text.get(scenarioKey);
+        if (!rawText) {
+            console.error(`定義ファイル [${scenarioKey}] が見つからないか、中身が空です。`);
+            return;
+        }
+        const lines = rawText.split(/\r\n|\n|\r/);
+        for (const line of lines) {
+            const trimedLine = line.trim();
+            if (trimedLine.startsWith('[chara_new')) {
+                const { tagName, params } = this.parseTag(trimedLine);
+                const handler = this.tagHandlers.get(tagName);
+                if (handler) {
+                    handler(this, params);
+                }
             }
-        });
-        return { tagName, params };
+            if (trimedLine.startsWith('*stop')) {
+                break;
+            }
+        }
+    }
+
+    // --- シナリオ進行メソッド ---
+
+    next() {
+        if (this.isWaitingClick) return;
+        if (this.currentLine >= this.scenario.length) {
+            this.textObject.setText('（シナリオ終了）');
+            return;
+        }
+        const line = this.scenario[this.currentLine];
+        this.currentLine++;
+        this.parse(line);
     }
     
+    onClick() {
+        if (this.isWaitingClick) {
+            this.isWaitingClick = false;
+            this.textObject.setText('');
+            this.next();
+        } else {
+            this.next();
+        }
+    }
+
+    // --- 解析・ヘルパーメソッド ---
+
     parse(line) {
         const trimedLine = line.trim();
-
         if (trimedLine.startsWith('*') || trimedLine.startsWith(';')) {
             this.next();
             return;
         }
-
         if (!trimedLine.startsWith('[')) {
             const wrappedLine = this.manualWrap(trimedLine);
             this.textObject.setText(wrappedLine);
             return;
         }
-        
         const { tagName, params } = this.parseTag(trimedLine);
         const handler = this.tagHandlers.get(tagName);
-
         if (handler) {
             console.log(`タグ[${tagName}]を実行, パラメータ:`, params);
             handler(this, params);
@@ -84,7 +121,20 @@ export default class ScenarioManager {
         }
     }
 
-    // 他のメソッド (manualWrap, load, next, onClick) はここにそのままペースト
+    parseTag(tagString) {
+        const content = tagString.substring(1, tagString.length - 1);
+        const parts = content.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
+        const tagName = parts.shift() || '';
+        const params = {};
+        parts.forEach(part => {
+            const [key, value] = part.split('=');
+            if (value) {
+                params[key] = value.replace(/"/g, '');
+            }
+        });
+        return { tagName, params };
+    }
+    
     manualWrap(text) {
         let wrappedText = '';
         let currentLine = '';
@@ -102,65 +152,5 @@ export default class ScenarioManager {
         }
         wrappedText += currentLine;
         return wrappedText;
-    }
-
-    // load メソッドの修正
-load(scenarioKey) {
-    const rawText = this.scene.cache.text.get(scenarioKey);
-    // ★★★ ファイルが見つからない場合に警告を出す ★★★
-    if (!rawText) {
-        console.error(`シナリオファイル [${scenarioKey}] が見つからないか、中身が空です。`);
-        return;
-    }
-
-     // ★★★ 定義ファイル専用の解析メソッドを追加 ★★★
-    /**
-     * 定義ファイルなどを解析し、定義情報を登録する
-     * @param {string} scenarioKey - 読み込んだ定義ファイルのキー
-     */
-    oadDefinitions(scenarioKey) {
-    const rawText = this.scene.cache.text.get(scenarioKey);
-    // ★★★ ファイルが見つからない場合に警告を出す ★★★
-    if (!rawText) {
-        console.error(`定義ファイル [${scenarioKey}] が見つからないか、中身が空です。`);
-        return;
-    }
-
-        const lines = rawText.split(/\r\n|\n|\r/);
-        for (const line of lines) {
-            const trimedLine = line.trim();
-            if (trimedLine.startsWith('[chara_new')) {
-                const { tagName, params } = this.parseTag(trimedLine);
-                const handler = this.tagHandlers.get(tagName);
-                if (handler) {
-                    handler(this, params);
-                }
-            }
-            // *stop で解析を終了
-            if (trimedLine.startsWith('*stop')) {
-                break;
-            }
-        }
-    }
-
-    next() {
-        if (this.isWaitingClick) return;
-        if (this.currentLine >= this.scenario.length) {
-            this.textObject.setText('（シナリオ終了）');
-            return;
-        }
-        const line = this.scenario[this.currentLine];
-        this.currentLine++;
-        this.parse(line);
-    }
-
-    onClick() {
-        if (this.isWaitingClick) {
-            this.isWaitingClick = false;
-            this.textObject.setText('');
-            this.next();
-        } else {
-            this.next();
-        }
     }
 }
