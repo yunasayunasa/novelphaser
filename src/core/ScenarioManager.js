@@ -104,11 +104,13 @@ export default class ScenarioManager {
         return wrappedText;
     }
 
-    load(scenarioKey) {
-        const rawText = this.scene.cache.text.get(scenarioKey);
-        this.scenario = rawText.split(/\r\n|\n|\r/).filter(line => line.trim() !== '');
-        this.currentLine = 0;
-        console.log("シナリオを解析しました:", this.scenario);
+    // load メソッドの修正
+load(scenarioKey) {
+    const rawText = this.scene.cache.text.get(scenarioKey);
+    // ★★★ ファイルが見つからない場合に警告を出す ★★★
+    if (!rawText) {
+        console.error(`シナリオファイル [${scenarioKey}] が見つからないか、中身が空です。`);
+        return;
     }
 
      // ★★★ 定義ファイル専用の解析メソッドを追加 ★★★
@@ -116,9 +118,13 @@ export default class ScenarioManager {
      * 定義ファイルなどを解析し、定義情報を登録する
      * @param {string} scenarioKey - 読み込んだ定義ファイルのキー
      */
-    loadDefinitions(scenarioKey) {
-        const rawText = this.scene.cache.text.get(scenarioKey);
-        if (!rawText) return;
+    oadDefinitions(scenarioKey) {
+    const rawText = this.scene.cache.text.get(scenarioKey);
+    // ★★★ ファイルが見つからない場合に警告を出す ★★★
+    if (!rawText) {
+        console.error(`定義ファイル [${scenarioKey}] が見つからないか、中身が空です。`);
+        return;
+    }
 
         const lines = rawText.split(/\r\n|\n|\r/);
         for (const line of lines) {
