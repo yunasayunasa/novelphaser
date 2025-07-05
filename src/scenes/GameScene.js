@@ -23,7 +23,7 @@ export default class GameScene extends Phaser.Scene {
         this.load.text('chara_define', 'assets/chara_define.ks');
          this.load.image('yuna_smile', 'assets/yuna_smile.png'); 
 }
-    }
+    
 
     // シーンが生成された時に呼ばれるメソッド
     create() {
