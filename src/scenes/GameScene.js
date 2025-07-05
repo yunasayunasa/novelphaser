@@ -2,7 +2,7 @@ import ScenarioManager from '../core/ScenarioManager.js';
 import { handleCharaShow } from '../handlers/chara_show.js';
 import { handleCharaHide } from '../handlers/chara_hide.js';
 import { handlePageBreak } from '../handlers/p.js';
-import { handleWait } from '../handlers/wait.js';
+//import { handleWait } from '../handlers/wait.js';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -41,7 +41,7 @@ export default class GameScene extends Phaser.Scene {
 
         // ★★★ initでセットされた this.charaDefs を使う ★★★
         this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs);
-        this.scenarioManager.registerTag('wait', handleWait);
+       // this.scenarioManager.registerTag('wait', handleWait);
         this.scenarioManager.registerTag('chara_show', handleCharaShow);
         this.scenarioManager.registerTag('chara_hide', handleCharaHide);
         this.scenarioManager.registerTag('p', handlePageBreak);
