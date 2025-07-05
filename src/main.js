@@ -10,7 +10,7 @@ const config = {
         height: 1280
     },
     // ★★★ 起動するシーンとして、インポートしたGameSceneを指定 ★★★
-     scene: [PreloadScene, GameScene]
+     scene: [PreloadScene,GameScene]
 };
 
 const game = new Phaser.Game(config);
