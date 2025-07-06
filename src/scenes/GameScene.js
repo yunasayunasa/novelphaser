@@ -13,7 +13,7 @@ import SoundManager from '../core/SoundManager.js';
 import { handlePlaySe } from '../handlers/playse.js';
 import { handlePlayBgm } from '../handlers/playbgm.js';
 import { handleStopBgm } from '../handlers/stopbgm.js';
-
+import StateManager from '../core/StateManager.js';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -23,6 +23,7 @@ export default class GameScene extends Phaser.Scene {
         this.charaDefs = null;
          this.messageWindow = null;
          this.soundManager = null;
+        this.stateManager = null;
         this.characters = {}; 
     }
 
@@ -39,7 +40,7 @@ export default class GameScene extends Phaser.Scene {
         this.layer.background = this.add.container(0, 0);
         this.layer.character = this.add.container(0, 0);
         this.layer.message = this.add.container(0, 0);
-
+this.stateManager = new StateManager();
         this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs);
           // ★★★ 1. 依存される部品を先に作る ★★★
         this.soundManager = new SoundManager(this);
@@ -48,7 +49,10 @@ export default class GameScene extends Phaser.Scene {
         this.messageWindow = new MessageWindow(this, this.soundManager);
         // ★★★ メッセージレイヤーにMessageWindowを追加 ★★★
         this.layer.message.add(this.messageWindow);
- 
+  // ★★★ 各マネージャーにstateManagerを渡す ★★★
+        this.soundManager = new SoundManager(this, this.stateManager);
+        this.messageWindow = new MessageWindow(this, this.soundManager);
+        this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager, this.stateManager);
 
         // ★★★ ScenarioManagerにsoundManagerを渡す ★★★
         this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager);
