@@ -29,12 +29,22 @@ export default class UIScene extends Phaser.Scene {
         panel.add([saveButton, loadButton, backlogButton, configButton]);
 
           // ★★★ ボタンのレイアウトを調整 ★★★
-        // 4つのボタンを均等に配置
+       // ★★★ ここからレイアウト調整 ★★★
         const buttons = [saveButton, loadButton, backlogButton, configButton];
-        const buttonWidth = gameWidth / (buttons.length + 1);
+        
+        // ボタンを配置する領域の「開始X座標」と「幅」を決める
+        const areaStartX = 200; // 例: 画面左端から200pxの位置から配置を開始
+        const areaWidth = gameWidth - areaStartX - 50; // 配置領域の幅 (右端にも少し余白)
+
+        const buttonMargin = areaWidth / (buttons.length); // 各ボタンに割り当てられる幅
+
         buttons.forEach((button, index) => {
-            button.setX(buttonWidth * (index + 1));
+            // 各ボタンのX座標を計算
+            const buttonX = areaStartX + (buttonMargin * index) + (buttonMargin / 2);
+            button.setX(buttonX);
         });
+        // ★★★ ここまで ★★★
+        
         
         panel.add(buttons); // パネルにボタンを追加
         // --- 3. メインの「メニュー」ボタンを作成 ---
