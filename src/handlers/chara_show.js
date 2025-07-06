@@ -2,7 +2,7 @@ import { Layout } from '../core/Layout.js';
 
 /**
  * [chara_show] タグの処理
- * @param {Object} params - {name, storage, pos, x, y, time}
+ * @param {Object} params - {name, face, storage, pos, x, y, time}
  */
 export function handleCharaShow(manager, params) {
     // --- 1. 必要なパラメータを取得 ---
@@ -20,29 +20,20 @@ export function handleCharaShow(manager, params) {
         return;
     }
 
-      // ★★★ 表情(face)パラメータを取得。なければ'normal'をデフォルトに ★★★
+    // --- 2. 表示する画像(storage)を決定 ---
+    // face属性が指定されていれば、それを優先する
     const face = params.face || 'normal';
-    // ★★★ 定義から、指定された表情に対応する画像キーを取得 ★★★
-    const storage = def.face[face];
+    const storage = def.face[face]; // "normal" や "angry" に対応する画像キーを取得
 
     if (!storage) {
-        console.warn(`キャラクター[${name}]の表情[${face}]が見つかりません。`);
-        manager.next();
-        return;
-    }
-    
-    // ★★★ storageの定義をここで行う ★★★
-    // 表情差分などでstorageが指定されていればそれを使い、なければ定義情報を使う
-    const storage = params.storage || def.storage;
-    if (!storage) {
-        console.warn(`キャラクター[${name}]のstorageが見つかりません。`);
+        console.warn(`キャラクター[${name}]の表情[${face}]のstorageが見つかりません。asset_define.jsonを確認してください。`);
         manager.next();
         return;
     }
 
-    // --- 2. 座標を決定 ---
+    // --- 3. 座標を決定 ---
     let x, y;
-    const pos = params.pos; // 'left', 'center', 'right'
+    const pos = params.pos;
     const orientation = manager.scene.scale.isPortrait ? 'portrait' : 'landscape';
 
     if (pos && Layout[orientation].character[pos]) {
@@ -53,10 +44,9 @@ export function handleCharaShow(manager, params) {
         y = Number(params.y) || Layout[orientation].character.center.y;
     }
     
-    // --- 3. 表示処理 ---
+    // --- 4. 表示処理 ---
     const time = Number(params.time) || 0;
 
-    // もし同じ名前のキャラクターが既にいたら、先に消しておく
     if (manager.scene.characters[name]) {
         manager.scene.characters[name].destroy();
     }
@@ -66,7 +56,7 @@ export function handleCharaShow(manager, params) {
     manager.layers.character.add(chara);
     manager.scene.characters[name] = chara;
 
-    // --- 4. アニメーション ---
+    // --- 5. アニメーション ---
     if (time > 0) {
         manager.scene.tweens.add({
             targets: chara,
