@@ -5,7 +5,67 @@ export default class SoundManager {
         // ★★★ Web Audio APIの心臓部、AudioContextを準備 ★★★
         // 一度だけ生成し、使い回すのが基本
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+           // ★★★ 現在再生中のBGMを保持するプロパティを追加 ★★★
+        this.currentBgm = null;
     }
+
+    /**
+     * BGMを再生する
+     * @param {string} key - asset_define.jsonで定義した音声のキー
+     * @param {number} volume - 音量 (0 to 1)
+     * @param {number} fadeInTime - フェードイン時間(ms)
+     */
+    playBgm(key, volume = 0.5, fadeInTime = 0) {
+        // すでに同じBGMが再生中なら何もしない
+        if (this.currentBgm && this.currentBgm.key === key) {
+            return;
+        }
+
+        // 別のBGMが再生中なら、それを停止する
+        if (this.currentBgm) {
+            this.stopBgm();
+        }
+
+        // 新しいBGMを再生
+        this.currentBgm = this.scene.sound.add(key, { loop: true, volume: 0 });
+        this.currentBgm.play();
+
+        // フェードイン処理
+        this.scene.tweens.add({
+            targets: this.currentBgm,
+            volume: volume,
+            duration: fadeInTime,
+            ease: 'Linear'
+        });
+    }
+    
+    // ★★★ BGM停止メソッドを新規追加 ★★★
+    /**
+     * 現在再生中のBGMを停止する
+     * @param {number} fadeOutTime - フェードアウト時間(ms)
+     */
+    stopBgm(fadeOutTime = 0) {
+        if (!this.currentBgm) return;
+
+        if (fadeOutTime > 0) {
+            // フェードアウト処理
+            this.scene.tweens.add({
+                targets: this.currentBgm,
+                volume: 0,
+                duration: fadeOutTime,
+                ease: 'Linear',
+                onComplete: () => {
+                    this.currentBgm.stop();
+                    this.currentBgm = null;
+                }
+            });
+        } else {
+            // 即時停止
+            this.currentBgm.stop();
+            this.currentBgm = null;
+        }
+    }
+
 
      /**
      * 効果音(SE)を再生する

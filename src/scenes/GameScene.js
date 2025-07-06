@@ -11,6 +11,8 @@ import { Layout } from '../core/Layout.js'; // これを追加
 import { handleCharaMod } from '../handlers/chara_mod.js';
 import SoundManager from '../core/SoundManager.js';
 import { handlePlaySe } from '../handlers/playse.js';
+import { handlePlayBgm } from '../handlers/playbgm.js';
+import { handleStopBgm } from '../handlers/stopbgm.js';
 
 
 export default class GameScene extends Phaser.Scene {
@@ -58,6 +60,8 @@ export default class GameScene extends Phaser.Scene {
         this.scenarioManager.registerTag('bg', handleBg); // これを追加
         this.scenarioManager.registerTag('chara_mod', handleCharaMod);
         this.scenarioManager.registerTag('playse', handlePlaySe);
+        this.scenarioManager.registerTag('playbgm', handlePlayBgm);
+this.scenarioManager.registerTag('stopbgm', handleStopBgm);
         this.scenarioManager.load('scene1');
         this.input.on('pointerdown', () => { this.scenarioManager.onClick(); });
         this.scenarioManager.next();

@@ -1,6 +1,7 @@
 ; まず背景を表示
 [bg storage="bog_schol" time=500]
 [wait time=500]
+[playbgm storage="ronpa_bgm" time="1500" volume="0.4"]
 
 
 ; 二人を登場させる
@@ -9,7 +10,7 @@
 [wait time=500]
 
 ; yunaが話す -> yunaが明るく、kaitoが暗くなる
-yuna:「こんにちは、海斗くん！」
+yuna:「こんにちは、海斗くん！bgmごい！>
 [p]
 
 ; kaitoが話す -> kaitoが明るく、yunaが暗くなる
@@ -25,6 +26,9 @@ kaito:「やあ、優奈さん。いい天気だね。」
 ; yunaが再び話す -> yunaが明るく、kaitoが暗くなる
 yuna:「そうだ、どこかに出かけない？」
 [p]
-
+; 2秒かけてBGMをフェードアウト
+[stopbgm time="2000"]
+[wait time=2000]
+yuna:「あ、音が消えた…」
 [chara_hide name="yuna" time=500]
 [chara_hide name="kaito" time=500]
