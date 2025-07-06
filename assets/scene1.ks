@@ -2,12 +2,21 @@
 [chara_show name="yuna" pos="center"]
 [wait time=500]
 
-yuna:「じゃあ、そろそろ帰るね。」
+yuna:「やったー！テストに合格したよ！」
 [p]
 
-; くるんっと反転
-[flip name="yuna" time=400]
-[wait time=400]
+; 喜びのジャンプ！
+[jump name="yuna" time=600 height=60]
+[wait time=600]
 
-; 歩いて退場
-[walk name="yuna" x=-200 time=2000]
+yuna:「これで、動的演出タグは完璧だね！」
+[p]
+yuna:「やったー！テストに合格したよ！」
+[p]
+
+; 喜びのジャンプ！
+[chara_jump name="yuna" time=600 height=60]
+[wait time=600]
+
+yuna:「これで、動的演出タグは完璧だね！」
+[p]
