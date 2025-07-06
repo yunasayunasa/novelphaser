@@ -127,12 +127,8 @@ export default class MessageWindow extends Container{
               //  triangle (三角波):
                // sawtooth (ノコギリ波):からえらべるよ
                    // ★★★ ここを書き換えて遊んでみよう！ ★★★
- // ★★★ 逆転裁判風タイプ音レシピ ★★★
-    this.soundManager.playSynth(
-        'triangle', // 波形：矩形波より少し丸い三角波が、耳に優しく心地よい
-        1800,       // 周波数：かなり高め。これが「ポ」ではなく「ピ」に聞こえる秘訣
-        0.02        // デュレーション：非常に短くする。これが軽快さの鍵！
-    );
+ // シンセの代わりに、SEを再生する
+                this.soundManager.playSe('popopo', { volume: 0.7 }); // volumeで音量を調整(0~1)
 
     // 例1: ちょっと優しい三角波のタイプ音
    // this.soundManager.playSynth('triangle', 1500, 0.04);

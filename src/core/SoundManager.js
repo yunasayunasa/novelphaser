@@ -7,6 +7,15 @@ export default class SoundManager {
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
 
+     /**
+     * 効果音(SE)を再生する
+     * @param {string} key - asset_define.jsonで定義した音声のキー
+     * @param {Phaser.Types.Sound.SoundConfig} config - 音量やループなどの設定(任意)
+     */
+    playSe(key, config = {}) {
+        this.scene.sound.play(key, config);
+    }
+
     /**
      * 指定された波形の音を短時間だけ再生する (Web Audio APIを使用)
      * @param {string} waveType - 'sine', 'square', 'sawtooth', 'triangle' のいずれか
