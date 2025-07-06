@@ -1,4 +1,4 @@
-[playbgm storage="bgm_school"]
+[playbgm storage="ronpa_bgm"]
 [bg storage="bg_school"]
 [chara_show name="yuna" pos="center"]
 
