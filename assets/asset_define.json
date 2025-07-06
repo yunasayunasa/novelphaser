@@ -6,14 +6,6 @@
      "bog_schol": "assets/bog_schol.jpg" ,
      "next_arrow": "assets/next_arrow.png"
   },
-  "sounds": {},
-  "characters": {
-    "yuna": {
-      "jname": "優奈",
-      
-      "face": {
-        "normal": "yuna_smile",
-        "angry": "yuna_angry"
-    }
+  "sounds": {}
+ 
   }
-  }}
