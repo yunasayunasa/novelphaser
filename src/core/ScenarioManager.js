@@ -59,20 +59,31 @@ export default class ScenarioManager {
     }
 
     next() {
-        if (this.isWaitingClick) return;
-        if (this.currentLine >= this.scenario.length) {
-            this.messageWindow.setText('（シナリオ終了）');
-            console.log("シナリオ終了");
-            return;
-        }
-        
-        // ★ 状態更新：次の行に進む「前」に、現在の行番号を保存
-        this.stateManager.updateScenario(this.currentFile, this.currentLine);
+    console.log(`--- next()呼び出し ---`);
+    console.log(`isWaitingClick: ${this.isWaitingClick}`);
 
-        const line = this.scenario[this.currentLine];
-        this.currentLine++;
-        this.parse(line);
+    if (this.isWaitingClick) return;
+
+    console.log(`currentLine: ${this.currentLine}, scenario.length: ${this.scenario.length}`);
+
+    if (this.currentLine >= this.scenario.length) {
+        this.messageWindow.setText('（シナリオ終了）');
+        console.log("シナリオ終了");
+        return;
     }
+
+    // ★ updateScenarioの前に、渡す値を確認
+    console.log(`Updating scenario state: file=${this.currentFile}, line=${this.currentLine}`);
+    this.stateManager.updateScenario(this.currentFile, this.currentLine); 
+
+    const line = this.scenario[this.currentLine];
+    console.log(`実行する行: "${line}"`);
+
+    this.currentLine++;
+    this.parse(line);
+}
+        
+      
     
     onClick() {
         this.messageWindow.hideNextArrow();
