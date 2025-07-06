@@ -19,6 +19,17 @@ export function handleCharaShow(manager, params) {
         manager.next();
         return;
     }
+
+      // ★★★ 表情(face)パラメータを取得。なければ'normal'をデフォルトに ★★★
+    const face = params.face || 'normal';
+    // ★★★ 定義から、指定された表情に対応する画像キーを取得 ★★★
+    const storage = def.face[face];
+
+    if (!storage) {
+        console.warn(`キャラクター[${name}]の表情[${face}]が見つかりません。`);
+        manager.next();
+        return;
+    }
     
     // ★★★ storageの定義をここで行う ★★★
     // 表情差分などでstorageが指定されていればそれを使い、なければ定義情報を使う

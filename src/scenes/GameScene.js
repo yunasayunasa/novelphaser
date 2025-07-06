@@ -8,6 +8,7 @@ import { handleWait } from '../handlers/wait.js'; // これも有効にする
 import { handleBg } from '../handlers/bg.js'; // これを追
 import MessageWindow from '../ui/MessageWindow.js';
 import { Layout } from '../core/Layout.js'; // これを追加
+import { handleCharaMod } from '../handlers/chara_mod.js';
 
 
 export default class GameScene extends Phaser.Scene {
@@ -48,6 +49,7 @@ export default class GameScene extends Phaser.Scene {
         this.scenarioManager.registerTag('p', handlePageBreak);
        this.scenarioManager.registerTag('wait', handleWait); // 有効化
         this.scenarioManager.registerTag('bg', handleBg); // これを追加
+        this.scenarioManager.registerTag('chara_mod', handleCharaMod);
         this.scenarioManager.load('scene1');
         this.input.on('pointerdown', () => { this.scenarioManager.onClick(); });
         this.scenarioManager.next();

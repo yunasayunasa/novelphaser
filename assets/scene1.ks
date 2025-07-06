@@ -1,26 +1,17 @@
 ; まず背景を表示
 [bg storage="bog_schol" time=500]
 [wait time=500]
-
-; センターに表示
+; normal表情（デフォルト）で表示
 [chara_show name="yuna" pos="center" time=500]
-「センターに登場！」
+
+「こんにちは、優奈です。」
 [p]
 
-[chara_hide name="yuna" time=500]
-[wait time=500]
+; angry表情に切り替え
+[chara_mod name="yuna" face="angry"]
 
-; 左に表示
-[chara_show name="yuna" pos="left" time=500]
-「左に登場！」
+「ちょっと怒ってます！」
 [p]
 
-[chara_hide name="yuna" time=500]
-[wait time=500]
-
-; 右に表示
-[chara_show name="yuna" pos="right" time=500]
-「右に登場！」してタイプですおらとばせるかなどをかくにんしてなください
-[p]
-
-[chara_hide name="yuna" time=500]
+[chara_hide name="yuna"]
+Use code with caution.
