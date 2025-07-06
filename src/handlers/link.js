@@ -3,7 +3,7 @@
  * 選択肢ボタンを生成する
  * @param {Object} params - {target}
  */
-eexport function handleLink(manager, params) {
+export function handleLink(manager, params) {
     const target = params.target;
     const text = params.text;
     if (!target || !text){ console.warn('[link] target属性は必須です。'); return; }
