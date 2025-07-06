@@ -1,16 +1,17 @@
 export default class ScenarioManager {
-    /**
-     * @param {Phaser.Scene} scene - このマネージャーが属するPhaserのシーン
-     * @param {Object} layers - ゲームの各レイヤー（コンテナ）
-     * @param {Object} charaDefs - キャラクター定義情報
-     * @param {MessageWindow} messageWindow - メッセージウィンドウのインスタンス
+   /**
+     * @param {Phaser.Scene} scene
+     * @param {Object} layers
+     * @param {Object} charaDefs
+     * @param {MessageWindow} messageWindow
+     * @param {SoundManager} soundManager  // ★★★ これを引数に追加 ★★★
      */
-    constructor(scene, layers, charaDefs, messageWindow) {
+    constructor(scene, layers, charaDefs, messageWindow, soundManager) {
         this.scene = scene;
         this.layers = layers;
         this.characterDefs = charaDefs || {};
         this.messageWindow = messageWindow; 
-  this.soundManager = SoundManager;
+  this.soundManager = soundManager;
 
         this.scenario = [];
         this.currentLine = 0;
