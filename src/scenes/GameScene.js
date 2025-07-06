@@ -83,12 +83,15 @@ async performLoad(slot) {
         // ★★★ awaitはここでは使わない。rebuildSceneは非同期である必要はない
         rebuildScene(this.scenarioManager, loadedState);
         
-        // ★★★ ここが最重要ポイント ★★★
-        // ロードが完了したら、新しい行からシナリオを「再開」する
-        // next()を呼ぶのではなく、直接次のステップに進む
-        this.scenarioManager.isWaitingClick = false;
-        this.messageWindow.hideNextArrow();
-        this.scenarioManager.next(); // これで、復元されたcurrentLineから再開される
+          
+        // ★★★ ここで直接parseを呼んで再開する ★★★
+        const line = this.scenarioManager.scenario[this.scenarioManager.currentLine];
+        
+        // 次のnext()に備えて、行番号をここで進めておく
+        this.scenarioManager.currentLine++;
+
+        // 復元した行のパースを実行
+        this.scenarioManager.parse(line);
         
     } catch (e) {
         console.error(`ロード処理でエラーが発生しました。`, e);
@@ -158,9 +161,17 @@ function rebuildScene(manager, state) {
     }
     console.log("...BGM復元完了");
     
-    // 6. メッセージウィンドウと話者ハイライトをリセット
+       // 6. メッセージウィンドウをリセット
     manager.messageWindow.setText('');
-    manager.highlightSpeaker(null); // 全員を通常の明るさに
 
+    // ★★★ 7. 話者とハイライトを復元 ★★★
+    let speakerName = null;
+    const line = manager.scenario[manager.currentLine];
+    const speakerMatch = line.trim().match(/^([a-zA-Z0-9_]+):/);
+    if (speakerMatch) {
+        speakerName = speakerMatch[1];
+    }
+    manager.highlightSpeaker(speakerName);
+    
     console.log("--- rebuildScene 正常終了 ---");
 }
