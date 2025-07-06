@@ -7,8 +7,8 @@
      "next_arrow": "assets/next_arrow.png"
   },
   "sounds": {
-"popopo": "assets/gyakuten_popopo.mp3"
-
+"popopo": "assets/gyakuten_popopo.mp3",
+"smash": "assets/smash.mp3"
   }
  
   }
