@@ -46,7 +46,7 @@ this.stateManager = new StateManager();
         this.soundManager = new SoundManager(this, this.stateManager);
         
         // ★★★2. 部品を使って、他のオブジェクトを作る ★★★
-        this.messageWindow = new MessageWindow(this, this.soundManagerthis, this.stateManager);
+        this.messageWindow = new MessageWindow(this, this.soundManagerthis);
         // ★★★ メッセージレイヤーにMessageWindowを追加 ★★★
         this.layer.message.add(this.messageWindow);
   // ★★★ 各マネージャーにstateManagerを渡す ★★
