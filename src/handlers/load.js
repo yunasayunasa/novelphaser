@@ -14,23 +14,32 @@ export async function handleLoad(manager, params) {
         const loadedState = JSON.parse(jsonString);
         manager.stateManager.setState(loadedState);
         console.log(`スロット[${slot}]からロードしました。`, loadedState);
+        // rebuildSceneを呼び出す
+        rebuildScene(manager, loadedState);
         
-        // ★★★ rebuildSceneをtry...catchで囲む ★★★
-          try {
-            rebuildScene(manager, loadedState);
-            const line = manager.scenario[manager.currentLine];
-            manager.currentLine++;
-            manager.parse(line);
-        } catch (rebuildError) {
-            // ★★★ ここを改造 ★★★
-            console.error("シーンの再構築に失敗しました。", rebuildError); // 第2引数にエラーオブジェクトそのものを渡す
-        
+        // ★★★ ここからが重要 ★★★
+        console.log("rebuildScene完了。シナリオ再開処理に入ります。");
+        console.log(`再開前の行番号: manager.currentLine = ${manager.currentLine}`);
+        console.log(`シナリオ配列の長さ: manager.scenario.length = ${manager.scenario.length}`);
 
-            manager.next(); // とりあえず次に進む
+        // 行番号が配列の範囲内かチェック
+        if (manager.currentLine >= manager.scenario.length) {
+            throw new Error(`復元しようとした行番号(${manager.currentLine})がシナリオの範囲外です。`);
         }
+
+        console.log("シナリオから行テキストを取得します...");
+        const line = manager.scenario[manager.currentLine];
+        console.log(`取得した行: "${line}"`);
+        
+        manager.currentLine++;
+        
+        console.log("parseを実行します...");
+        manager.parse(line);
+        console.log("parseを実行しました。");
+
     } catch (e) {
-        console.error(`ロードに失敗しました: スロット[${slot}]`, e);
-        manager.next();
+        console.error("ロード処理全体でエラーが発生しました。", e);
+        manager.next(); // エラー時はとりあえず次に進む
     }
 }
 
