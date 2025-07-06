@@ -99,7 +99,9 @@ export default class ScenarioManager {
     }
 
        parse(line) {
-        const trimedLine = line.trim();
+         let processedLine = this.embedVariables(line);
+        const trimedLine = processedLine.trim();
+
 
         // 1. 無視する行の判定
         if (trimedLine.startsWith(';') || trimedLine.startsWith('*')) {
@@ -148,6 +150,22 @@ export default class ScenarioManager {
         const wrappedLine = this.manualWrap(trimedLine);
         this.messageWindow.setText(wrappedLine, true, () => {
             this.messageWindow.showNextArrow();
+        });
+    }
+
+     // ★★★ 変数埋め込み用の新しいメソッドを追加 ★★★
+    /**
+     * 行の中から &f.hoge や &sf.piyo といった記述を探し、変数の値に置き換える
+     * @param {string} line - 処理対象の行
+     * @returns {string} 置き換え後の行
+     */
+    embedVariables(line) {
+        // 正規表現で &f.hoge や &sf.hoge を見つける
+        return line.replace(/&((f|sf)\.[a-zA-Z0-9_]+)/g, (match, exp) => {
+            // 見つかった式 (exp) を評価し、その値を取得する
+            const value = this.stateManager.eval(exp);
+            // 値がundefinedやnullなら空文字に、そうでなければその値を返す
+            return value !== undefined && value !== null ? value : '';
         });
     }
 
