@@ -29,7 +29,7 @@ export default class UIScene extends Phaser.Scene {
         // --- 3. メインの「メニュー」ボタンを作成 ---
         // メッセージウィンドウの下の隙間あたりに配置
         const menuButtonY = gameHeight - 50;
-        const menuButton = this.add.text(gameWidth / 2, menuButtonY, 'MENU', { fontSize: '36px', fill: '#fff' }).setOrigin(0.5).setInteractive();
+        const menuButton = this.add.text(gameWidth / 2, menuButtonY, 'MENU', { fontSize: '36px', fill: '#fff' }).setOrigin(0.1).setInteractive();
 
         // --- 4. ボタンの動作を定義 ---
         let isPanelOpen = false;
