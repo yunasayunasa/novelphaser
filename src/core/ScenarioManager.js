@@ -112,7 +112,8 @@ export default class ScenarioManager {
         if (speakerMatch) {
             const speakerName = speakerMatch[1];
             const dialogue = trimedLine.substring(speakerName.length + 1).trim();
-
+ // ★★★ 履歴を記録 ★★★
+            this.stateManager.addHistory(speakerName, dialogue);
             this.highlightSpeaker(speakerName);
             
             const wrappedLine = this.manualWrap(dialogue);
@@ -139,6 +140,8 @@ export default class ScenarioManager {
         }
 
         // 4. 上記のいずれでもなければ「地の文」と確定
+        // ★★★ 地の文も履歴として記録 ★★★
+        this.stateManager.addHistory(null, trimedLine);
         this.highlightSpeaker(null); // 全員のハイライトを元に戻す
 
         this.isWaitingClick = true; 

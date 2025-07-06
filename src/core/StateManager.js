@@ -4,9 +4,25 @@ export default class StateManager {
             scenario: { fileName: null, line: 0 },
             layers: { background: null, characters: {} },
             sound: { bgm: null },
-            variables: {}
+            variables: {},
+            history: [] // ★★★ 履歴を保存する配列を追加 ★★★
         };
     }
+      /**
+     * 読んだテキストの履歴を追加する
+     * @param {string} speaker - 話者名 (地の文の場合はnull)
+     * @param {string} dialogue - セリフ内容
+     */
+    addHistory(speaker, dialogue) {
+        this.state.history.push({ speaker, dialogue });
+        
+        // 履歴が長くなりすぎないように、古いものから削除する (例: 100件まで)
+        if (this.state.history.length > 100) {
+            this.state.history.shift();
+        }
+        console.log('History Updated:', this.state.history);
+    }
+
     getState() { return JSON.parse(JSON.stringify(this.state)); }
     setState(newState) { this.state = newState; }
     updateScenario(fileName, line) { this.state.scenario.fileName = fileName; this.state.scenario.line = line; console.log('State Updated (Scenario):', this.state.scenario); }
