@@ -1,17 +1,19 @@
-yuna:「ねえ、週末はどこに行きたい？」
+[bg storage="bg_school"]
+[wait time=500]
 
-[link target="*go_sea" text="海に行く"]
-[link target="*go_mountain" text="山に行く"]
+; 画面外下から、中央にスライドインで登場
+[chara_show name="yuna" pos="center" y=1400]
+[move name="yuna" y=800 time=1000]
+
+yuna:「スライドインで登場しました！」
 [p]
 
-*go_sea
-yuna:「海、いいね！水着持っていかなくちゃ。」
-[jump target="*end_choice"]
+; 少し右に移動
+[move name="yuna" x=500 time=800]
+[p]
 
-*go_mountain
-yuna:「山かー。虫よけスプレーが必要ね。」
-[jump target="*end_choice"]
+; 左に移動しながら退場
+[move name="yuna" x=-200 time=1200]
+[wait time=1200]
 
-*end_choice
-kaito:「じゃあ、週末が楽しみだね！」
-[s]
+; シナリオ終了

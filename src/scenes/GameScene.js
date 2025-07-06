@@ -14,6 +14,7 @@ import { handleStopBgm } from '../handlers/stopbgm.js';
 import ConfigManager from '../core/ConfigManager.js';
 import { handleLink } from '../handlers/link.js';
 import { handleJump } from '../handlers/jump.js';
+import { handleMove } from '../handlers/move.js';
 
 
 export default class GameScene extends Phaser.Scene {
@@ -67,6 +68,7 @@ export default class GameScene extends Phaser.Scene {
         this.scenarioManager.registerTag('stopbgm', handleStopBgm);
         this.scenarioManager.registerTag('link', handleLink);
         this.scenarioManager.registerTag('jump', handleJump);
+        this.scenarioManager.registerTag('move', handleMove);
         
         // --- ゲーム開始 ---
         this.scenarioManager.load('scene1');
