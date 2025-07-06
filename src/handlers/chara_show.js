@@ -56,6 +56,18 @@ export function handleCharaShow(manager, params) {
     manager.layers.character.add(chara);
     manager.scene.characters[name] = chara;
 
+    // ★★★ 状態を更新 ★★★
+    // ★★★ ここから状態更新 ★★★
+    const charaData = {
+        name: name,
+        face: params.face || 'normal',
+        storage: storage,
+        pos: params.pos,
+        x: x,
+        y: y
+    };
+    manager.stateManager.updateChara(name, charaData);
+
     // --- 5. アニメーション ---
     if (time > 0) {
         manager.scene.tweens.add({

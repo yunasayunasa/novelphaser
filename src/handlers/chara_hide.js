@@ -17,6 +17,16 @@ export function handleCharaHide(manager, params) {
         manager.next();
         return;
     }
+const onComplete = () => {
+        chara.destroy();
+        delete manager.scene.characters[name];
+        
+        // ★★★ 状態を更新 (nullを渡して削除) ★★★
+        manager.stateManager.updateChara(name, null);
+        
+        manager.next();
+    };
+
 
     const time = Number(params.time) || 0;
 
@@ -30,6 +40,7 @@ export function handleCharaHide(manager, params) {
                 chara.destroy();
                 delete manager.scene.characters[name];
                 manager.next();
+                onComplete;
             }
         });
     } else {

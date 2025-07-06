@@ -31,6 +31,20 @@ export function handleCharaMod(manager, params) {
 
     const time = Number(params.time) || 200; // デフォルト200msで切り替え
 
+ // ★★★ 状態更新用の新しいキャラクター情報を準備 ★★★
+    // 既存の状態をコピーし、表情とstorageだけを上書き
+    const currentState = manager.stateManager.getState().layers.characters[name];
+    if (!currentState) {
+        console.warn(`[chara_mod] 状態管理にキャラクター[${name}]が見つかりません。`);
+        manager.next();
+        return;
+    }
+    const newCharaData = {
+        ...currentState, // 既存の状態をコピー
+        face: face,
+        storage: storage
+    };
+
     // ★★★ 画像を切り替える (setTexture) ★★★
     // 一瞬で切り替えるのではなく、クロスフェードさせるとリッチになる
     
@@ -64,6 +78,8 @@ export function handleCharaMod(manager, params) {
 
     // アニメーションを待って次に進む
     manager.scene.time.delayedCall(time, () => {
+       // ★★★ 新しい情報で状態を更新 ★★★
+        manager.stateManager.updateChara(name, newCharaData); 
         manager.next();
     });
 }

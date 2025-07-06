@@ -47,6 +47,10 @@ this.stateManager =stateManager;
             return;
         }
         const line = this.scenario[this.currentLine];
+        // ★★★ 状態を更新 (現在の行番号) ★★★
+    // (fileNameも渡す必要があるが、まずは行番号だけ)
+    this.stateManager.updateScenario(this.currentFile, this.currentLine); 
+    
         this.currentLine++;
         this.parse(line);
     }

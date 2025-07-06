@@ -6,5 +6,8 @@ export function handlePlayBgm(manager, params) {
     const time = Number(params.time) || 0; // フェードイン時間
 
     manager.soundManager.playBgm(storage, volume, time);
+     // ★★★ 状態を更新 ★★★
+    manager.stateManager.updateBgm(storage);
+
     manager.next(); // BGMは再生しっぱなしでOK
 }
