@@ -98,7 +98,7 @@ displayChoiceButtons() {
     this.pendingChoices.forEach((choice, index) => {
         const y = startY + (index * 120); // ボタン間のスペース
 
-    const button = this.add.text(this.scale.width / 2, y, text, { fontSize: '36px', fill: '#fff', backgroundColor: '#555', padding: { x: 20, y: 10 }})
+    const button = this.add.text(this.scale.width / 2, y, choice.text, { fontSize: '36px', fill: '#fff', backgroundColor: '#555', padding: { x: 20, y: 10 }})
         .setOrigin(0.5)
         .setInteractive();
     
