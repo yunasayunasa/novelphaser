@@ -39,27 +39,30 @@ export default class SaveLoadScene extends Phaser.Scene {
             this.add.text(this.scale.width / 2, y, text, { fontSize: '28px', fill: '#fff', align: 'center' }).setOrigin(0.5);
 
             // スロットがクリックされた時の処理
+                  // スロットがクリックされた時の処理
             slotBg.on('pointerdown', () => {
                 const gameScene = this.scene.get('GameScene');
                 
                 if (this.mode === 'save') {
-                    // ★★★ GameSceneのセーブ機能を呼び出す ★★★
                     gameScene.performSave(i);
-                    // セーブしたらUIを閉じてゲームに戻る
                     this.scene.stop();
+                    // ★★★ セーブ後も、GameSceneを再開する ★★★
                     this.scene.resume('GameScene');
 
                 } else { // 'load'モードの場合
                     if (saveData) {
-                        // ★★★ GameSceneのロード機能を呼び出す ★★★
                         gameScene.performLoad(i);
-                        // ロードしたらUIを閉じる
                         this.scene.stop();
+                        // ★★★ ロード後も、GameSceneを再開する ★★★
+                        // performLoadはシーンを再構築し、シナリオを1行パースするだけ。
+                        // その後のクリックイベントなどを受け付けるために、シーン自体の再開が必要。
+                        this.scene.resume('GameScene'); 
                     } else {
                         console.log(`スロット${i}は空なのでロードできません。`);
                     }
                 }
             });
+// ...
         }
     }
 }
