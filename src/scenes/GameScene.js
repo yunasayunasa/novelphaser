@@ -169,6 +169,9 @@ function rebuildScene(manager, state) {
             throw new Error(`キャラクターテクスチャ[${charaData.storage}]がキャッシュにありません。`);
         }
         const chara = scene.add.image(charaData.x, charaData.y, charaData.storage);
+        // ★★★ 必ずTintをリセットして明るい状態にする ★★★
+        chara.setTint(0xffffff);
+
         manager.layers.character.add(chara);
         scene.characters[name] = chara; // 管理リストに再登録
     }
@@ -191,7 +194,7 @@ function rebuildScene(manager, state) {
     if (speakerMatch) {
         speakerName = speakerMatch[1];
     }
-    manager.highlightSpeaker(speakerName);
+    manager.highlightSpeaker(speakerName);*/
     
-    console.log("--- rebuildScene 正常終了 ---");*/
+    console.log("--- rebuildScene 正常終了 ---");
 }
