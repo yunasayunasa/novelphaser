@@ -20,6 +20,7 @@ import { handleShake } from '../handlers/shake.js';
 import { handleVibrate } from '../handlers/vibrate.js';
 import { handleFlip } from '../handlers/flip.js';
 import { handleCharaJump } from '../handlers/chara_jump.js';
+import { handleEval } from '../handlers/eval.js';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -78,6 +79,7 @@ export default class GameScene extends Phaser.Scene {
         this.scenarioManager.registerTag('vibrate', handleVibrate);
         this.scenarioManager.registerTag('flip', handleFlip);
         this.scenarioManager.registerTag('chara_jump', handleCharaJump);
+        this.scenarioManager.registerTag('eval', handleEval);
         
         // --- ゲーム開始 ---
         this.scenarioManager.load('scene1');

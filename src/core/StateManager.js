@@ -5,9 +5,52 @@ export default class StateManager {
             layers: { background: null, characters: {} },
             sound: { bgm: null },
             variables: {},
-            history: [] // ★★★ 履歴を保存する配列を追加 ★★★
+            history: [], // ★★★ 履歴を保存する配列を追加 ★★★
+            variables: {} // ★ f.変数用の領域
         };
+        this.systemVariables = this.loadSystemVariables(); 
     }
+
+    // ★★★ 変数を操作するメソッドを追加 ★★★
+    /**
+     * 文字列のJavaScript式を安全に評価・実行する
+     * @param {string} exp - 実行する式 (例: "f.hoge = 10")
+     */
+    eval(exp) {
+        // f と sf を、式のスコープ内で使えるようにする
+        const f = this.state.variables;
+        const sf = this.systemVariables;
+
+        try {
+            // Functionコンストラクタで、安全なスコープで式を実行
+            // 'use strict'; は、より厳格なエラーチェックを有効にするおまじない
+            new Function('f', 'sf', `'use strict'; return (${exp})`)(f, sf);
+            
+            // sf変数が変更された場合は、自動で保存
+            this.saveSystemVariables();
+        } catch (e) {
+            console.error(`[eval] 式の評価中にエラーが発生しました: ${exp}`, e);
+        }
+    }
+
+    // ★★★ sf変数のセーブ/ロード機能 ★★★
+    saveSystemVariables() {
+        try {
+            localStorage.setItem('my_novel_engine_system', JSON.stringify(this.systemVariables));
+        } catch (e) {
+            console.error("システム変数の保存に失敗しました。", e);
+        }
+    }
+    loadSystemVariables() {
+        try {
+            const data = localStorage.getItem('my_novel_engine_system');
+            return data ? JSON.parse(data) : {};
+        } catch (e) {
+            console.error("システム変数の読み込みに失敗しました。", e);
+            return {};
+        }
+    }
+
       /**
      * 読んだテキストの履歴を追加する
      * @param {string} speaker - 話者名 (地の文の場合はnull)

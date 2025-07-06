@@ -1,22 +1,11 @@
-[bg storage="bg_school"]
-[chara_show name="yuna" pos="center"]
-[wait time=500]
+; 変数を設定する
+[eval exp="f.test_flag = true"]
+[eval exp="f.player_name = '勇者'"]
+[eval exp="sf.play_count = (sf.play_count || 0) + 1"]
 
-yuna:「やったー！テストに合格したよ！」
+yuna:「変数を設定しました。コンソールとセーブデータを確認してください。」
+[p]
+yuna:「プレイ回数は[eval exp="sf.play_count"]回目です。」
 [p]
 
-; 喜びのジャンプ！
-[jump name="yuna" time=600 height=60]
-[wait time=600]
-
-yuna:「これで、動的演出タグは完璧だね！」
-[p]
-yuna:「やったー！テストに合格したよ！」
-[p]
-
-; 喜びのジャンプ！
-[chara_jump name="yuna" time=600 height=60]
-[wait time=600]
-
-yuna:「これで、動的演出タグは完璧だね！」
-[p]
+[save slot=1]
