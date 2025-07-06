@@ -44,15 +44,15 @@ export default class GameScene extends Phaser.Scene {
         this.layer.message.add(this.messageWindow);
 this.stateManager = new StateManager();
         this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs);
-         // 1. SoundManagerが最初に作られているか？
-    this.soundManager = new SoundManager(this);
-    
-    // 2. MessageWindowに、作ったsoundManagerが渡されているか？
-    this.messageWindow = new MessageWindow(this, this.soundManager);
-    this.layer.message.add(this.messageWindow);
+          // ★★★ 1. 依存される部品を先に作る ★★★
+        this.soundManager = new SoundManager(this, this.stateManager);
+        
+        // ★★★2. 部品を使って、他のオブジェクトを作る ★★★
+        this.messageWindow = new MessageWindow(this, this.soundManagerthis);
+   
+  // ★★★ 各マネージャーにstateManagerを渡す ★★
 
-    // 3. ScenarioManagerにも、同じsoundManagerが渡されているか？
-    this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager, this.stateManager);
+        this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager, this.stateManager);
 
         
        
