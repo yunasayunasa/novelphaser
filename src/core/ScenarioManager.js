@@ -38,6 +38,26 @@ export default class ScenarioManager {
         console.log(`シナリオを解析しました: ${this.currentFile}`, this.scenario);
     }
 
+        /**
+     * 指定された話者を明るくし、それ以外を暗くする
+     * @param {string | null} speakerName - 明るくするキャラクターの名前。nullの場合は全員を明るくする。
+     */
+    highlightSpeaker(speakerName) {
+        const bright = 0xffffff; // 通常の色
+        const dark = 0x888888;   // 暗い色
+
+        for (const name in this.scene.characters) {
+            const chara = this.scene.characters[name];
+            if (!chara.active) continue; // 非アクティブなキャラは無視
+
+            if (speakerName === null || speakerName === name) {
+                chara.setTint(bright);
+            } else {
+                chara.setTint(dark);
+            }
+        }
+    }
+
     next() {
         if (this.isWaitingClick) return;
         if (this.currentLine >= this.scenario.length) {
@@ -66,20 +86,37 @@ export default class ScenarioManager {
         }
     }
 
-    parse(line) {
+       parse(line) {
         const trimedLine = line.trim();
+
+        // 1. 無視する行の判定
         if (trimedLine.startsWith(';') || trimedLine.startsWith('*')) {
             this.next();
             return;
         }
-        if (trimedLine === '[p]') {
+
+        // 2. 話者指定行の判定 (例: "yuna:こんにちは")
+        const speakerMatch = trimedLine.match(/^([a-zA-Z0-9_]+):/);
+        if (speakerMatch) {
+            const speakerName = speakerMatch[1];
+            const dialogue = trimedLine.substring(speakerName.length + 1).trim();
+
+            this.highlightSpeaker(speakerName);
+            
+            const wrappedLine = this.manualWrap(dialogue);
             this.isWaitingClick = true;
-            this.messageWindow.showNextArrow();
+            this.messageWindow.setText(wrappedLine, true, () => {
+                this.messageWindow.showNextArrow();
+            });
             return;
         }
+
+        // 3. タグ行の判定
         if (trimedLine.startsWith('[')) {
+            // [p]タグもここでまとめて処理できる
             const { tagName, params } = this.parseTag(trimedLine);
             const handler = this.tagHandlers.get(tagName);
+    
             if (handler) {
                 handler(this, params);
             } else {
@@ -88,6 +125,10 @@ export default class ScenarioManager {
             }
             return;
         }
+
+        // 4. 上記のいずれでもなければ「地の文」と確定
+        this.highlightSpeaker(null); // 全員のハイライトを元に戻す
+
         this.isWaitingClick = true; 
         const wrappedLine = this.manualWrap(trimedLine);
         this.messageWindow.setText(wrappedLine, true, () => {
