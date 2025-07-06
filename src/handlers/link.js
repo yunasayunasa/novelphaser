@@ -3,8 +3,9 @@
  * 選択肢ボタンを生成する
  * @param {Object} params - {target}
  */
-export function handleLink(manager, params) {
+eexport function handleLink(manager, params) {
     const target = params.target;
+    const text = params.text;
     if (!target || !text){ console.warn('[link] target属性は必須です。'); return; }
 
     // ★★★ GameSceneのpendingChoicesに選択肢情報を追加 ★★★
