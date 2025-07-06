@@ -1,6 +1,6 @@
 ; === セーブ機能テスト：セーブ用シナリオ ===
 
-[playbgm storage="bgm_school" time=1000]
+[playbgm storage="ronpa_bgm" time=1000]
 [bg storage="bg_school" time=1000]
 [wait time=1000]
 
