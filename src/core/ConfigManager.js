@@ -13,6 +13,7 @@ const STORAGE_KEY = 'my_novel_engine_config';
 
 export default class ConfigManager extends EventEmitter {
     constructor() {
+        super(); 
         // 現在の設定値を保持するオブジェクト
         this.values = {};
         
