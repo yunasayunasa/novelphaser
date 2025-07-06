@@ -66,6 +66,30 @@ export default class ScenarioManager {
         }
     }
 
+    // ... ScenarioManagerクラスの中に追加 ...
+
+    /**
+     * 指定された話者を明るくし、それ以外を暗くする
+     * @param {string | null} speakerName - 明るくするキャラクターの名前。nullの場合は全員を明るくする。
+     */
+    highlightSpeaker(speakerName) {
+        const bright = 0xffffff; // 通常の明るさ（白）
+        const dark = 0x888888;   // 暗い状態（グレー）
+
+        // GameSceneが管理しているキャラクターリストをループ
+        for (const name in this.scene.characters) {
+            const chara = this.scene.characters[name];
+            
+            if (speakerName === null || speakerName === name) {
+                // 話者がいない(null)場合、または現在のキャラが話者の場合は明るくする
+                chara.setTint(bright);
+            } else {
+                // それ以外のキャラは暗くする
+                chara.setTint(dark);
+            }
+        }
+    }
+
     // --- 解析・ヘルパーメソッド ---
 
      /**
@@ -79,6 +103,25 @@ export default class ScenarioManager {
         if (trimedLine.startsWith(';') || trimedLine.startsWith('*')) {
             // 何もせず、すぐに次の行の処理へ
             this.next();
+            return;
+        }
+
+          // ★★★ 2. 話者指定行の判定 (新規追加) ★★★
+        // "キャラ名:" または "#キャラ名" の形式を認識 (正規表現を使用)
+        const speakerMatch = trimedLine.match(/^([a-zA-Z0-9_]+):/);
+        if (speakerMatch) {
+            const speakerName = speakerMatch[1]; // マッチした部分（キャラ名）を取得
+            const dialogue = trimedLine.substring(speakerName.length + 1).trim(); // コロン以降のセリフ部分を取得
+
+            // 話者ハイライト処理を呼び出す
+            this.highlightSpeaker(speakerName);
+            
+            // セリフ部分をテロップ表示
+            const wrappedLine = this.manualWrap(dialogue);
+            this.isWaitingClick = true;
+            this.messageWindow.setText(wrappedLine, true, () => {
+                this.messageWindow.showNextArrow();
+            });
             return;
         }
 
@@ -107,13 +150,12 @@ export default class ScenarioManager {
             return;
         }
 
-        // 4. 上記のいずれでもなければセリフ行と確定
+       // 5. 上記のいずれでもなければ「地の文」と確定
+        // ★★★ 地の文の場合は、全員をハイライト（元の明るさに戻す） ★★★
+        this.highlightSpeaker(null); // nullを渡すと全員が通常表示になるように設計
+
         const wrappedLine = this.manualWrap(trimedLine);
-        
-        // テロップ表示中はクリックしても進まないようにする
         this.isWaitingClick = true; 
-        
-        // テロップ表示をリクエストし、完了したら矢印を出すコールバックを渡す
         this.messageWindow.setText(wrappedLine, true, () => {
             this.messageWindow.showNextArrow();
         });
@@ -161,4 +203,6 @@ export default class ScenarioManager {
         wrappedText += currentLine;
         return wrappedText;
     }
+
+    
 }
