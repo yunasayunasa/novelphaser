@@ -11,8 +11,7 @@ import { handleBg } from '../handlers/bg.js';
 import { handlePlaySe } from '../handlers/playse.js';
 import { handlePlayBgm } from '../handlers/playbgm.js';
 import { handleStopBgm } from '../handlers/stopbgm.js';
-import { handleSave } from '../handlers/save.js';
-import { handleLoad } from '../handlers/load.js';
+
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -59,14 +58,25 @@ export default class GameScene extends Phaser.Scene {
         this.scenarioManager.registerTag('playse', handlePlaySe);
         this.scenarioManager.registerTag('playbgm', handlePlayBgm);
         this.scenarioManager.registerTag('stopbgm', handleStopBgm);
-        this.scenarioManager.registerTag('save', handleSave);
-        this.scenarioManager.registerTag('load', handleLoad);
         
         // --- ゲーム開始 ---
         this.scenarioManager.load('scene1');
         this.input.on('pointerdown', () => { this.scenarioManager.onClick(); });
         this.scenarioManager.next();
     }
+
+    // GameSceneクラスの中に追加
+performSave(slot) {
+    try {
+        const gameState = this.stateManager.getState();
+        gameState.saveDate = new Date().toLocaleString();
+        const jsonString = JSON.stringify(gameState);
+        localStorage.setItem(`save_data_${slot}`, jsonString);
+        console.log(`スロット[${slot}]にセーブしました。`, gameState);
+    } catch (e) {
+        console.error(`セーブに失敗しました: スロット[${slot}]`, e);
+    }
+}
 
     // GameSceneクラスの中に追加
 async performLoad(slot) { // asyncに戻しておくと後々安全

@@ -1,5 +1,7 @@
-import GameScene from './scenes/GameScene.js';
 import PreloadScene from './scenes/PreloadScene.js';
+import GameScene from './scenes/GameScene.js';
+import UIScene from './scenes/UIScene.js';
+import SaveLoadScene from './scenes/SaveLoadScene.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -10,8 +12,7 @@ const config = {
         width: 720,
         height: 1280
     },
-    // ★★★ 起動するシーンとして、インポートしたGameSceneを指定 ★★★
-     scene: [PreloadScene,GameScene]
+    scene: [PreloadScene, GameScene, UIScene, SaveLoadScene]
 };
 
 const game = new Phaser.Game(config);
