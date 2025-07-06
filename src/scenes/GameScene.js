@@ -51,7 +51,7 @@ export default class GameScene extends Phaser.Scene {
         // ★★★ ScenarioManagerにsoundManagerを渡す ★★★
         this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager);
         // ★★★ ScenarioManagerにmessageWindowを渡す ★★★
-        this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow);
+        this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager);
         this.scenarioManager.registerTag('chara_show', handleCharaShow);
         this.scenarioManager.registerTag('chara_hide', handleCharaHide); // 有効化
         this.scenarioManager.registerTag('p', handlePageBreak);
