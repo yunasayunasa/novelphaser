@@ -1,30 +1,15 @@
 [bg storage="bg_school"]
-[chara_show name="yuna" pos="left" y=1400 visible=false]
-
-; スライドインで登場
-[move name="yuna" y=800 alpha=1 time=1000]
+[chara_show name="yuna" pos="center"]
 [wait time=500]
 
-yuna:「じゃあ、ちょっとあそこまで歩いてみるね。」
-[p]
+yuna:「えっ！？　な、なに今の音！？」
 
-; 右端まで歩かせる
-[walk name="yuna" x=600 time=3000]
-[wait time=3000]
+; 驚きを表現
+[shake name="yuna" time=600 power=15]
+[wait time=600]
 
-yuna:「着いたー！」
-[p]
+; 画面全体を揺らす
+[vibrate time=800 power=0.01]
 
-; 反転して
-[flip name="yuna" time=500]
-[wait time=500]
-
-yuna:「今度は小走りで戻るよ！」
-[p]
-
-; 左端まで小走りで戻る (speedを速く、heightを小さく)
-[walk name="yuna" x=180 time=1500 speed=100 height=5]
-[wait time=1500]
-
-yuna:「ただいま！」
+yuna:「きゃっ！地震！？」
 [p]
