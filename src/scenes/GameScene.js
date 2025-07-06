@@ -43,19 +43,17 @@ export default class GameScene extends Phaser.Scene {
 this.stateManager = new StateManager();
         this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs);
           // ★★★ 1. 依存される部品を先に作る ★★★
-        this.soundManager = new SoundManager(this);
+        this.soundManager = new SoundManager(this, this.stateManager);
         
-        // ★★★ 2. 部品を使って、他のオブジェクトを作る ★★★
-        this.messageWindow = new MessageWindow(this, this.soundManager);
+        // ★★★2. 部品を使って、他のオブジェクトを作る ★★★
+        this.messageWindow = new MessageWindow(this, this.soundManagerthis, this.stateManager);
         // ★★★ メッセージレイヤーにMessageWindowを追加 ★★★
         this.layer.message.add(this.messageWindow);
-  // ★★★ 各マネージャーにstateManagerを渡す ★★★
-        this.soundManager = new SoundManager(this, this.stateManager);
-        this.messageWindow = new MessageWindow(this, this.soundManager);
+  // ★★★ 各マネージャーにstateManagerを渡す ★★
+
         this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager, this.stateManager);
 
-        // ★★★ ScenarioManagerにsoundManagerを渡す ★★★
-        this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager);
+        
        
         this.scenarioManager.registerTag('chara_show', handleCharaShow);
         this.scenarioManager.registerTag('chara_hide', handleCharaHide); // 有効化
