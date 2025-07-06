@@ -1,9 +1,9 @@
-/**
- * [p] タグの処理 (クリック待ち)
- * @param {ScenarioManager} manager - シナリオマネージャーのインスタンス
- * @param {Object} params - タグのパラメータ (このタグでは使わない)
- */
 export function handlePageBreak(manager, params) {
+    // もし選択肢が表示されている最中なら、それを消去する
+    if (manager.isWaitingChoice) {
+        manager.scene.clearChoiceButtons();
+    }
+    
     manager.isWaitingClick = true;
-    // このタグは次の行に進まない
+    manager.messageWindow.showNextArrow();
 }

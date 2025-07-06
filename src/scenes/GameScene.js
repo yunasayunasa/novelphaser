@@ -12,6 +12,8 @@ import { handlePlaySe } from '../handlers/playse.js';
 import { handlePlayBgm } from '../handlers/playbgm.js';
 import { handleStopBgm } from '../handlers/stopbgm.js';
 import ConfigManager from '../core/ConfigManager.js';
+import { handleLink } from '../handlers/link.js';
+import { handleJump } from '../handlers/jump.js';
 
 
 export default class GameScene extends Phaser.Scene {
@@ -62,6 +64,8 @@ export default class GameScene extends Phaser.Scene {
         this.scenarioManager.registerTag('playse', handlePlaySe);
         this.scenarioManager.registerTag('playbgm', handlePlayBgm);
         this.scenarioManager.registerTag('stopbgm', handleStopBgm);
+        this.scenarioManager.registerTag('link', handleLink);
+        this.scenarioManager.registerTag('jump', handleJump);
         
         // --- ゲーム開始 ---
         this.scenarioManager.load('scene1');
@@ -93,8 +97,25 @@ addChoiceButton(text, target) {
     
     // ボタンにジャンプ先情報を保存
     button.target = target;
-    
+    button.on('pointerdown', () => {
+        // 1. 表示されている選択肢ボタンをすべて消す
+        this.clearChoiceButtons();
+
+        // 2. ScenarioManagerのジャンプ機能を呼び出す
+        this.scenarioManager.jumpTo(target);
+    });
+
     this.choiceButtons.push(button);
+}
+ 
+// ★★★ ボタンを消すためのヘルパーメソッドを追加 ★★★
+clearChoiceButtons() {
+    this.choiceButtons.forEach(button => button.destroy());
+    this.choiceButtons = []; // 配列を空にする
+    // 選択肢待ち状態を解除
+    if (this.scenarioManager) {
+        this.scenarioManager.isWaitingChoice = false;
+    }
 }
 
     // GameSceneクラスの中に追加

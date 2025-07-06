@@ -1,7 +1,7 @@
 yuna:「ねえ、週末はどこに行きたい？」
 
-[link target="*go_sea"]海に行く[/link]
-[link target="*go_mountain"]山に行く[/link]
+[link target="*go_sea" text="海に行く"]
+[link target="*go_mountain" text="山に行く"]
 [p]
 
 *go_sea
@@ -13,4 +13,5 @@ yuna:「山かー。虫よけスプレーが必要ね。」
 [jump target="*end_choice"]
 
 *end_choice
-; 分岐後の共通ルート
+kaito:「じゃあ、週末が楽しみだね！」
+[s]

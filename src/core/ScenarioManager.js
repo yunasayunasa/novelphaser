@@ -187,4 +187,34 @@ export default class ScenarioManager {
         wrappedText += currentLine;
         return wrappedText;
     }
+
+    // ScenarioManagerクラスの中に追加
+
+/**
+ * 指定されたラベルにジャンプする
+ * @param {string} target - ジャンプ先のラベル名 (例: "*go_sea")
+ */
+jumpTo(target) {
+    // ラベル名の`*`を削除
+    const labelName = target.substring(1);
+
+    // シナリオの最初から、指定されたラベル行を探す
+    const targetLineIndex = this.scenario.findIndex(line => {
+        // 行の先頭が '*' で、かつラベル名が一致するか
+        return line.trim().startsWith('*') && line.trim().substring(1) === labelName;
+    });
+
+    if (targetLineIndex !== -1) {
+        // ラベルが見つかった場合
+        console.log(`ジャンプ: ${target} (行番号 ${targetLineIndex})`);
+        // 次に実行する行番号を、見つかった行に設定
+        this.currentLine = targetLineIndex;
+        // すぐに次の行から実行を再開
+        this.next();
+    } else {
+        // ラベルが見つからなかった場合
+        console.error(`ジャンプ先のラベル[${target}]が見つかりませんでした。`);
+        this.next(); // とりあえず次に進む
+    }
+}
 }
