@@ -10,6 +10,7 @@ export default class ScenarioManager {
         this.layers = layers;
         this.characterDefs = charaDefs || {};
         this.messageWindow = messageWindow; 
+  this.soundManager = soundManager;
 
         this.scenario = [];
         this.currentLine = 0;

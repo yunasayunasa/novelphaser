@@ -17,7 +17,8 @@ export default class MessageWindow extends Container{
         // 画面下端から、ウィンドウの高さの半分だけ上に配置するイメージ
         const windowY = gameHeight - 180; // 例：画面下から180pxの位置
         this.windowImage = scene.add.image(gameWidth / 2, windowY, 'message_window');
-
+//サウンドマネージャーオブジェクト
+        this.soundManager = soundManager;
         // --- テキストオブジェクト ---
         const padding = 35; // ウィンドウの内側の余白
         const textWidth = this.windowImage.width - (padding * 2);
@@ -116,6 +117,8 @@ export default class MessageWindow extends Container{
         this.charByCharTimer = this.scene.time.addEvent({
             delay: 50,
             callback: () => {
+                //ここでタイプ音を変更可能
+                  this.soundManager.playSynth('square');
                 // ★★★ this.charByCharTimer から直接 fullText を参照する ★★★
                 this.textObject.text += this.charByCharTimer.fullText[index];
                 index++;

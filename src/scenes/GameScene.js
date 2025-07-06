@@ -9,7 +9,7 @@ import { handleBg } from '../handlers/bg.js'; // これを追
 import MessageWindow from '../ui/MessageWindow.js';
 import { Layout } from '../core/Layout.js'; // これを追加
 import { handleCharaMod } from '../handlers/chara_mod.js';
-
+import SoundManager from '../core/SoundManager.js';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -18,7 +18,7 @@ export default class GameScene extends Phaser.Scene {
         this.layer = { background: null, character: null, message: null };
         this.charaDefs = null;
          this.messageWindow = null;
-        // ★★★ 正しい位置はここです！ ★★★
+         this.soundManager = null;
         this.characters = {}; 
     }
 
@@ -38,10 +38,13 @@ export default class GameScene extends Phaser.Scene {
 
         this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs);
         // ★★★ MessageWindowを生成 ★★★
-        this.messageWindow = new MessageWindow(this);
+        this.messageWindow = new MessageWindow(this, this.soundManager);
         // ★★★ メッセージレイヤーにMessageWindowを追加 ★★★
         this.layer.message.add(this.messageWindow);
+   this.soundManager = new SoundManager(this);
 
+        // ★★★ ScenarioManagerにsoundManagerを渡す ★★★
+        this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager);
         // ★★★ ScenarioManagerにmessageWindowを渡す ★★★
         this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow);
         this.scenarioManager.registerTag('chara_show', handleCharaShow);
