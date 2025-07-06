@@ -55,8 +55,10 @@ export function handleBg(manager, params) {
         
         // アニメーションの完了を待ってから次に進む
         scene.time.delayedCall(time, () => {
+    manager.stateManager.updateBg(storage);
             manager.next();
         });
+    
 
     } else {
         // 即時切り替え
@@ -64,6 +66,7 @@ export function handleBg(manager, params) {
         if (oldBg && oldBg !== newBg) {
             oldBg.destroy();
         }
+        manager.stateManager.updateBg(storage);
         manager.next();
     }
 }
