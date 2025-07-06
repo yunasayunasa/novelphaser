@@ -36,5 +36,19 @@ export default class UIScene extends Phaser.Scene {
             this.scene.pause('GameScene');
             this.scene.launch('SaveLoadScene', { mode: 'load' });
         });
-    }
+
+        const configButton = this.add.text(this.scale.width - 100, 170, '設定', { fontSize: '28px', fill: '#fff' })
+        .setOrigin(0.5)
+        .setInteractive();
+        
+    configButton.on('pointerdown', () => {
+        console.log("コンフィグボタンが押されました。");
+        this.scene.pause('GameScene');
+        this.scene.pause('UIScene'); // UIScene自身も一時停止
+        this.scene.launch('ConfigScene');
+    });
+}
+    
+
+    
 }
