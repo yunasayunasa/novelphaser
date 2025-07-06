@@ -132,7 +132,7 @@ function rebuildScene(manager, state) {
     manager.layers.background.removeAll(true);
     manager.layers.character.removeAll(true);
     scene.characters = {}; // キャラクター管理リストもリセット
-    manager.soundManager.stopBgm();
+  //  manager.soundManager.stopBgm();
     console.log("...レイヤークリア完了");
 
     // 2. シナリオを復元
@@ -175,11 +175,11 @@ function rebuildScene(manager, state) {
     console.log("...キャラクター復元完了");
 
     // 5. BGMを復元
-    console.log("5. BGMを復元します...");
+   /* console.log("5. BGMを復元します...");
     if (state.sound.bgm) {
         manager.soundManager.playBgm(state.sound.bgm);
     }
-    console.log("...BGM復元完了");
+    console.log("...BGM復元完了");*/
     
        // 6. メッセージウィンドウをリセット
     manager.messageWindow.setText('');
