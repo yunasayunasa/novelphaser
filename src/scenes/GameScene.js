@@ -182,7 +182,7 @@ function rebuildScene(manager, state) {
     console.log("...BGM復元完了");*/
     
        // 6. メッセージウィンドウをリセット
-    manager.messageWindow.setText('');
+   // manager.messageWindow.setText('');
 
     // ★★★ 7. 話者とハイライトを復元 ★★★
     let speakerName = null;
