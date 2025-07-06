@@ -19,13 +19,17 @@ export async function handleLoad(manager, params) {
         manager.stateManager.setState(loadedState);
         console.log(`スロット[${slot}]からロードしました。`, loadedState);
         
-        // ★★★ 4. 画面を再構築 ★★★
-        await rebuildScene(manager, loadedState);
+         // ★★★ 4. 画面を再構築 ★★★
+    await rebuildScene(manager, loadedState);
         
-        // 5. ロードしたシナリオの行から再開
-        manager.next();
+    // 5. ロードしたシナリオの行から「再開」する
+    // ★★★ next()を呼ぶのではなく、直接parse()を呼ぶ ★★★
+    const line = manager.scenario[manager.currentLine];
+    manager.currentLine++; // 次の行に進む準備をしておく
+    manager.parse(line); // 保存されていた行を直接実行する
+}
 
-    } catch (e) {
+     catch (e) {
         console.error(`ロードに失敗しました: スロット[${slot}]`, e);
         manager.next();
     }
