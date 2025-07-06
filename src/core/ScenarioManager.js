@@ -153,6 +153,11 @@ export default class ScenarioManager {
         const parts = content.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
         const tagName = parts.shift() || '';
         const params = {};
+           // ★★★ グラフィカルリンク用のテキストパラメータを追加 ★★★
+    if (tagName === 'glink' && parts.length > 0 && !parts[parts.length-1].includes('=')) {
+        params.text = parts.pop();
+    }
+    // ★★★ ここまで ★★★
         parts.forEach(part => {
             const [key, value] = part.split('=');
             if (value) {

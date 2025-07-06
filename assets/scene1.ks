@@ -1,28 +1,16 @@
-; === セーブ機能テスト：セーブ用シナリオ ===
+yuna:「ねえ、週末はどこに行きたい？」
 
-[playbgm storage="ronpa_bgm" time=1000]
-[bg storage="bg_school" time=1000]
-[wait time=1000]
-
-[chara_show name="yuna" pos="left" time=500]
-[chara_show name="kaito" pos="right" time=500]
-[wait time=500]
-[load slot="1"]
-yuna:「この会話の途中でセーブしますね。」
+[link target="*go_sea"]海に行く[/link]
+[link target="*go_mountain"]山に行く[/link]
 [p]
 
-kaito:「了解。背景、キャラクター2人、BGMが流れている状態だね。」
-[p]
+*go_sea
+yuna:「海、いいね！水着持っていかなくちゃ。」
+[jump target="*end_choice"]
 
-[save slot="1"]
+*go_mountain
+yuna:「山かー。虫よけスプレーが必要ね。」
+[jump target="*end_choice"]
 
-yuna:「セーブしました。」
-[p]
-
-yuna:「ロードが成功すれば、このセリフが表示されます。」
-[p]
-
-; --- この先はセーブ後のテストなので、ロード時には実行されない ---
-[chara_hide name="yuna"]
-[chara_hide name="kaito"]
-[stopbgm]
+*end_choice
+; 分岐後の共通ルート

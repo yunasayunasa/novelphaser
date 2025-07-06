@@ -25,6 +25,7 @@ export default class GameScene extends Phaser.Scene {
         this.charaDefs = null;
         this.characters = {};
         this.configManager = null;
+        this.choiceButtons = []; 
     }
 
     init(data) {
@@ -79,6 +80,21 @@ performSave(slot) {
     } catch (e) {
         console.error(`セーブに失敗しました: スロット[${slot}]`, e);
     }
+}
+
+addChoiceButton(text, target) {
+    // 現在の選択肢ボタンの数を取得して、Y座標を計算
+    const buttonCount = this.choiceButtons.length;
+    const y = 400 + (buttonCount * 100);
+
+    const button = this.add.text(this.scale.width / 2, y, text, { fontSize: '36px', fill: '#fff', backgroundColor: '#555', padding: { x: 20, y: 10 }})
+        .setOrigin(0.5)
+        .setInteractive();
+    
+    // ボタンにジャンプ先情報を保存
+    button.target = target;
+    
+    this.choiceButtons.push(button);
 }
 
     // GameSceneクラスの中に追加
