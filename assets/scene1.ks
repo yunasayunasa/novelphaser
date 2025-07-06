@@ -1,5 +1,28 @@
-; ゲーム開始直後に、スロット1からロードする
-[load slot="1"]
+; === セーブ機能テスト：セーブ用シナリオ ===
 
-; ロードが成功すれば、この行は実行されず、
-; 保存した次の行（yuna:「セーブしました...」）から再開するはず
+[playbgm storage="ronpa_bgm" time=1000]
+[bg storage="bg_school" time=1000]
+[wait time=1000]
+
+[chara_show name="yuna" pos="left" time=500]
+[chara_show name="kaito" pos="right" time=500]
+[wait time=500]
+
+yuna:「この会話の途中でセーブしますね。」
+[p]
+
+kaito:「了解。背景、キャラクター2人、BGMが流れている状態だね。」
+[p]
+
+[save slot="1"]
+
+yuna:「セーブしました。」
+[p]
+
+yuna:「ロードが成功すれば、このセリフが表示されます。」
+[p]
+
+; --- この先はセーブ後のテストなので、ロード時には実行されない ---
+[chara_hide name="yuna"]
+[chara_hide name="kaito"]
+[stopbgm]
