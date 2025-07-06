@@ -6,13 +6,13 @@ export default class ScenarioManager {
      * @param {MessageWindow} messageWindow
      * @param {SoundManager} soundManager  // ★★★ これを引数に追加 ★★★
      */
-    constructor(scene, layers, charaDefs, messageWindow, soundManager) {
+    constructor(scene, layers, charaDefs, messageWindow, soundManager, stateManager) {
         this.scene = scene;
         this.layers = layers;
         this.characterDefs = charaDefs || {};
         this.messageWindow = messageWindow; 
   this.soundManager = soundManager;
-
+this.stateManager =stateManager;
         this.scenario = [];
         this.currentLine = 0;
         this.isWaitingClick = false;
