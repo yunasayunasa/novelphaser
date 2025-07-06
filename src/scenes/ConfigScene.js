@@ -34,7 +34,8 @@ export default class ConfigScene extends Phaser.Scene {
             this.add.text(100, y, def.label, { fontSize: '32px', fill: '#fff' }).setOrigin(0, 0.5);
 
             // 値を表示
-            const valueText = this.add.text(this.scale.width - 100, y, this.configManager.getValue(key), { fontSize: '32px', fill: '#fff' }).setOrigin(1, 0.5);
+            const valueTextX = this.scale.width - 320;
+            const valueText = this.add.text(valueTextX, y, this.configManager.getValue(key), { fontSize: '32px', fill: '#fff' }).setOrigin(1, 0.5);
 
             // スライダーUIを模した簡単なクリックボタンを作成
             // (本格的なスライダーUIは、外部ライブラリを使うか、自作する必要があり複雑なため)
