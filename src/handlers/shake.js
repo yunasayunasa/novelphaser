@@ -16,42 +16,39 @@ export function handleShake(manager, params) {
     
     // 元の位置を保存しておく
     const originX = chara.x;
+    const originY = chara.y; // Y座標も揺らす場合のために保持
 
-    // ★★★ PhaserのTimeline機能を使って、複数のTweenを連続実行 ★★★
-    const timeline = manager.scene.tweens.createTimeline();
+    let elapsed = 0; // 経過時間
 
-    // 総時間(time)が経過するまで、短い揺れを繰り返す
-    const repeatCount = Math.floor(time / (duration * 2)); 
-    for (let i = 0; i < repeatCount; i++) {
-        timeline.add({
+    // ★★★ 揺れアニメーションを定義する再帰関数 ★★★
+    const shakeAnim = () => {
+        // 経過時間が総時間を超えたら、終了処理
+        if (elapsed >= time) {
+            chara.setPosition(originX, originY); // 最終的に元の位置に戻す
+            manager.next();
+            return;
+        }
+
+        // 次の揺れの目標座標をランダムに決める
+        const targetX = originX + (Math.random() * power * 2) - power;
+        const targetY = originY + (Math.random() * power * 2) - power;
+
+        elapsed += duration;
+
+        // 1回分の揺れTweenを実行
+        manager.scene.tweens.add({
             targets: chara,
-            x: originX + power, // 右に揺れる
+            x: targetX,
+            y: targetY,
             duration: duration,
             ease: 'Power1',
-            yoyo: true, // 元の位置に戻る
+            onComplete: () => {
+                // 1回の揺れが終わったら、自分自身（次の揺れ）を呼び出す
+                shakeAnim(); 
+            }
         });
-        timeline.add({
-            targets: chara,
-            x: originX - power, // 左に揺れる
-            duration: duration,
-            ease: 'Power1',
-            yoyo: true,
-        });
-    }
+    };
 
-    // ★★★ 最後に元の位置に戻すことを保証する ★★★
-    timeline.add({
-        targets: chara,
-        x: originX,
-        duration: duration,
-        ease: 'Power1'
-    });
-    
-    // タイムラインを実行
-    timeline.play();
-
-    // 揺れが終わるのを待ってから次に進む
-    manager.scene.time.delayedCall(time, () => {
-        manager.next();
-    });
+    // ★★★ 最初の揺れを開始 ★★★
+    shakeAnim();
 }
