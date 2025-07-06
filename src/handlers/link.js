@@ -5,18 +5,12 @@
  */
 export function handleLink(manager, params) {
     const target = params.target;
-    if (!target) { console.warn('[link] target属性は必須です。'); return; }
+    if (!target || !text){ console.warn('[link] target属性は必須です。'); return; }
 
-    // ★★★ [link]...[/link] の間のテキストを取得する処理が必要 ★★★
-    // これは parseTag を改造する必要があり、少し複雑
-    // 今回は、仮で `text` 属性で指定できるようにする
-    const text = params.text;
-    if (!text) { console.warn('[link] text属性は必須です。'); return; }
-
-    // GameSceneにボタン生成を依頼
-    manager.scene.addChoiceButton(text, target);
-
-    // ★★★ 選択肢表示中はシナリオを進めない ★★★
-    manager.isWaitingChoice = true; 
-    // next()は呼ばない！
+    // ★★★ GameSceneのpendingChoicesに選択肢情報を追加 ★★★
+    manager.scene.pendingChoices.push({ text: text, target: target });
+    
+    // ★★★ isWaitingChoiceにはしない！ ★★★
+    // すぐに次の行（次の[link]タグ）に進む
+    manager.next();
 }
