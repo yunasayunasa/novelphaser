@@ -102,7 +102,6 @@ displayChoiceButtons() {
         .setOrigin(0.5)
         .setInteractive();
     
-<<<<<<< HEAD
         button.on('pointerdown', () => {
             this.clearChoiceButtons();
             this.scenarioManager.jumpTo(choice.target);
@@ -112,19 +111,6 @@ displayChoiceButtons() {
     });
 
     this.pendingChoices = []; // 溜めていた情報はクリア
-=======
-    // ボタンにジャンプ先情報を保存
-    button.target = target;
-    button.on('pointerdown', () => {
-        // 1. 表示されている選択肢ボタンをすべて消す
-        this.clearChoiceButtons();
-
-        // 2. ScenarioManagerのジャンプ機能を呼び出す
-        this.scenarioManager.jumpTo(target);
-    });
-
-    this.choiceButtons.push(button);
->>>>>>> eacc979b47946080c501244139878da9c5aba54a
 }
  
 // ★★★ ボタンを消すためのヘルパーメソッドを追加 ★★★
