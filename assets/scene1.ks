@@ -8,15 +8,14 @@
 [chara_show name="kaito" pos="right" time=500]
 [wait time=500]
 
-yuna:「この会話の途中でロードしますね。」
+yuna:「この会話の途中でセーブしますね。」
 [p]
-[load slot="1"]
 
 kaito:「了解。背景、キャラクター2人、BGMが流れている状態だね。」
 [p]
 
-
-
+[save slot="1"]
+[load slot="1"]
 yuna:「セーブしました。」
 [p]
 
