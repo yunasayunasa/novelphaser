@@ -1,7 +1,7 @@
 export default class SoundManager {
-    constructor(scene) {
+    constructor(scene, stateManager) {
         this.scene = scene;
-        
+        this.stateManager = stateManager;
         // ★★★ Web Audio APIの心臓部、AudioContextを準備 ★★★
         // 一度だけ生成し、使い回すのが基本
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
