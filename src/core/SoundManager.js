@@ -4,8 +4,20 @@ export default class SoundManager {
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         this.currentBgm = null;
         this.configManager = configManager;
+   // ★★★ 設定変更イベントを監視する ★★★
+        this.configManager.on('change:bgmVolume', (newValue) => {
+            // bgmVolumeが変更されたら、この関数が呼ばれる
+            if (this.currentBgm && this.currentBgm.isPlaying) {
+                this.currentBgm.setVolume(newValue);
+            }
+        });
 
+        this.configManager.on('change:seVolume', (newValue) => {
+            // SE音量が変わった時の処理もここに追加できる
+            // (今回はplaySeの中で毎回値を見ているので不要だが、設計としては可能)
+        });
     }
+    
      playSe(key, config = {}) {
         // ★★★ SE音量の設定を反映 ★★★
         // configでvolumeが指定されていなければ、設定値を使う

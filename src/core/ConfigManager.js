@@ -1,5 +1,6 @@
 // --- 設定項目の定義データ ---
 // ここに項目を追加すれば、自動でUIやセーブ機能が対応する
+const EventEmitter = Phaser.Events.EventEmitter;
 const configDefs = {
     bgmVolume: { type: 'slider', label: 'BGM 音量', min: 0, max: 1, step: 0.1, defaultValue: 0.5 },
     seVolume: { type: 'slider', label: 'SE 音量', min: 0, max: 1, step: 0.1, defaultValue: 0.8 },
@@ -10,7 +11,7 @@ const configDefs = {
 const STORAGE_KEY = 'my_novel_engine_config';
 
 
-export default class ConfigManager {
+export default class ConfigManager extends EventEmitter {
     constructor() {
         // 現在の設定値を保持するオブジェクト
         this.values = {};
@@ -42,9 +43,17 @@ export default class ConfigManager {
      * @param {*} value - 新しい値
      */
     setValue(key, value) {
+        // 値が実際に変更されたかチェック
+        const oldValue = this.values[key];
+        if (oldValue === value) return; // 変更がなければ何もしない
+
         this.values[key] = value;
         console.log(`設定変更: ${key} = ${value}`);
         this.save();
+        
+        // ★★★ 変更があったことをイベントで通知 ★★★
+        // イベント名は 'change:[キー名]' とする (例: 'change:bgmVolume')
+        this.emit(`change:${key}`, value, oldValue);
     }
     
     /**
