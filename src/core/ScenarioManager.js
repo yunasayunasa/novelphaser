@@ -7,13 +7,14 @@ export default class ScenarioManager {
      * @param {SoundManager} soundManager
      * @param {StateManager} stateManager
      */
-    constructor(scene, layers, charaDefs, messageWindow, soundManager, stateManager) {
+    constructor(scene, layers, charaDefs, messageWindow, soundManager, stateManager, configManager) {
         this.scene = scene;
         this.layers = layers;
         this.characterDefs = charaDefs || {};
         this.messageWindow = messageWindow;
         this.soundManager = soundManager;
         this.stateManager = stateManager;
+        this.configManager = configManager;
 
         this.scenario = [];
         this.currentFile = null; // 現在のシナリオファイル名を保持

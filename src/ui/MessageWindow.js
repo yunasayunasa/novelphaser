@@ -8,7 +8,7 @@ export default class MessageWindow extends Container{
      * @param {Phaser.Scene} scene
      * @param {SoundManager} soundManager // ★★★ JSDocにも追加 ★★★
      */
-    constructor(scene, soundManager) { // ★★★ 引数に soundManager を追加 ★★★
+    constructor(scene, soundManager, configManager) { // ★★★ 引数に soundManager を追加 ★★★
         // 親クラス(Container)のコンストラクタを呼び出す
         // コンテナ自体の位置は(0,0)でOK。中の要素の位置で調整する。
         super(scene, 0, 0);
@@ -23,6 +23,8 @@ export default class MessageWindow extends Container{
         this.windowImage = scene.add.image(gameWidth / 2, windowY, 'message_window');
 //サウンドマネージャーオブジェクト
         this.soundManager = soundManager;
+        this.configManager = configManager;
+
         // --- テキストオブジェクト ---
         const padding = 35; // ウィンドウの内側の余白
         const textWidth = this.windowImage.width - (padding * 2);
@@ -93,13 +95,7 @@ export default class MessageWindow extends Container{
         }
     }
 
-    /**
-     * テキストを設定するメソッド (大改造)
-     * @param {string} text - 表示する全文
-     * @param {boolean} useTyping - テロップ表示を使うかどうか
-     * @param {function} onComplete - 表示完了時に呼ばれるコールバック関数
-     */
-    setText(text, useTyping = true, onComplete = () => {}) {
+      setText(text, useTyping = true, onComplete = () => {}) {
         // 既存のテキストとタイマーをクリア
         this.textObject.setText('');
         if (this.charByCharTimer) {
@@ -107,53 +103,48 @@ export default class MessageWindow extends Container{
         }
         
         if (!useTyping || text.length === 0) {
-            // テロップ表示を使わない場合、またはテキストが空の場合は即時表示
             this.textObject.setText(text);
             this.isTyping = false;
-            onComplete(); // 即座に完了コールバックを呼ぶ
+            onComplete();
             return;
         }
         
         this.isTyping = true;
         let index = 0;
         
-       // ★★★ タイマーイベントを作成 ★★★
-        this.charByCharTimer = this.scene.time.addEvent({
-            delay: 50,
+        // テキスト表示速度の設定を反映
+        const textSpeedValue = this.configManager.getValue('textSpeed');
+        const delay = 100 - textSpeedValue;
+
+        const timerConfig = {
+            delay: Math.max(delay, 0),
             callback: () => {
-                //ここでタイプ音を変更可能
-                //square (矩形波)
-              //  sine (正弦波):
-              //  triangle (三角波):
-               // sawtooth (ノコギリ波):からえらべるよ
-                   // ★★★ ここを書き換えて遊んでみよう！ ★★★
- // シンセの代わりに、SEを再生する
-                this.soundManager.playSe('popopo', { volume: 0.7 }); // volumeで音量を調整(0~1)
+                // タイプ音を再生
+                this.soundManager.playSe('popopo'); // 音量設定はSoundManagerに任せる
 
-    // 例1: ちょっと優しい三角波のタイプ音
-   // this.soundManager.playSynth('triangle', 1500, 0.04);
-
-    // 例2: 低めの正弦波で、ポポポという感じの音
-    // this.soundManager.playSynth('sine', 880, 0.08);
-    
-    // 例3: ノコギリ波の攻撃的な音
-    // this.soundManager.playSynth('sawtooth', 500, 0.03)
-                // ★★★ this.charByCharTimer から直接 fullText を参照する ★★★
-                this.textObject.text += this.charByCharTimer.fullText[index];
+                // 文字を追加
+                this.textObject.text += timerConfig.fullText[index];
                 index++;
 
-                if (index === this.charByCharTimer.fullText.length) {
+                // 終了判定
+                if (index === timerConfig.fullText.length) {
                     this.charByCharTimer.remove();
                     this.isTyping = false;
                     onComplete();
                 }
             },
             callbackScope: this,
-            loop: true
-        });
+            loop: true,
+            // カスタムプロパティとして全文を保存
+            fullText: text 
+        };
         
-        // ★★★ 作成したタイマーオブジェクトに、後からプロパティを追加する ★★★
-        this.charByCharTimer.fullText = text;
+        // ★★★ この2行が重要です ★★★
+        // 1. timerConfigを使ってタイマーを作成する
+        this.charByCharTimer = this.scene.time.addEvent(timerConfig);
+        
+        // 2. 作成したタイマーに全文をセットする (timerConfigに含めたので、この行はもう不要)
+        // this.charByCharTimer.fullText = text;
     }
     
     skipTyping() {

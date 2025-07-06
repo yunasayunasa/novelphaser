@@ -1,16 +1,30 @@
 export default class SoundManager {
-    constructor(scene) {
+    constructor(scene, configManager) {
         this.scene = scene;
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         this.currentBgm = null;
+        this.configManager = configManager;
+
     }
-    playSe(key, config = {}) { this.scene.sound.play(key, config); }
-    playBgm(key, volume = 0.5, fadeInTime = 0) {
+     playSe(key, config = {}) {
+        // ★★★ SE音量の設定を反映 ★★★
+        // configでvolumeが指定されていなければ、設定値を使う
+        if (config.volume === undefined) {
+            config.volume = this.configManager.getValue('seVolume');
+        }
+        this.scene.sound.play(key, config);
+    }
+    
+    playBgm(key, volume, fadeInTime = 0) {
+        // ★★★ BGM音量の設定を反映 ★★★
+        // volumeが引数で指定されていなければ、設定値を使う
+        const targetVolume = volume !== undefined ? volume : this.configManager.getValue('bgmVolume');
         if (this.currentBgm && this.currentBgm.key === key) return;
         if (this.currentBgm) { this.stopBgm(); }
         this.currentBgm = this.scene.sound.add(key, { loop: true, volume: fadeInTime > 0 ? 0 : volume });
         this.currentBgm.play();
-        if (fadeInTime > 0) { this.scene.tweens.add({ targets: this.currentBgm, volume: volume, duration: fadeInTime, ease: 'Linear' }); }
+        if (fadeInTime > 0) {
+            this.scene.tweens.add({ targets: this.currentBgm, volume: targetVolume, duration: fadeInTime, ease: 'Linear' }); }
     }
     stopBgm(fadeOutTime = 0) {
         if (!this.currentBgm) return;

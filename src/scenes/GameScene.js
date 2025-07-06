@@ -11,6 +11,7 @@ import { handleBg } from '../handlers/bg.js';
 import { handlePlaySe } from '../handlers/playse.js';
 import { handlePlayBgm } from '../handlers/playbgm.js';
 import { handleStopBgm } from '../handlers/stopbgm.js';
+import ConfigManager from '../core/ConfigManager.js';
 
 
 export default class GameScene extends Phaser.Scene {
@@ -23,6 +24,7 @@ export default class GameScene extends Phaser.Scene {
         this.layer = { background: null, character: null, message: null };
         this.charaDefs = null;
         this.characters = {};
+        this.configManager = null;
     }
 
     init(data) {
@@ -42,11 +44,12 @@ export default class GameScene extends Phaser.Scene {
         this.layer.message = this.add.container(0, 0);
 
         // --- マネージャー/UIクラスの生成 (依存関係に注意) ---
+        this.configManager = new ConfigManager();
         this.stateManager = new StateManager();
-        this.soundManager = new SoundManager(this);
-        this.messageWindow = new MessageWindow(this, this.soundManager);
+        this.soundManager = new SoundManager(this, this.configManager);
+        this.messageWindow = new MessageWindow(this, this.soundManager, this.configManager);
         this.layer.message.add(this.messageWindow);
-        this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager, this.stateManager);
+        this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager, this.stateManager, this.configManager);
         
         // --- タグハンドラの登録 ---
         this.scenarioManager.registerTag('chara_show', handleCharaShow);
