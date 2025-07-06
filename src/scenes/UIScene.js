@@ -5,50 +5,64 @@ export default class UIScene extends Phaser.Scene {
         super({ key: 'UIScene', active: true });
     }
 
-    create() {
+   create() {
         console.log("UIScene: 作成されました。");
         const gameWidth = this.scale.width;
+        const gameHeight = this.scale.height;
 
-        // --- セーブボタンを作成 ---
-        // 将来的にメニューボタンから開くようにするが、今は直接ボタンを置く
-        const saveButton = this.add.text(gameWidth - 100, 50, 'セーブ', { fontSize: '28px', fill: '#fff' })
-            .setOrigin(0.5)
-            .setInteractive(); // クリック可能にする
+        // --- 1. メニューパネル（ボタンの入れ物）を作成 ---
+        // 最初は画面の外に隠しておく
+        const panelY = gameHeight + 100; // 画面の下に隠れる位置
+        const panel = this.add.container(0, panelY);
+
+        // パネルの背景（半透明の黒）
+        const panelBg = this.add.rectangle(gameWidth / 2, 0, gameWidth, 120, 0x000000, 0.8);
+        panel.add(panelBg);
         
-        saveButton.on('pointerdown', () => {
-            console.log("セーブボタンが押されました。");
+        // --- 2. パネル内の各ボタンを作成 ---
+        const buttonY = 0; // パネル内のY座標
+        const saveButton = this.add.text(gameWidth / 2 - 180, buttonY, 'セーブ', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
+        const loadButton = this.add.text(gameWidth / 2, buttonY, 'ロード', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
+        const configButton = this.add.text(gameWidth / 2 + 180, buttonY, '設定', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
+        panel.add([saveButton, loadButton, configButton]);
 
-            // GameSceneの動作を一時停止
-            this.scene.pause('GameScene');
+        // --- 3. メインの「メニュー」ボタンを作成 ---
+        // メッセージウィンドウの下の隙間あたりに配置
+        const menuButtonY = gameHeight - 50;
+        const menuButton = this.add.text(gameWidth / 2, menuButtonY, 'MENU', { fontSize: '36px', fill: '#fff' }).setOrigin(0.5).setInteractive();
+
+        // --- 4. ボタンの動作を定義 ---
+        let isPanelOpen = false;
+
+        menuButton.on('pointerdown', () => {
+            isPanelOpen = !isPanelOpen; // パネルの表示/非表示を切り替え
             
-            // SaveLoadSceneを上に重ねて起動する
-            // 起動時に 'save' モードであることを伝えるデータを渡す
-            this.scene.launch('SaveLoadScene', { mode: 'save' });
+            const targetY = isPanelOpen ? gameHeight - 60 : gameHeight + 100; // 表示位置 or 隠れる位置
+
+            // パネルをスライドさせるアニメーション
+            this.tweens.add({
+                targets: panel,
+                y: targetY,
+                duration: 300,
+                ease: 'Cubic.easeInOut'
+            });
         });
 
-        // --- ロードボタンを作成 ---
-        const loadButton = this.add.text(gameWidth - 100, 110, 'ロード', { fontSize: '28px', fill: '#fff' })
-            .setOrigin(0.5)
-            .setInteractive();
-
+        // パネル内の各ボタンの動作
+        saveButton.on('pointerdown', () => {
+            this.scene.pause('GameScene');
+            this.scene.launch('SaveLoadScene', { mode: 'save' });
+        });
         loadButton.on('pointerdown', () => {
-            console.log("ロードボタンが押されました。");
             this.scene.pause('GameScene');
             this.scene.launch('SaveLoadScene', { mode: 'load' });
         });
-
-        const configButton = this.add.text(this.scale.width - 100, 170, '設定', { fontSize: '28px', fill: '#fff' })
-        .setOrigin(0.5)
-        .setInteractive();
-        
-    configButton.on('pointerdown', () => {
-        console.log("コンフィグボタンが押されました。");
-        this.scene.pause('GameScene');
-        this.scene.pause('UIScene'); // UIScene自身も一時停止
-        this.scene.launch('ConfigScene');
-    });
+        configButton.on('pointerdown', () => {
+            this.scene.pause('GameScene');
+            this.scene.pause('UIScene'); // Configを開くときはUIも止める
+            this.scene.launch('ConfigScene');
+        });
+    }
 }
-    
 
     
-}
