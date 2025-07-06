@@ -185,7 +185,7 @@ function rebuildScene(manager, state) {
    // manager.messageWindow.setText('');
 
     // ★★★ 7. 話者とハイライトを復元 ★★★
-    let speakerName = null;
+   /* let speakerName = null;
     const line = manager.scenario[manager.currentLine];
     const speakerMatch = line.trim().match(/^([a-zA-Z0-9_]+):/);
     if (speakerMatch) {
@@ -193,5 +193,5 @@ function rebuildScene(manager, state) {
     }
     manager.highlightSpeaker(speakerName);
     
-    console.log("--- rebuildScene 正常終了 ---");
+    console.log("--- rebuildScene 正常終了 ---");*/
 }
