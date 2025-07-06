@@ -174,7 +174,7 @@ function rebuildScene(manager, state) {
     }
     console.log("...キャラクター復元完了");
 
-     5. BGMを復元
+    // 5. BGMを復元
    console.log("5. BGMを復元します...");
     if (state.sound.bgm) {
         manager.soundManager.playBgm(state.sound.bgm);
