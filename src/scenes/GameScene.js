@@ -28,6 +28,7 @@ export default class GameScene extends Phaser.Scene {
         this.characters = {};
         this.configManager = null;
         this.choiceButtons = []; 
+        this.pendingChoices = []; // ★★★ 選択肢の一時保管場所 ★★★
     }
 
     init(data) {
@@ -86,15 +87,32 @@ performSave(slot) {
     }
 }
 
-addChoiceButton(text, target) {
-    // 現在の選択肢ボタンの数を取得して、Y座標を計算
-    const buttonCount = this.choiceButtons.length;
-    const y = 400 + (buttonCount * 100);
+/**
+ * 溜まっている選択肢情報を元に、ボタンを一括で画面に表示する
+ */
+displayChoiceButtons() {
+    // Y座標の計算を、全体のボタン数に基づいて行う
+    const totalButtons = this.pendingChoices.length;
+    const startY = (this.scale.height / 2) - ((totalButtons - 1) * 60); // 全体が中央に来るように開始位置を調整
+
+    this.pendingChoices.forEach((choice, index) => {
+        const y = startY + (index * 120); // ボタン間のスペース
 
     const button = this.add.text(this.scale.width / 2, y, text, { fontSize: '36px', fill: '#fff', backgroundColor: '#555', padding: { x: 20, y: 10 }})
         .setOrigin(0.5)
         .setInteractive();
     
+<<<<<<< HEAD
+        button.on('pointerdown', () => {
+            this.clearChoiceButtons();
+            this.scenarioManager.jumpTo(choice.target);
+        });
+
+        this.choiceButtons.push(button);
+    });
+
+    this.pendingChoices = []; // 溜めていた情報はクリア
+=======
     // ボタンにジャンプ先情報を保存
     button.target = target;
     button.on('pointerdown', () => {
@@ -106,6 +124,7 @@ addChoiceButton(text, target) {
     });
 
     this.choiceButtons.push(button);
+>>>>>>> eacc979b47946080c501244139878da9c5aba54a
 }
  
 // ★★★ ボタンを消すためのヘルパーメソッドを追加 ★★★
@@ -117,6 +136,16 @@ clearChoiceButtons() {
         this.scenarioManager.isWaitingChoice = false;
     }
 }
+
+clearChoiceButtons() {
+    this.choiceButtons.forEach(button => button.destroy());
+    this.choiceButtons = [];
+    this.pendingChoices = []; // 念のためこちらもクリア
+    if (this.scenarioManager) {
+        this.scenarioManager.isWaitingChoice = false;
+    }
+}
+
 
     // GameSceneクラスの中に追加
 async performLoad(slot) { // asyncに戻しておくと後々安全
