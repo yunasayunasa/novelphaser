@@ -20,7 +20,18 @@ export function handleCharaShow(manager, params) {
         return;
     }
 
-     // --- 2. 座標を決定 ---
+    // --- 2. 表示する画像(storage)を決定 ---
+    // face属性が指定されていれば、それを優先する
+    const face = params.face || 'normal';
+    const storage = def.face[face]; // "normal" や "angry" に対応する画像キーを取得
+
+    if (!storage) {
+        console.warn(`キャラクター[${name}]の表情[${face}]のstorageが見つかりません。asset_define.jsonを確認してください。`);
+        manager.next();
+        return;
+    }
+
+       // --- 2. 座標を決定 ---
     let x, y;
     const pos = params.pos;
     const orientation = manager.scene.scale.isPortrait ? 'portrait' : 'landscape';
@@ -43,20 +54,6 @@ export function handleCharaShow(manager, params) {
         y = Number(params.y);
     }
 
-
-    // --- 3. 座標を決定 ---
-    let x, y;
-    const pos = params.pos;
-    const orientation = manager.scene.scale.isPortrait ? 'portrait' : 'landscape';
-
-    if (pos && Layout[orientation].character[pos]) {
-        x = Layout[orientation].character[pos].x;
-        y = Layout[orientation].character[pos].y;
-    } else {
-        x = Number(params.x) || Layout[orientation].character.center.x;
-        y = Number(params.y) || Layout[orientation].character.center.y;
-    }
-    
     // --- 4. 表示処理 ---
     const time = Number(params.time) || 0;
 
