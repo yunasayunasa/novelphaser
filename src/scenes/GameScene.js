@@ -11,6 +11,8 @@ import { handleBg } from '../handlers/bg.js';
 import { handlePlaySe } from '../handlers/playse.js';
 import { handlePlayBgm } from '../handlers/playbgm.js';
 import { handleStopBgm } from '../handlers/stopbgm.js';
+import { handleSave } from '../handlers/save.js';
+import { handleLoad } from '../handlers/load.js';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -57,6 +59,8 @@ export default class GameScene extends Phaser.Scene {
         this.scenarioManager.registerTag('playse', handlePlaySe);
         this.scenarioManager.registerTag('playbgm', handlePlayBgm);
         this.scenarioManager.registerTag('stopbgm', handleStopBgm);
+        this.scenarioManager.registerTag('save', handleSave);
+        this.scenarioManager.registerTag('load', handleLoad);
         
         // --- ゲーム開始 ---
         this.scenarioManager.load('scene1');
