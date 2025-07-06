@@ -16,14 +16,16 @@ export async function handleLoad(manager, params) {
         console.log(`スロット[${slot}]からロードしました。`, loadedState);
         
         // ★★★ rebuildSceneをtry...catchで囲む ★★★
-        try {
-            rebuildScene(manager, loadedState); // rebuildSceneはasyncである必要はない
+          try {
+            rebuildScene(manager, loadedState);
             const line = manager.scenario[manager.currentLine];
             manager.currentLine++;
             manager.parse(line);
         } catch (rebuildError) {
-            // ★★★ 再構築中のエラーをキャッチ ★★★
-            console.error("シーンの再構築に失敗しました。", rebuildError);
+            // ★★★ ここを改造 ★★★
+            console.error("シーンの再構築に失敗しました。", rebuildError); // 第2引数にエラーオブジェクトそのものを渡す
+        
+
             manager.next(); // とりあえず次に進む
         }
     } catch (e) {
