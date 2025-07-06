@@ -73,15 +73,15 @@ export default class ScenarioManager {
     }
 
     // ★ updateScenarioの前に、渡す値を確認
-    console.log(`Updating scenario state: file=${this.currentFile}, line=${this.currentLine}`);
-    this.stateManager.updateScenario(this.currentFile, this.currentLine); 
+     // ★★★ 状態更新のタイミングを、行番号を進める「前」にする ★★★
+    // これで「今から実行する行」の番号が保存される
+    this.stateManager.updateScenario(this.currentFile, this.currentLine);
 
     const line = this.scenario[this.currentLine];
-    console.log(`実行する行: "${line}"`);
-
     this.currentLine++;
     this.parse(line);
 }
+
         
       
     
