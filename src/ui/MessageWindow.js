@@ -4,7 +4,11 @@ const Container = Phaser.GameObjects.Container;
 // MessageWindowクラスを定義し、エクスポート
 export default class MessageWindow extends Container{
 
-    constructor(scene) {
+      /**
+     * @param {Phaser.Scene} scene
+     * @param {SoundManager} soundManager // ★★★ JSDocにも追加 ★★★
+     */
+    constructor(scene, soundManager) { // ★★★ 引数に soundManager を追加 ★★★
         // 親クラス(Container)のコンストラクタを呼び出す
         // コンテナ自体の位置は(0,0)でOK。中の要素の位置で調整する。
         super(scene, 0, 0);
