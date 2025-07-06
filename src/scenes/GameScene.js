@@ -69,7 +69,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     // GameSceneクラスの中に追加
-async performLoad(slot) {
+async performLoad(slot) { // asyncに戻しておくと後々安全
     try {
         const jsonString = localStorage.getItem(`save_data_${slot}`);
         if (!jsonString) {
@@ -80,20 +80,40 @@ async performLoad(slot) {
         this.stateManager.setState(loadedState);
         console.log(`スロット[${slot}]からロードしました。`, loadedState);
 
-        // ★★★ awaitはここでは使わない。rebuildSceneは非同期である必要はない
         rebuildScene(this.scenarioManager, loadedState);
         
-          
-        // ★★★ ここで直接parseを呼んで再開する ★★★
-        const line = this.scenarioManager.scenario[this.scenarioManager.currentLine];
+        // ★★★ ここからデバッグログ ★★★
+        console.log("--- performLoad: シナリオ再開処理 ---");
+
+        // ScenarioManagerが持つシナリオ配列は正しいか？
+        if (!this.scenarioManager.scenario) {
+            console.error("エラー: scenarioManager.scenarioが存在しません！");
+            return;
+        }
+        console.log(`シナリオ配列の長さ: ${this.scenarioManager.scenario.length}`);
         
-        // 次のnext()に備えて、行番号をここで進めておく
+        // currentLineは正しいか？
+        console.log(`再開行番号: ${this.scenarioManager.currentLine}`);
+
+        if (this.scenarioManager.currentLine >= this.scenarioManager.scenario.length) {
+            console.error("エラー: 再開行番号がシナリオの範囲外です！");
+            return;
+        }
+        
+        // 行テキストの取得
+        const line = this.scenarioManager.scenario[this.scenarioManager.currentLine];
+        console.log(`再開する行テキスト: "${line}"`);
+
+        // 行番号を進める
         this.scenarioManager.currentLine++;
 
-        // 復元した行のパースを実行
+        // パース実行
+        console.log("parseを実行します...");
         this.scenarioManager.parse(line);
+        console.log("performLoad 正常終了");
         
     } catch (e) {
+        // ★★★ エラーオブジェクトも出力する ★★★
         console.error(`ロード処理でエラーが発生しました。`, e);
     }
 }
