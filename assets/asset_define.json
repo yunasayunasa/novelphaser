@@ -6,6 +6,9 @@
      "bog_schol": "assets/bog_schol.jpg" ,
      "next_arrow": "assets/next_arrow.png"
   },
-  "sounds": {}
+  "sounds": {
+"popopo": "assets/gyakuten_popopo.mp3"
+
+  }
  
   }
