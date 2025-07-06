@@ -1,5 +1,10 @@
-; ゲーム開始直後に、スロット1からロードする
-[load slot="1"]
+[playbgm storage="bgm_school"]
+[bg storage="bg_school"]
+[chara_show name="yuna" pos="center"]
 
-; ロードが成功すれば、この行は実行されず、
-; 保存した次の行（yuna:「セーブしました...」）から再開するはず
+yuna:「この状態でセーブします。」
+[p]
+
+[save slot="1"]
+
+yuna:「セーブしました。ブラウザをリロードしてください。」
