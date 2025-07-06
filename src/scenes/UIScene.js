@@ -22,10 +22,21 @@ export default class UIScene extends Phaser.Scene {
         // --- 2. パネル内の各ボタンを作成 ---
         const buttonY = 0; // パネル内のY座標
         const saveButton = this.add.text(gameWidth / 2 - 180, buttonY, 'セーブ', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
-        const loadButton = this.add.text(gameWidth / 2, buttonY, 'ロード', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
+        const loadButton = this.add.text(gameWidth / 2 - 50, buttonY, 'ロード', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
         const configButton = this.add.text(gameWidth / 2 + 180, buttonY, '設定', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
-        panel.add([saveButton, loadButton, configButton]);
+        // ★★★ パネルにバックログボタンを追加 ★★★
+        const backlogButton = this.add.text(gameWidth / 2 + 50, buttonY, '履歴', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
+        panel.add([saveButton, loadButton, backlogButton, configButton]);
 
+          // ★★★ ボタンのレイアウトを調整 ★★★
+        // 4つのボタンを均等に配置
+        const buttons = [saveButton, loadButton, backlogButton, configButton];
+        const buttonWidth = gameWidth / (buttons.length + 1);
+        buttons.forEach((button, index) => {
+            button.setX(buttonWidth * (index + 1));
+        });
+        
+        panel.add(buttons); // パネルにボタンを追加
         // --- 3. メインの「メニュー」ボタンを作成 ---
         // メッセージウィンドウの下の隙間あたりに配置
         const menuButtonY = gameHeight - 50;
@@ -61,6 +72,12 @@ export default class UIScene extends Phaser.Scene {
             this.scene.pause('GameScene');
             this.scene.pause('UIScene'); // Configを開くときはUIも止める
             this.scene.launch('ConfigScene');
+        });
+         // ★★★ バックログボタンの動作を定義 ★★★
+        backlogButton.on('pointerdown', () => {
+            this.scene.pause('GameScene');
+            this.scene.pause('UIScene');
+            this.scene.launch('BacklogScene');
         });
     }
 }
