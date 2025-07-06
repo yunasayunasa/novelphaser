@@ -43,7 +43,7 @@ export default class GameScene extends Phaser.Scene {
              // ★★★ メッセージレイヤーにMessageWindowを追加 ★★★
         this.layer.message.add(this.messageWindow);
 this.stateManager = new StateManager();
-      
+        this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs);
          // 1. SoundManagerが最初に作られているか？
     this.soundManager = new SoundManager(this);
     
