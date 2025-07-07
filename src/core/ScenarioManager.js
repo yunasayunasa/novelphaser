@@ -1,12 +1,4 @@
 export default class ScenarioManager {
-    /**
-     * @param {Phaser.Scene} scene
-     * @param {Object} layers
-     * @param {Object} charaDefs
-     * @param {MessageWindow} messageWindow
-     * @param {SoundManager} soundManager
-     * @param {StateManager} stateManager
-     */
     constructor(scene, layers, charaDefs, messageWindow, soundManager, stateManager, configManager) {
         this.scene = scene;
         this.layers = layers;
@@ -17,7 +9,7 @@ export default class ScenarioManager {
         this.configManager = configManager;
 
         this.scenario = [];
-        this.currentFile = null; // 現在のシナリオファイル名を保持
+        this.currentFile = null;
         this.currentLine = 0;
         this.isWaitingClick = false;
         this.tagHandlers = new Map();
@@ -34,57 +26,22 @@ export default class ScenarioManager {
             return;
         }
         this.scenario = rawText.split(/\r\n|\n|\r/).filter(line => line.trim() !== '');
-        this.currentFile = scenarioKey; // ファイル名を保存
+        this.currentFile = scenarioKey;
         this.currentLine = 0;
         console.log(`シナリオを解析しました: ${this.currentFile}`, this.scenario);
     }
 
-        /**
-     * 指定された話者を明るくし、それ以外を暗くする
-     * @param {string | null} speakerName - 明るくするキャラクターの名前。nullの場合は全員を明るくする。
-     */
-    highlightSpeaker(speakerName) {
-        const bright = 0xffffff; // 通常の色
-        const dark = 0x888888;   // 暗い色
-
-        for (const name in this.scene.characters) {
-            const chara = this.scene.characters[name];
-            if (!chara.active) continue; // 非アクティブなキャラは無視
-
-            if (speakerName === null || speakerName === name) {
-                chara.setTint(bright);
-            } else {
-                chara.setTint(dark);
-            }
-        }
-    }
-
     next() {
-    console.log(`--- next()呼び出し ---`);
-    console.log(`isWaitingClick: ${this.isWaitingClick}`);
-
-    if (this.isWaitingClick) return;
-
-    console.log(`currentLine: ${this.currentLine}, scenario.length: ${this.scenario.length}`);
-
-    if (this.currentLine >= this.scenario.length) {
-        this.messageWindow.setText('（シナリオ終了）');
-        console.log("シナリオ終了");
-        return;
+        if (this.isWaitingClick) return;
+        if (this.currentLine >= this.scenario.length) {
+            this.messageWindow.setText('（シナリオ終了）');
+            return;
+        }
+        this.stateManager.updateScenario(this.currentFile, this.currentLine);
+        const line = this.scenario[this.currentLine];
+        this.currentLine++;
+        this.parse(line);
     }
-
-    // ★ updateScenarioの前に、渡す値を確認
-     // ★★★ 状態更新のタイミングを、行番号を進める「前」にする ★★★
-    // これで「今から実行する行」の番号が保存される
-    this.stateManager.updateScenario(this.currentFile, this.currentLine);
-
-    const line = this.scenario[this.currentLine];
-    this.currentLine++;
-    this.parse(line);
-}
-
-        
-      
     
     onClick() {
         this.messageWindow.hideNextArrow();
@@ -98,26 +55,21 @@ export default class ScenarioManager {
         }
     }
 
-         parse(line) {
-        // ★★★ 1. どんな行でも、まず変数埋め込みを試みる ★★★
+    parse(line) {
         const processedLine = this.embedVariables(line);
         const trimedLine = processedLine.trim();
 
-        // 2. 無視する行の判定
         if (trimedLine.startsWith(';') || trimedLine.startsWith('*')) {
             this.next();
             return;
         }
 
-        // 3. 話者指定行の判定
         const speakerMatch = trimedLine.match(/^([a-zA-Z0-9_]+):/);
         if (speakerMatch) {
             const speakerName = speakerMatch[1];
             const dialogue = trimedLine.substring(speakerName.length + 1).trim();
-
             this.stateManager.addHistory(speakerName, dialogue);
             this.highlightSpeaker(speakerName);
-            
             const wrappedLine = this.manualWrap(dialogue);
             this.isWaitingClick = true;
             this.messageWindow.setText(wrappedLine, true, () => {
@@ -126,11 +78,9 @@ export default class ScenarioManager {
             return;
         }
 
-        // 4. タグ行の判定
         if (trimedLine.startsWith('[')) {
             const { tagName, params } = this.parseTag(trimedLine);
             const handler = this.tagHandlers.get(tagName);
-    
             if (handler) {
                 handler(this, params);
             } else {
@@ -140,10 +90,8 @@ export default class ScenarioManager {
             return;
         }
 
-        // 5. 上記のいずれでもなければ「地の文」と確定
         this.stateManager.addHistory(null, trimedLine);
         this.highlightSpeaker(null);
-
         this.isWaitingClick = true; 
         const wrappedLine = this.manualWrap(trimedLine);
         this.messageWindow.setText(wrappedLine, true, () => {
@@ -151,20 +99,10 @@ export default class ScenarioManager {
         });
     }
 
-     // ★★★ 変数埋め込み用の新しいメソッドを追加 ★★★
-    /**
-     * 行の中から &f.hoge や &sf.piyo といった記述を探し、変数の値に置き換える
-     * @param {string} line - 処理対象の行
-     * @returns {string} 置き換え後の行
-     */
-       embedVariables(line) {
-        // &f.hoge や &sf.piyo を見つける
+    embedVariables(line) {
         return line.replace(/&((f|sf)\.[a-zA-Z0-9_.-]+)/g, (match, exp) => {
             const value = this.stateManager.eval(exp);
-            
-            // ★★★ 値が見つからなかった場合の表示を変更 ★★★
             if (value === undefined || value === null) {
-                // デバッグしやすいように、どの変数が未定義かを示す
                 return `(undef: ${exp})`; 
             }
             return value;
@@ -176,11 +114,6 @@ export default class ScenarioManager {
         const parts = content.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
         const tagName = parts.shift() || '';
         const params = {};
-           // ★★★ グラフィカルリンク用のテキストパラメータを追加 ★★★
-    if (tagName === 'glink' && parts.length > 0 && !parts[parts.length-1].includes('=')) {
-        params.text = parts.pop();
-    }
-    // ★★★ ここまで ★★★
         parts.forEach(part => {
             const [key, value] = part.split('=');
             if (value) {
@@ -211,33 +144,30 @@ export default class ScenarioManager {
         return wrappedText;
     }
 
-    // ScenarioManagerクラスの中に追加
-
-/**
- * 指定されたラベルにジャンプする
- * @param {string} target - ジャンプ先のラベル名 (例: "*go_sea")
- */
-jumpTo(target) {
-    // ラベル名の`*`を削除
-    const labelName = target.substring(1);
-
-    // シナリオの最初から、指定されたラベル行を探す
-    const targetLineIndex = this.scenario.findIndex(line => {
-        // 行の先頭が '*' で、かつラベル名が一致するか
-        return line.trim().startsWith('*') && line.trim().substring(1) === labelName;
-    });
-
-    if (targetLineIndex !== -1) {
-        // ラベルが見つかった場合
-        console.log(`ジャンプ: ${target} (行番号 ${targetLineIndex})`);
-        // 次に実行する行番号を、見つかった行に設定
-        this.currentLine = targetLineIndex;
-        // すぐに次の行から実行を再開
-        this.next();
-    } else {
-        // ラベルが見つからなかった場合
-        console.error(`ジャンプ先のラベル[${target}]が見つかりませんでした。`);
-        this.next(); // とりあえず次に進む
+    highlightSpeaker(speakerName) {
+        const bright = 0xffffff;
+        const dark = 0x888888;
+        for (const name in this.scene.characters) {
+            const chara = this.scene.characters[name];
+            if (!chara.active) continue;
+            if (speakerName === null || speakerName === name) {
+                chara.setTint(bright);
+            } else {
+                chara.setTint(dark);
+            }
+        }
     }
-}
+
+    jumpTo(target) {
+        const labelName = target.substring(1);
+        const targetLineIndex = this.scenario.findIndex(line => line.trim().startsWith('*') && line.trim().substring(1) === labelName);
+        if (targetLineIndex !== -1) {
+            console.log(`ジャンプ: ${target} (行番号 ${targetLineIndex})`);
+            this.currentLine = targetLineIndex;
+            this.next();
+        } else {
+            console.error(`ジャンプ先のラベル[${target}]が見つかりませんでした。`);
+            this.next();
+        }
+    }
 }
