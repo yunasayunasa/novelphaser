@@ -1,18 +1,15 @@
-[bg storage="bg_school"]
-yuna:「ここで、一枚絵のCGを表示してみるね。」
+*start
+yuna:「画像を使ったボタンをテストします。」
 [p]
 
-; CGレイヤーにCGを表示 (layer属性を省略)
-[image storage="cg01" time=1500]
-[wait time=1500]
+; 画面右上にタイトルへ戻るボタンを配置
+[button graphic="button_title" x=620 y=80 target="*title_screen"]
 
-[cm]
-yuna:「どうかな？メッセージウィンドウは消えずに、CGだけ表示されたでしょ？」
+yuna:「右上にボタンが表示されていれば成功です。」
 [p]
+yuna:「クリックすると、*title_screenラベルにジャンプします。」
+[s] ; ここで停止
 
-; CGレイヤーの画像を消去
-[freeimage]
-[wait time=1500]
-
-yuna:「レイヤー構造、完璧だね！」
+*title_screen
+yuna:「タイトル画面へようこそ！（ジャンプ成功）」
 [s]

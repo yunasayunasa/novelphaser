@@ -32,6 +32,8 @@ import { handleErase } from '../handlers/er.js';
 import { handleDelay } from '../handlers/delay.js';
 import { handleImage } from '../handlers/image.js';
 import { handleFreeImage } from '../handlers/freeimage.js';
+import { handleButton } from '../handlers/button.js';
+
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -46,6 +48,7 @@ export default class GameScene extends Phaser.Scene {
         this.configManager = null;
         this.choiceButtons = []; 
         this.pendingChoices = []; // ★★★ 選択肢の一時保管場所 ★★★
+        this.uiButtons = [];
     }
 
     init(data) {
@@ -102,7 +105,8 @@ export default class GameScene extends Phaser.Scene {
 　　　　　this.scenarioManager.registerTag('er', handleErase);
         this.scenarioManager.registerTag('delay', handleDelay);
         this.scenarioManager.registerTag('image', handleImage);
-this.scenarioManager.registerTag('freeimage', handleFreeImage);
+        this.scenarioManager.registerTag('freeimage', handleFreeImage);
+        this.scenarioManager.registerTag('button', handleButton);
         
         // --- ゲーム開始 ---
         this.scenarioManager.load('scene1');
