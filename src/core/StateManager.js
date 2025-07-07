@@ -16,19 +16,30 @@ export default class StateManager {
      * 文字列のJavaScript式を安全に評価・実行する
      * @param {string} exp - 実行する式 (例: "f.hoge = 10")
      */
-            eval(exp) {
+                eval(exp) {
         const f = this.state.variables;
         const sf = this.systemVariables;
 
         try {
-            // "return"を先頭に付けて、必ず評価結果が返るようにする
-            // 代入式の場合でも、代入された値が返る
-            const func = new Function('f', 'sf', `'use strict'; return ${exp}`);
-            const result = func(f, sf);
-            
+            // ★★★ 式に '=' が含まれるか（代入式か）どうかで処理を分ける ★★★
+            let result;
+            if (exp.includes('=')) {
+                //【代入式の場合】値を設定するのが目的なので、戻り値は気にしない
+                const execFunc = new Function('f', 'sf', `'use strict'; ${exp}`);
+                execFunc(f, sf);
+                // 代入後の値を取得するために、もう一度評価する
+                // 例: "f.hoge = 10" -> "f.hoge" に変換
+                const varName = exp.split('=')[0].trim();
+                const valueFunc = new Function('f', 'sf', `'use strict'; return ${varName}`);
+                result = valueFunc(f, sf);
+
+            } else {
+                //【値の取得の場合】単純に評価して結果を返す
+                const evalFunc = new Function('f', 'sf', `'use strict'; return ${exp}`);
+                result = evalFunc(f, sf);
+            }
+
             this.saveSystemVariables();
-            
-            // 評価結果を返す
             return result;
 
         } catch (e) {
