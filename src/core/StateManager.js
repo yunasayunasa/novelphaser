@@ -6,7 +6,7 @@ export default class StateManager {
             sound: { bgm: null },
             variables: {},
             history: [], // ★★★ 履歴を保存する配列を追加 ★★★
-            variables: {} // ★ f.変数用の領域
+           
         };
         this.systemVariables = this.loadSystemVariables(); 
     }
