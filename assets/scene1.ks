@@ -1,15 +1,14 @@
-yuna:「このセリフのあと、メッセージが消えるよ。」
+[bg storage="bg_school"]
+[chara_show name="yuna" pos="left"]
+[chara_show name="kaito" pos="right"]
+[wait time=1000]
+
+yuna:「じゃあ、そろそろ二人とも帰ろうか。」
+[p]
+kaito:「そうだね。」
 [p]
 
-[cm]
-[wait time=1500]
+; キャラクターレイヤーを一括消去
+[er layer="character"]
 
-yuna:「どう？消えたでしょ？」
-[p]
-yuna:「じゃあ、次の行でシナリオを停止します。」
-[p]
-
-[s]
-
-; この下の行は実行されない
-yuna:「このセリフが表示されたら、[s]タグは失敗です。」
+yuna:「キャラクターが全員、一瞬で消えたら成功です。」

@@ -28,6 +28,7 @@ import { handleElse } from '../handlers/else.js';
 import { handleEndif } from '../handlers/endif.js';
 import { handleStop } from '../handlers/s.js';
 import { handleClearMessage } from '../handlers/cm.js';
+import { handleErase } from '../handlers/er.js';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -94,6 +95,7 @@ export default class GameScene extends Phaser.Scene {
         this.scenarioManager.registerTag('endif', handleEndif);
         this.scenarioManager.registerTag('s', handleStop);
 　　　　　this.scenarioManager.registerTag('cm', handleClearMessage);
+　　　　　this.scenarioManager.registerTag('er', handleErase);
         
         // --- ゲーム開始 ---
         this.scenarioManager.load('scene1');
