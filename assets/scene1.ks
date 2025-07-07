@@ -1,14 +1,18 @@
-yuna:「このセリフは、デフォルトの速度で表示されます。」
+[bg storage="bg_school"]
+yuna:「ここで、一枚絵のCGを表示してみるね。」
 [p]
 
-[delay speed=200]
-yuna:「このセリフは、すごくゆっくり表示されるはず…。」
+; メッセージレイヤーにCGを表示（キャラクターより手前）
+[image storage="cg01" layer="message" time=1500]
+[wait time=1500]
+
+[cm]
+yuna:「どうかな？表示された？」
 [p]
 
-[delay speed=10]
-yuna:「これはメチャクチャ速い！目で追えるかな！？」
-[p]
+; CGを消去
+[freeimage layer="message" time=1500]
+[wait time=1500]
 
-[delay speed=0]
-yuna:「このセリフは、一瞬で表示されます。」
-[p]
+yuna:「これで便利タグも一通り揃ったね！」
+[s]

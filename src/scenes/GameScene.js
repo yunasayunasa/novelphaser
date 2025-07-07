@@ -30,6 +30,8 @@ import { handleStop } from '../handlers/s.js';
 import { handleClearMessage } from '../handlers/cm.js';
 import { handleErase } from '../handlers/er.js';
 import { handleDelay } from '../handlers/delay.js';
+import { handleImage } from '../handlers/image.js';
+import { handleFreeImage } from '../handlers/freeimage.js';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -98,6 +100,8 @@ export default class GameScene extends Phaser.Scene {
 　　　　　this.scenarioManager.registerTag('cm', handleClearMessage);
 　　　　　this.scenarioManager.registerTag('er', handleErase);
         this.scenarioManager.registerTag('delay', handleDelay);
+        this.scenarioManager.registerTag('image', handleImage);
+this.scenarioManager.registerTag('freeimage', handleFreeImage);
         
         // --- ゲーム開始 ---
         this.scenarioManager.load('scene1');
