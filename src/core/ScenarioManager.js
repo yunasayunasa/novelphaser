@@ -15,6 +15,7 @@ export default class ScenarioManager {
         this.tagHandlers = new Map();
         this.ifStack = []; 
         this.isEnd = false;
+        this.callStack = [];
     }
 
     registerTag(tagName, handler) {
@@ -221,14 +222,42 @@ export default class ScenarioManager {
         }
     }
 
-    jumpTo(target) {
+    // ★★★ シナリオファイルを変更するための新しいメソッドを追加 ★★★
+/**
+ * 新しいシナリオファイルをロードし、実行コンテキストを切り替える
+ * @param {string} scenarioKey - ロードするシナリオのキー
+ * @param {string} targetLabel - ジャンプ先のラベル (任意)
+ */
+async loadScenario(scenarioKey, targetLabel = null) {
+    // Phaserのローダーで、新しいシナリオファイルを動的に読み込む
+    // すでに読み込み済みなら、キャッシュが使われる
+    await new Promise(resolve => {
+        this.scene.load.text(scenarioKey, `assets/${scenarioKey}`);
+        this.scene.load.once('complete', resolve);
+        this.scene.load.start();
+    });
+    
+    // シナリオを入れ替える
+    this.load(scenarioKey);
+
+    // ジャンプ先ラベルが指定されていれば、そこにジャンプする
+    if (targetLabel) {
+        this.jumpTo(targetLabel, false); // falseは「nextを呼ばない」の意
+    }
+}
+/**
+ * @param {string} target 
+ * @param {boolean} callNext - ジャンプ後にnext()を呼ぶか
+ */
+jumpTo(target, callNext = true) {
         const labelName = target.substring(1);
         const targetLineIndex = this.scenario.findIndex(line => line.trim().startsWith('*') && line.trim().substring(1) === labelName);
-        if (targetLineIndex !== -1) {
-            console.log(`ジャンプ: ${target} (行番号 ${targetLineIndex})`);
-            this.currentLine = targetLineIndex;
+       if (targetLineIndex !== -1) {
+        this.currentLine = targetLineIndex;
+        if (callNext) {
             this.next();
-        } else {
+        }
+    } else {
             console.error(`ジャンプ先のラベル[${target}]が見つかりませんでした。`);
             this.next();
         }

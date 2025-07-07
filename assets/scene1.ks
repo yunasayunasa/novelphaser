@@ -1,15 +1,8 @@
-*start
-yuna:「画像を使ったボタンをテストします。」
+yuna:「これから、scene2.ksを呼び出してみるね。」
 [p]
 
-; 画面右上にタイトルへ戻るボタンを配置
-[button graphic="button_title" x=620 y=80 target="*title_screen"]
+[call storage="scene2.ks" target="*start"]
 
-yuna:「右上にボタンが表示されていれば成功です。」
+yuna:「scene2.ksから、ちゃんと戻ってこれたみたい！」
 [p]
-yuna:「クリックすると、*title_screenラベルにジャンプします。」
-[s] ; ここで停止
-
-*title_screen
-yuna:「タイトル画面へようこそ！（ジャンプ成功）」
 [s]
