@@ -16,43 +16,25 @@ export default class StateManager {
      * 文字列のJavaScript式を安全に評価・実行する
      * @param {string} exp - 実行する式 (例: "f.hoge = 10")
      */
-          eval(exp) {
-        console.log(`[StateManager.eval] 開始: exp = "${exp}"`);
+              eval(exp) {
         const f = this.state.variables;
         const sf = this.systemVariables;
 
         try {
-            console.log(`[StateManager.eval] tryブロックに入りました。`);
-            let result;
+            // new Function のスコープ内で、式を安全に評価・実行する
+            // この方法が、代入・比較・値の取得すべてを最もシンプルに扱える
+            const result = (function(f, sf) {
+                // 'use strict' を使うことで、より安全な実行モードになる
+                'use strict';
+                return eval(exp); 
+            })(f, sf);
 
-            if (exp.includes('=')) {
-                console.log(`[StateManager.eval] 代入式と判断しました。`);
-                const execFunc = new Function('f', 'sf', `'use strict'; ${exp}`);
-                console.log(`[StateManager.eval] 代入用の関数を作成しました。`);
-                execFunc(f, sf);
-                console.log(`[StateManager.eval] 代入用の関数を実行しました。 f:`, f);
-
-                const varName = exp.split('=')[0].trim();
-                const valueFunc = new Function('f', 'sf', `'use strict'; return ${varName}`);
-                result = valueFunc(f, sf);
-                console.log(`[StateManager.eval] 値の再取得結果:`, result);
-
-            } else {
-                console.log(`[StateManager.eval] 値取得の式と判断しました。`);
-                const evalFunc = new Function('f', 'sf', `'use strict'; return ${exp}`);
-                console.log(`[StateManager.eval] 評価用の関数を作成しました。`);
-                result = evalFunc(f, sf);
-                console.log(`[StateManager.eval] 評価結果:`, result);
-            }
-
+            // sf変数が変更された場合は、自動で保存
             this.saveSystemVariables();
-            console.log(`[StateManager.eval] 正常終了。戻り値:`, result);
             return result;
 
         } catch (e) {
-            // ★★★ 絶対にエラーをコンソールに出す ★★★
-            console.error(`[StateManager.eval] CRITICAL ERROR: 式の評価中に致命的なエラーが発生しました: "${exp}"`, e);
-            alert("evalでエラーが発生しました！コンソールを確認してください。"); // 強制的にアラートを出す
+            console.error(`[eval] 式の評価中にエラーが発生しました: "${exp}"`, e);
             return undefined;
         }
     }
