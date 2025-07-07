@@ -16,22 +16,23 @@ export default class StateManager {
      * 文字列のJavaScript式を安全に評価・実行する
      * @param {string} exp - 実行する式 (例: "f.hoge = 10")
      */
-        eval(exp) {
+            eval(exp) {
         const f = this.state.variables;
         const sf = this.systemVariables;
 
         try {
-            // ★★★ return を追加し、式の評価結果を返すようにする ★★★
-            const result = new Function('f', 'sf', `'use strict'; return (${exp})`)(f, sf);
+            // "return"を先頭に付けて、必ず評価結果が返るようにする
+            // 代入式の場合でも、代入された値が返る
+            const func = new Function('f', 'sf', `'use strict'; return ${exp}`);
+            const result = func(f, sf);
             
             this.saveSystemVariables();
             
-            // ★★★ 結果を返す ★★★
+            // 評価結果を返す
             return result;
 
         } catch (e) {
-            console.error(`[eval] 式の評価中にエラーが発生しました: ${exp}`, e);
-            // エラー時は undefined を返す
+            console.error(`[eval] 式の評価中にエラーが発生しました: "${exp}"`, e);
             return undefined;
         }
     }

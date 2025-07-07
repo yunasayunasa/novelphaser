@@ -159,13 +159,17 @@ export default class ScenarioManager {
      * @param {string} line - 処理対象の行
      * @returns {string} 置き換え後の行
      */
-    embedVariables(line) {
-        // 正規表現で &f.hoge や &sf.hoge を見つける
-        return line.replace(/&((f|sf)\.[a-zA-Z0-9_]+)/g, (match, exp) => {
-            // 見つかった式 (exp) を評価し、その値を取得する
+       embedVariables(line) {
+        // &f.hoge や &sf.piyo を見つける
+        return line.replace(/&((f|sf)\.[a-zA-Z0-9_.-]+)/g, (match, exp) => {
             const value = this.stateManager.eval(exp);
-            // 値がundefinedやnullなら空文字に、そうでなければその値を返す
-            return value !== undefined && value !== null ? value : '';
+            
+            // ★★★ 値が見つからなかった場合の表示を変更 ★★★
+            if (value === undefined || value === null) {
+                // デバッグしやすいように、どの変数が未定義かを示す
+                return `(undef: ${exp})`; 
+            }
+            return value;
         });
     }
 
