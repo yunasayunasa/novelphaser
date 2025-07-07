@@ -13,6 +13,7 @@ export default class ScenarioManager {
         this.currentLine = 0;
         this.isWaitingClick = false;
         this.tagHandlers = new Map();
+        this.ifStack = []; 
     }
 
     registerTag(tagName, handler) {
@@ -55,19 +56,36 @@ export default class ScenarioManager {
         }
     }
 
-    parse(line) {
+        parse(line) {
+        // 1. どんな行でも、まず変数埋め込みを試みる
         const processedLine = this.embedVariables(line);
         const trimedLine = processedLine.trim();
 
-        if (trimedLine.startsWith(';') || trimedLine.startsWith('*')) {
-            this.next();
-            return;
+        // 2. スキップモードかどうかを判定
+        const ifState = this.ifStack.length > 0 ? this.ifStack[this.ifStack.length - 1] : null;
+        if (ifState && ifState.skipping) {
+            // スキップモード中は、分岐タグ以外はすべて無視して次に進む
+            if (trimedLine.startsWith('[elsif') || trimedLine.startsWith('[else') || trimedLine.startsWith('[endif')) {
+                // 分岐タグの場合は、スキップせずにハンドラに処理を任せる
+            } else {
+                this.next();
+                return;
+            }
         }
+        
+        // --- ここから通常の実行フロー ---
 
-        const speakerMatch = trimedLine.match(/^([a-zA-Z0-9_]+):/);
-        if (speakerMatch) {
+        // 3. 行の種類を判定し、適切な処理に振り分ける
+        if (trimedLine.startsWith(';') || trimedLine.startsWith('*')) {
+            // コメント行やラベル行
+            this.next();
+
+        } else if (trimedLine.match(/^([a-zA-Z0-9_]+):/)) {
+            // 話者指定行
+            const speakerMatch = trimedLine.match(/^([a-zA-Z0-9_]+):/);
             const speakerName = speakerMatch[1];
             const dialogue = trimedLine.substring(speakerName.length + 1).trim();
+
             this.stateManager.addHistory(speakerName, dialogue);
             this.highlightSpeaker(speakerName);
             const wrappedLine = this.manualWrap(dialogue);
@@ -75,10 +93,9 @@ export default class ScenarioManager {
             this.messageWindow.setText(wrappedLine, true, () => {
                 this.messageWindow.showNextArrow();
             });
-            return;
-        }
 
-        if (trimedLine.startsWith('[')) {
+        } else if (trimedLine.startsWith('[')) {
+            // タグ行
             const { tagName, params } = this.parseTag(trimedLine);
             const handler = this.tagHandlers.get(tagName);
             if (handler) {
@@ -87,18 +104,22 @@ export default class ScenarioManager {
                 console.warn(`未定義のタグです: [${tagName}]`);
                 this.next();
             }
-            return;
+
+        } else if (trimedLine.length > 0) {
+            // 地の文 (空行は無視)
+            this.stateManager.addHistory(null, trimedLine);
+            this.highlightSpeaker(null);
+            this.isWaitingClick = true; 
+            const wrappedLine = this.manualWrap(trimedLine);
+            this.messageWindow.setText(wrappedLine, true, () => {
+                this.messageWindow.showNextArrow();
+            });
+
+        } else {
+            // 空行やその他の場合は、何もせず次に進む
+            this.next();
         }
-
-        this.stateManager.addHistory(null, trimedLine);
-        this.highlightSpeaker(null);
-        this.isWaitingClick = true; 
-        const wrappedLine = this.manualWrap(trimedLine);
-        this.messageWindow.setText(wrappedLine, true, () => {
-            this.messageWindow.showNextArrow();
-        });
     }
-
        embedVariables(line) {
         console.log(`[embedVariables] 開始: line = "${line}"`);
         

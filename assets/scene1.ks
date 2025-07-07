@@ -1,14 +1,25 @@
-[eval exp="f.player_name = '才城'"]
-[eval exp="f.level = 10"]
-[eval exp="sf.play_count = (sf.play_count || 0) + 1"]
+[eval exp="f.test = 10"]
+[eval exp="f.name = 'yuna'"]
 
-; コンソールに変数の値を出力
-[log exp="f.player_name"]
-[log exp="f.level"]
-[log exp="sf.play_count"]
+; --- パターン1: ifがtrue ---
+[if exp="f.test === 10"]
+yuna:「f.testは10です。正しく表示されました。」
+[endif]
 
-; テキストに変数を埋め込む
-yuna:「ようこそ、&f.player_name さん。あなたのレベルは &f.level ね。」
-[p]
-yuna:「このゲームをプレイするのは、&sf.play_count 回目よ。」
-[p]
+; --- パターン2: ifがfalse, elsifがtrue ---
+[if exp="f.test === 99"]
+yuna:「この行は表示されません。」
+[elsif exp="f.name === 'yuna'"]
+yuna:「elsifが正しく評価されました。」
+[else]
+yuna:「この行も表示されません。」
+[endif]
+
+; --- パターン3: if/elsifがfalse, elseが実行 ---
+[if exp="f.test < 0"]
+yuna:「この行は表示されません。」
+[elsif exp="f.name === 'kaito'"]
+yuna:「この行も表示されません。」
+[else]
+yuna:「elseが正しく実行されました。」
+[endif]
