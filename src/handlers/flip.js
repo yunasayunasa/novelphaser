@@ -41,7 +41,7 @@ export function handleFlip(manager, params) {
         
         // すべてのTweenが完了した後に呼ばれる
         onComplete: () => {
-            manager.next();
+           // manager.next();
         }
     });
 }

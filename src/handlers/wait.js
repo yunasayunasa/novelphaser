@@ -14,6 +14,6 @@ export function handleWait(manager, params) {
         });
     } else {
         // timeが0以下の場合は、すぐに次の行へ
-        manager.next();
+      //  manager.next();
     }
 }

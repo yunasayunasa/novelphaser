@@ -89,6 +89,6 @@ export function handleCharaShow(manager, params) {
         });
     } else {
         chara.setAlpha(1);
-        manager.next();
+       // manager.next();
     }
 }

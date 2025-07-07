@@ -14,5 +14,5 @@ export function handleEval(manager, params) {
     // StateManagerに式の実行を依頼
     manager.stateManager.eval(exp);
 
-    manager.next();
+    //manager.next();
 }

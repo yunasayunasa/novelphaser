@@ -67,6 +67,6 @@ export function handleBg(manager, params) {
             oldBg.destroy();
         }
         manager.stateManager.updateBg(storage);
-        manager.next();
+        //manager.next();
     }
 }

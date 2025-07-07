@@ -16,5 +16,5 @@ export function handlePlaySe(manager, params) {
     manager.soundManager.playSe(storage, { volume: volume });
 
     // SEは再生しっぱなしで、すぐに次の行へ進む
-    manager.next();
+    //manager.next();
 }

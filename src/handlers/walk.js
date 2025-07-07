@@ -38,7 +38,7 @@ export function handleWalk(manager, params) {
                 charaData.y = y;
                 manager.stateManager.updateChara(name, charaData);
             }
-            manager.next();
+           // manager.next();
         }
     });
 

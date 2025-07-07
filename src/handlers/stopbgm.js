@@ -4,5 +4,5 @@ export function handleStopBgm(manager, params) {
      // ★★★ 状態を更新 ★★★
     manager.stateManager.updateBgm(null);
 
-    manager.next();
+  //  manager.next();
 }

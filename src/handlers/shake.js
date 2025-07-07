@@ -25,7 +25,7 @@ export function handleShake(manager, params) {
         // 経過時間が総時間を超えたら、終了処理
         if (elapsed >= time) {
             chara.setPosition(originX, originY); // 最終的に元の位置に戻す
-            manager.next();
+            //manager.next();
             return;
         }
 

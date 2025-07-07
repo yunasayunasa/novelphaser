@@ -39,7 +39,7 @@ export function handleCharaJump(manager, params) {
             chara.y = originY;
             
             // 次のシナリオへ
-            manager.next();
+            //manager.next();
         }
     });
 }

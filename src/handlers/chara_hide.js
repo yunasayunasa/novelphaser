@@ -46,6 +46,6 @@ const onComplete = () => {
     } else {
         chara.destroy();
         delete manager.scene.characters[name];
-        manager.next();
+      //  manager.next();
     }
 }

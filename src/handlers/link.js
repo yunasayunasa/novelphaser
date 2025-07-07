@@ -13,5 +13,5 @@ export function handleLink(manager, params) {
     
     // ★★★ isWaitingChoiceにはしない！ ★★★
     // すぐに次の行（次の[link]タグ）に進む
-    manager.next();
+  //  manager.next();
 }

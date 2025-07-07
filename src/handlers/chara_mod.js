@@ -80,6 +80,6 @@ export function handleCharaMod(manager, params) {
     manager.scene.time.delayedCall(time, () => {
        // ★★★ 新しい情報で状態を更新 ★★★
         manager.stateManager.updateChara(name, newCharaData); 
-        manager.next();
+        //manager.next();
     });
 }

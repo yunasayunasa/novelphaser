@@ -43,7 +43,7 @@ export function handleMove(manager, params) {
             }
             
             // 次のシナリオへ
-            manager.next();
+           // manager.next();
         }
     });
 }

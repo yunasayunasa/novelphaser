@@ -17,5 +17,5 @@ export function handleLog(manager, params) {
 
     console.log(`[Log Tag]: ${exp} =`, value);
 
-    manager.next();
+    //manager.next();
 }

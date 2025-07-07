@@ -9,5 +9,5 @@ export function handlePlayBgm(manager, params) {
      // ★★★ 状態を更新 ★★★
     manager.stateManager.updateBgm(storage);
 
-    manager.next(); // BGMは再生しっぱなしでOK
+   // manager.next(); // BGMは再生しっぱなしでOK
 }
