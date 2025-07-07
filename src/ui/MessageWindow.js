@@ -109,47 +109,40 @@ export default class MessageWindow extends Container{
         }
     }
 
-      setText(text, useTyping = true, onComplete = () => {}) {
+         /**
+     * テキストを設定するメソッド
+     * @param {string} text - 表示する全文
+     * @param {boolean} useTyping - テロップ表示を使うかどうか
+     * @param {function} onComplete - 表示完了時に呼ばれるコールバック関数
+     */
+    setText(text, useTyping = true, onComplete = () => {}) {
         // 既存のテキストとタイマーをクリア
         this.textObject.setText('');
         if (this.charByCharTimer) {
             this.charByCharTimer.remove();
         }
         
-        if (!useTyping || text.length === 0) {
-            this.textObject.setText(text);
-            this.isTyping = false;
-            onComplete();
-            return;
-        }
-        
-        this.isTyping = true;
-        let index = 0;
-        
-        // テキスト表示速度の設定を反映
-      //  const textSpeedValue = this.configManager.getValue('textSpeed');
-      //  const delay = 100 - textSpeedValue;
-
-         // ★★★ currentTextDelayが0なら、テロップを使わずに即時表示 ★★★
+        // テロップ表示を使わない条件を判定
         if (!useTyping || text.length === 0 || this.currentTextDelay <= 0) {
             this.textObject.setText(text);
             this.isTyping = false;
             onComplete();
             return;
         }
-
+        
+        // --- ここからテロップ表示処理 ---
         this.isTyping = true;
-        let index = 0;
-
+        let index = 0; // ★★★ index変数はここで一度だけ宣言 ★★★
+        
         const timerConfig = {
             delay: this.currentTextDelay,
             callback: () => {
                 // タイプ音を再生
-                this.soundManager.playSe('popopo'); // 音量設定はSoundManagerに任せる
+                this.soundManager.playSe('popopo');
 
-                // 文字を追加
+                // 文字を追加 (timerConfigのfullTextを参照)
                 this.textObject.text += timerConfig.fullText[index];
-                index++;
+                index++; // スコープの外側で宣言されたindexをインクリメント
 
                 // 終了判定
                 if (index === timerConfig.fullText.length) {
@@ -160,16 +153,10 @@ export default class MessageWindow extends Container{
             },
             callbackScope: this,
             loop: true,
-            // カスタムプロパティとして全文を保存
-            fullText: text 
+            fullText: text // カスタムプロパティとして全文を保存
         };
         
-        // ★★★ この2行が重要です ★★★
-        // 1. timerConfigを使ってタイマーを作成する
         this.charByCharTimer = this.scene.time.addEvent(timerConfig);
-        
-        // 2. 作成したタイマーに全文をセットする (timerConfigに含めたので、この行はもう不要)
-        // this.charByCharTimer.fullText = text;
     }
     
     skipTyping() {
