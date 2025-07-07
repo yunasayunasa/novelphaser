@@ -24,6 +24,19 @@ export default class MessageWindow extends Container{
 //サウンドマネージャーオブジェクト
         this.soundManager = soundManager;
         this.configManager = configManager;
+        this.charByCharTimer = null;
+        this.isTyping = false;
+        
+        // ★★★ コンフィグ値から、currentTextDelayの初期値を設定 ★★★
+        const textSpeedValue = this.configManager.getValue('textSpeed');
+        this.currentTextDelay = 100 - textSpeedValue;
+
+        // ★★★ コンフィグが変更されたら、currentTextDelayも更新するイベントリスナー ★★★
+        this.configManager.on('change:textSpeed', (newValue) => {
+            this.currentTextDelay = 100 - newValue;
+            console.log(`コンフィグ変更を検知: テキスト表示速度を ${this.currentTextDelay}ms に更新`);
+        });
+    
 
         // --- テキストオブジェクト ---
         const padding = 35; // ウィンドウの内側の余白
@@ -42,6 +55,7 @@ export default class MessageWindow extends Container{
                 fixedHeight: textHeight
             }
         );
+        this.currentTextDelay = 50; // デフォルト値
 
        // ★★★ ここからがアイコンの修正 ★★★
 
@@ -113,11 +127,22 @@ export default class MessageWindow extends Container{
         let index = 0;
         
         // テキスト表示速度の設定を反映
-        const textSpeedValue = this.configManager.getValue('textSpeed');
-        const delay = 100 - textSpeedValue;
+      //  const textSpeedValue = this.configManager.getValue('textSpeed');
+      //  const delay = 100 - textSpeedValue;
+
+         // ★★★ currentTextDelayが0なら、テロップを使わずに即時表示 ★★★
+        if (!useTyping || text.length === 0 || this.currentTextDelay <= 0) {
+            this.textObject.setText(text);
+            this.isTyping = false;
+            onComplete();
+            return;
+        }
+
+        this.isTyping = true;
+        let index = 0;
 
         const timerConfig = {
-            delay: Math.max(delay, 0),
+            delay: this.currentTextDelay,
             callback: () => {
                 // タイプ音を再生
                 this.soundManager.playSe('popopo'); // 音量設定はSoundManagerに任せる

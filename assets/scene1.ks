@@ -1,14 +1,14 @@
-[bg storage="bg_school"]
-[chara_show name="yuna" pos="left"]
-[chara_show name="kaito" pos="right"]
-[wait time=1000]
-
-yuna:「じゃあ、そろそろ二人とも帰ろうか。」
-[p]
-kaito:「そうだね。」
+yuna:「このセリフは、デフォルトの速度で表示されます。」
 [p]
 
-; キャラクターレイヤーを一括消去
-[er layer="character"]
+[delay speed=200]
+yuna:「このセリフは、すごくゆっくり表示されるはず…。」
+[p]
 
-yuna:「キャラクターが全員、一瞬で消えたら成功です。」
+[delay speed=10]
+yuna:「これはメチャクチャ速い！目で追えるかな！？」
+[p]
+
+[delay speed=0]
+yuna:「このセリフは、一瞬で表示されます。」
+[p]
