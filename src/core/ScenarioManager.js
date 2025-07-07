@@ -14,6 +14,7 @@ export default class ScenarioManager {
         this.isWaitingClick = false;
         this.tagHandlers = new Map();
         this.ifStack = []; 
+        this.isEnd = false;
     }
 
     registerTag(tagName, handler) {
@@ -33,6 +34,7 @@ export default class ScenarioManager {
     }
 
     next() {
+        if (this.isEnd) return;
         if (this.isWaitingClick) return;
         if (this.currentLine >= this.scenario.length) {
             this.messageWindow.setText('（シナリオ終了）');
@@ -45,6 +47,7 @@ export default class ScenarioManager {
     }
     
     onClick() {
+        if (this.isEnd) return;
         this.messageWindow.hideNextArrow();
         if (this.messageWindow.isTyping) {
             this.messageWindow.skipTyping();

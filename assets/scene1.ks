@@ -1,25 +1,15 @@
-[eval exp="f.test = 10"]
-[eval exp="f.name = 'yuna'"]
+yuna:「このセリフのあと、メッセージが消えるよ。」
+[p]
 
-; --- パターン1: ifがtrue ---
-[if exp="f.test === 10"]
-yuna:「f.testは10です。正しく表示されました。」
-[endif]
+[cm]
+[wait time=1500]
 
-; --- パターン2: ifがfalse, elsifがtrue ---
-[if exp="f.test === 99"]
-yuna:「この行は表示されません。」
-[elsif exp="f.name === 'yuna'"]
-yuna:「elsifが正しく評価されました。」
-[else]
-yuna:「この行も表示されません。」
-[endif]
+yuna:「どう？消えたでしょ？」
+[p]
+yuna:「じゃあ、次の行でシナリオを停止します。」
+[p]
 
-; --- パターン3: if/elsifがfalse, elseが実行 ---
-[if exp="f.test < 0"]
-yuna:「この行は表示されません。」
-[elsif exp="f.name === 'kaito'"]
-yuna:「この行も表示されません。」
-[else]
-yuna:「elseが正しく実行されました。」
-[endif]
+[s]
+
+; この下の行は実行されない
+yuna:「このセリフが表示されたら、[s]タグは失敗です。」

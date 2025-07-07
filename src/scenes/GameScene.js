@@ -26,6 +26,8 @@ import { handleIf } from '../handlers/if.js';
 import { handleElsif } from '../handlers/elsif.js';
 import { handleElse } from '../handlers/else.js';
 import { handleEndif } from '../handlers/endif.js';
+import { handleStop } from '../handlers/s.js';
+import { handleClearMessage } from '../handlers/cm.js';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -90,6 +92,8 @@ export default class GameScene extends Phaser.Scene {
         this.scenarioManager.registerTag('elsif', handleElsif);
         this.scenarioManager.registerTag('else', handleElse);
         this.scenarioManager.registerTag('endif', handleEndif);
+        this.scenarioManager.registerTag('s', handleStop);
+　　　　　this.scenarioManager.registerTag('cm', handleClearMessage);
         
         // --- ゲーム開始 ---
         this.scenarioManager.load('scene1');
