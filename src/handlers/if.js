@@ -6,6 +6,6 @@ export function handleIf(manager, params) {
         conditionMet: result, // このif/elsifブロックで条件が満たされたか
         skipping: !result     // 現在スキップ中か
     });
-    
+    manager.finishTagExecution();
    // manager.next();
 }

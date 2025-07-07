@@ -9,14 +9,16 @@ export function handleCharaShow(manager, params) {
     const name = params.name;
     if (!name) {
         console.warn('[chara_show] name属性は必須です。');
-        manager.next();
+       // manager.next();
+       manager.finishTagExecution();
         return;
     }
 
     const def = manager.characterDefs[name];
     if (!def) {
         console.warn(`キャラクター[${name}]の定義が見つかりません。`);
-        manager.next();
+        //manager.next();
+        manager.finishTagExecution();
         return;
     }
 
@@ -27,7 +29,8 @@ export function handleCharaShow(manager, params) {
 
     if (!storage) {
         console.warn(`キャラクター[${name}]の表情[${face}]のstorageが見つかりません。asset_define.jsonを確認してください。`);
-        manager.next();
+        //manager.next();
+        manager.finishTagExecution();
         return;
     }
 
@@ -89,6 +92,7 @@ export function handleCharaShow(manager, params) {
         });
     } else {
         chara.setAlpha(1);
+        manager.finishTagExecution();
        // manager.next();
     }
 }

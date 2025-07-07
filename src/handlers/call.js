@@ -20,5 +20,6 @@ export async function handleCall(manager, params) {
     await manager.loadScenario(storage, target);
     
     // ★ 3. 新しいシナリオの最初の行から実行を開始
-    manager.next();
+   // manager.next();
+   manager.finishTagExecution();
 }
