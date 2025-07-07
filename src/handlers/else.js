@@ -1,10 +1,15 @@
 export function handleElse(manager, params) {
     const ifState = manager.ifStack[manager.ifStack.length - 1];
-    if (!ifState) { console.error("[else] 対応する[if]がありません。"); manager.next(); return; }
+    if (!ifState) { /* ... */ return; }
 
-    // すでに条件が満たされていればスキップ、そうでなければ実行
-    ifState.skipping = ifState.conditionMet;
-    ifState.conditionMet = true; // elseブロックが実行されるので、条件は満たされた扱い
-
+    // ★★★ すでに前のif/elsifで条件が満たされているか？ ★★★
+    if (ifState.conditionMet) {
+        // 満たされているなら、このelseは無条件でスキップ
+        ifState.skipping = true;
+    } else {
+        // まだなら、このelseブロックを実行する
+        ifState.conditionMet = true; // elseが実行されるので、条件は満たされた扱い
+        ifState.skipping = false;    // スキップを解除
+    }
     manager.next();
 }
