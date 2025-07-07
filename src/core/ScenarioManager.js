@@ -56,76 +56,67 @@ export default class ScenarioManager {
         }
     }
 
-      parse(line) {
+         parse(line) {
         // --- 1. 変数埋め込み ---
         const processedLine = this.embedVariables(line);
         const trimedLine = processedLine.trim();
 
-        // --- 2. 制御タグかどうかを判定 ---
-        // if,elsif,else,endif は、常にハンドラが呼ばれる必要がある
+        // --- 2. タグ名とパラメータを先に解析 ---
         const { tagName, params } = this.parseTag(trimedLine);
         const handler = this.tagHandlers.get(tagName);
-        const isControlTag = ['if', 'elsif', 'else', 'endif'].includes(tagName);
 
-        if (isControlTag) {
-            if (handler) {
-                handler(this, params);
-            }
-            this.next(); // 制御タグは処理したら必ず次に進む
-            return;
+        // --- 3. 現在のスキップ状態を確認 ---
+        let isSkipping = false;
+        if (this.ifStack.length > 0) {
+            isSkipping = this.ifStack[this.ifStack.length - 1].skipping;
         }
 
-        // --- 3. スキップ判定 ---
-        // 制御タグ以外の場合、スキップ状態をチェックする
-        const ifState = this.ifStack.length > 0 ? this.ifStack[this.ifStack.length - 1] : null;
-        if (ifState && ifState.skipping) {
-            this.next(); // スキップモードなら何もせず次に進む
-            return;
+        // --- 4. 実行 or スキップの判断 ---
+        // 制御タグ([if]など)か、またはスキップモードでない場合にのみ、中身の処理を行う
+        if (handler && ['if', 'elsif', 'else', 'endif'].includes(tagName)) {
+            // ★ 分岐制御タグは、常にハンドラが呼ばれる
+            handler(this, params);
+        } else if (!isSkipping) {
+            // ★ スキップモードでないなら、通常の処理を実行
+            if (trimedLine.startsWith(';') || trimedLine.startsWith('*')) {
+                // コメント/ラベルは無視
+            } else if (trimedLine.match(/^([a-zA-Z0-9_]+):/)) {
+                // 話者指定行
+                const speakerMatch = trimedLine.match(/^([a-zA-Z0-9_]+):/);
+                const speakerName = speakerMatch[1];
+                const dialogue = trimedLine.substring(speakerName.length + 1).trim();
+                this.stateManager.addHistory(speakerName, dialogue);
+                this.highlightSpeaker(speakerName);
+                const wrappedLine = this.manualWrap(dialogue);
+                this.isWaitingClick = true;
+                this.messageWindow.setText(wrappedLine, true, () => {
+                    this.messageWindow.showNextArrow();
+                });
+                return; // テロップ表示を開始したら、next()は呼ばない
+            } else if (trimedLine.startsWith('[')) {
+                // 通常のタグ行
+                if (handler) {
+                    handler(this, params);
+                } else {
+                    console.warn(`未定義のタグです: [${tagName}]`);
+                    this.next();
+                }
+                return; // ハンドラがnext()を呼ぶので、ここでは呼ばない
+            } else if (trimedLine.length > 0) {
+                // 地の文
+                this.stateManager.addHistory(null, trimedLine);
+                this.highlightSpeaker(null);
+                this.isWaitingClick = true; 
+                const wrappedLine = this.manualWrap(trimedLine);
+                this.messageWindow.setText(wrappedLine, true, () => {
+                    this.messageWindow.showNextArrow();
+                });
+                return; // テロップ表示を開始したら、next()は呼ばない
+            }
         }
         
-
-        // 3. 行の種類を判定し、適切な処理に振り分ける
-        if (trimedLine.startsWith(';') || trimedLine.startsWith('*')) {
-            // コメント行やラベル行
-            this.next();
-
-        } else if (trimedLine.match(/^([a-zA-Z0-9_]+):/)) {
-            // 話者指定行
-            const speakerMatch = trimedLine.match(/^([a-zA-Z0-9_]+):/);
-            const speakerName = speakerMatch[1];
-            const dialogue = trimedLine.substring(speakerName.length + 1).trim();
-
-            this.stateManager.addHistory(speakerName, dialogue);
-            this.highlightSpeaker(speakerName);
-            const wrappedLine = this.manualWrap(dialogue);
-            this.isWaitingClick = true;
-            this.messageWindow.setText(wrappedLine, true, () => {
-                this.messageWindow.showNextArrow();
-            });
-
-          } else if (trimedLine.startsWith('[')) {
-            // タグ行 (ifなどの制御タグは上で処理済み)
-            if (handler) {
-                handler(this, params);
-            } else {
-                console.warn(`未定義のタグです: [${tagName}]`);
-                this.next();
-            }
-
-        } else if (trimedLine.length > 0) {
-            // 地の文 (空行は無視)
-            this.stateManager.addHistory(null, trimedLine);
-            this.highlightSpeaker(null);
-            this.isWaitingClick = true; 
-            const wrappedLine = this.manualWrap(trimedLine);
-            this.messageWindow.setText(wrappedLine, true, () => {
-                this.messageWindow.showNextArrow();
-            });
-
-        } else {
-            // 空行やその他の場合は、何もせず次に進む
-            this.next();
-        }
+        // --- 5. 上記の処理が終わったら、次の行へ ---
+        this.next();
     }
        embedVariables(line) {
         console.log(`[embedVariables] 開始: line = "${line}"`);
