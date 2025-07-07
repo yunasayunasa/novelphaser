@@ -12,9 +12,11 @@ export default class ScenarioManager {
         this.currentFile = null;
         this.currentLine = 0;
         this.isWaitingClick = false;
-        this.tagHandlers = new Map();
-        this.ifStack = []; 
+        this.isWaitingTag = false;
         this.isEnd = false;
+
+        this.tagHandlers = new Map();
+        this.ifStack = [];
         this.callStack = [];
     }
 
@@ -26,6 +28,7 @@ export default class ScenarioManager {
         const rawText = this.scene.cache.text.get(scenarioKey);
         if (!rawText) {
             console.error(`シナリオファイル [${scenarioKey}] が見つからないか、中身が空です。`);
+            this.isEnd = true;
             return;
         }
         this.scenario = rawText.split(/\r\n|\n|\r/).filter(line => line.trim() !== '');
@@ -34,21 +37,27 @@ export default class ScenarioManager {
         console.log(`シナリオを解析しました: ${this.currentFile}`, this.scenario);
     }
 
-    next() {
-        if (this.isEnd) return;
-        if (this.isWaitingClick) return;
-        if (this.currentLine >= this.scenario.length) {
-            this.messageWindow.setText('（シナリオ終了）');
+    async next() {
+        if (this.isEnd || this.isWaitingClick || this.isWaitingTag) {
             return;
         }
-        this.stateManager.updateScenario(this.currentFile, this.currentLine);
+        if (this.currentLine >= this.scenario.length) {
+            this.messageWindow.setText('（シナリオ終了）', false);
+            this.isEnd = true;
+            return;
+        }
+        
         const line = this.scenario[this.currentLine];
         this.currentLine++;
-        this.parse(line);
+        
+        this.stateManager.updateScenario(this.currentFile, this.currentLine - 1);
+        
+        await this.parse(line);
     }
     
     onClick() {
         if (this.isEnd) return;
+        
         this.messageWindow.hideNextArrow();
         if (this.messageWindow.isTyping) {
             this.messageWindow.skipTyping();
@@ -60,41 +69,26 @@ export default class ScenarioManager {
         }
     }
 
-     parse(line) {
+    async parse(line) {
         const processedLine = this.embedVariables(line);
         const trimedLine = processedLine.trim();
 
-        const { tagName, params } = this.parseTag(trimedLine);
-        const handler = this.tagHandlers.get(tagName);
-
-        // --- スキップ判定 ---
-        let isSkipping = false;
-        if (this.ifStack.length > 0) {
-            isSkipping = this.ifStack[this.ifStack.length - 1].skipping;
-        }
-
-        // --- ハンドラの実行 ---
-        // ifなどの制御タグも、通常のタグも、ここでまとめてハンドラを呼ぶ
-        if (trimedLine.startsWith('[')) {
-            if (handler) {
-                handler(this, params);
-            } else if(tagName !== 'p') { // [p]は特別なので、未定義でも警告しない
-                console.warn(`未定義のタグです: [${tagName}]`);
+        // スキップ判定
+        const ifState = this.ifStack.length > 0 ? this.ifStack[this.ifStack.length - 1] : null;
+        if (ifState && ifState.skipping) {
+            const { tagName } = this.parseTag(trimedLine);
+            if (['if', 'elsif', 'else', 'endif'].includes(tagName)) {
+                const handler = this.tagHandlers.get(tagName);
+                if (handler) await handler(this, this.parseTag(trimedLine).params);
             }
-        }
-        
-        // --- 実行 or スキップの判断 ---
-        if (isSkipping) {
-            // スキップモードなら、何もせず次に進む
             this.next();
             return;
         }
-
-        // --- 通常実行 (スキップモードでない場合) ---
+        
+        // 通常実行フロー
         if (trimedLine.startsWith(';') || trimedLine.startsWith('*')) {
-            // コメント/ラベルは無視
+            this.next();
         } else if (trimedLine.match(/^([a-zA-Z0-9_]+):/)) {
-            // 話者指定行
             const speakerMatch = trimedLine.match(/^([a-zA-Z0-9_]+):/);
             const speakerName = speakerMatch[1];
             const dialogue = trimedLine.substring(speakerName.length + 1).trim();
@@ -105,20 +99,17 @@ export default class ScenarioManager {
             this.messageWindow.setText(wrappedLine, true, () => {
                 this.messageWindow.showNextArrow();
             });
-            return; // テロップ表示中はここで停止
-        } else if (trimedLine === '[p]') {
-             // [p]タグ (クリック待ち)
-             if (this.scene.pendingChoices.length > 0) {
-                this.isWaitingChoice = true;
-                this.scene.displayChoiceButtons();
-             } else {
-                this.isWaitingClick = true;
-                this.messageWindow.showNextArrow();
-             }
-             return; // クリック待ちなのでここで停止
-        }
-        else if (trimedLine.length > 0 && !trimedLine.startsWith('[')) {
-            // 地の文
+        } else if (trimedLine.startsWith('[')) {
+            const { tagName, params } = this.parseTag(trimedLine);
+            const handler = this.tagHandlers.get(tagName);
+            if (handler) {
+                this.isWaitingTag = true;
+                await handler(this, params);
+            } else {
+                console.warn(`未定義のタグです: [${tagName}]`);
+                this.next();
+            }
+        } else if (trimedLine.length > 0) {
             this.stateManager.addHistory(null, trimedLine);
             this.highlightSpeaker(null);
             this.isWaitingClick = true; 
@@ -126,64 +117,69 @@ export default class ScenarioManager {
             this.messageWindow.setText(wrappedLine, true, () => {
                 this.messageWindow.showNextArrow();
             });
-            return; // テロップ表示中はここで停止
+        } else {
+            this.next();
         }
-        
-        // ハンドラが実行され、かつクリック待ちやテロップ表示ではない場合
-        // (例: [eval], [chara_hide]など)
+    }
+    
+    finishTagExecution() {
+        this.isWaitingTag = false;
         this.next();
     }
-       embedVariables(line) {
-        console.log(`[embedVariables] 開始: line = "${line}"`);
-        
-        // 正規表現がマッチするかどうかをテスト
-        const regex = /&((f|sf)\.[a-zA-Z0-9_.-]+)/g;
-        if (!regex.test(line)) {
-            // console.log(`[embedVariables] マッチなし。そのまま返します。`);
-            return line; // マッチしなかったらログは出さずにすぐ返す
+    
+    async loadScenario(scenarioKey, targetLabel = null) {
+        if (!this.scene.cache.text.has(scenarioKey)) {
+            await new Promise(resolve => {
+                this.scene.load.text(scenarioKey, `assets/${scenarioKey}`);
+                this.scene.load.once('complete', resolve);
+                this.scene.load.start();
+            });
         }
-        
-        console.log(`[embedVariables] 変数埋め込み候補が見つかりました。`);
-        return line.replace(regex, (match, exp) => {
-            console.log(`[embedVariables] マッチ部分: match="${match}", exp="${exp}"`);
+        this.load(scenarioKey);
+        if (targetLabel) {
+            this.jumpTo(targetLabel);
+        }
+    }
+
+    jumpTo(target) {
+        const labelName = target.substring(1);
+        const targetLineIndex = this.scenario.findIndex(line => line.trim().startsWith('*') && line.trim().substring(1) === labelName);
+        if (targetLineIndex !== -1) {
+            this.currentLine = targetLineIndex;
+        } else {
+            console.error(`ジャンプ先のラベル[${target}]が見つかりませんでした。`);
+        }
+    }
+
+    embedVariables(line) {
+        return line.replace(/&((f|sf)\.[a-zA-Z0-9_.-]+)/g, (match, exp) => {
             const value = this.stateManager.eval(exp);
-            console.log(`[embedVariables] stateManager.evalの結果: value =`, value);
-            
             if (value === undefined || value === null) {
-                const undefinedText = `(undef: ${exp})`;
-                console.log(`[embedVariables] 値が未定義のため、"${undefinedText}" に置換します。`);
-                return undefinedText; 
+                return `(undef: ${exp})`;
             }
-            console.log(`[embedVariables] 値 "${value}" に置換します。`);
             return value;
         });
     }
-       parseTag(tagString) {
+
+    parseTag(tagString) {
         const content = tagString.substring(1, tagString.length - 1).trim();
         const firstSpaceIndex = content.indexOf(' ');
-        
-        // タグ名と、それ以降の属性文字列に分割
         const tagName = firstSpaceIndex === -1 ? content : content.substring(0, firstSpaceIndex);
         const attributesString = firstSpaceIndex === -1 ? '' : content.substring(firstSpaceIndex + 1);
-
         const params = {};
-        
-        // ★★★ 属性文字列をパースする、より強力な正規表現 ★★★
         const regex = /(\w+)\s*=\s*("[^"]*"|'[^']*'|[^'"\s]+)/g;
         let match;
         while ((match = regex.exec(attributesString)) !== null) {
-            const key = match[1];
             let value = match[2];
-            
-            // 値を囲む引用符があれば削除する
-            if (value.startsWith('"') && value.endsWith('"')) {
-                value = value.substring(1, value.length - 1);
-            } else if (value.startsWith("'") && value.endsWith("'")) {
+            if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
                 value = value.substring(1, value.length - 1);
             }
             params[key] = value;
         }
-        
+        if (tagName === 'glink' && !params.text) {
+             const lastPart = content.substring(content.lastIndexOf(attributesString) + attributesString.length).trim();
+             if (lastPart) params.text = lastPart;
+        }
         return { tagName, params };
     }
     
@@ -213,53 +209,13 @@ export default class ScenarioManager {
         const dark = 0x888888;
         for (const name in this.scene.characters) {
             const chara = this.scene.characters[name];
-            if (!chara.active) continue;
-            if (speakerName === null || speakerName === name) {
-                chara.setTint(bright);
-            } else {
-                chara.setTint(dark);
+            if (chara && chara.active) {
+                if (speakerName === null || speakerName === name) {
+                    chara.setTint(bright);
+                } else {
+                    chara.setTint(dark);
+                }
             }
-        }
-    }
-
-    // ★★★ シナリオファイルを変更するための新しいメソッドを追加 ★★★
-/**
- * 新しいシナリオファイルをロードし、実行コンテキストを切り替える
- * @param {string} scenarioKey - ロードするシナリオのキー
- * @param {string} targetLabel - ジャンプ先のラベル (任意)
- */
-async loadScenario(scenarioKey, targetLabel = null) {
-    // Phaserのローダーで、新しいシナリオファイルを動的に読み込む
-    // すでに読み込み済みなら、キャッシュが使われる
-    await new Promise(resolve => {
-        this.scene.load.text(scenarioKey, `assets/${scenarioKey}`);
-        this.scene.load.once('complete', resolve);
-        this.scene.load.start();
-    });
-    
-    // シナリオを入れ替える
-    this.load(scenarioKey);
-
-    // ジャンプ先ラベルが指定されていれば、そこにジャンプする
-    if (targetLabel) {
-        this.jumpTo(targetLabel, false); // falseは「nextを呼ばない」の意
-    }
-}
-/**
- * @param {string} target 
- * @param {boolean} callNext - ジャンプ後にnext()を呼ぶか
- */
-jumpTo(target, callNext = true) {
-        const labelName = target.substring(1);
-        const targetLineIndex = this.scenario.findIndex(line => line.trim().startsWith('*') && line.trim().substring(1) === labelName);
-       if (targetLineIndex !== -1) {
-        this.currentLine = targetLineIndex;
-        if (callNext) {
-            this.next();
-        }
-    } else {
-            console.error(`ジャンプ先のラベル[${target}]が見つかりませんでした。`);
-            this.next();
         }
     }
 }
