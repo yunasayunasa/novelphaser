@@ -124,17 +124,32 @@ export default class ScenarioManager {
             return value;
         });
     }
-    parseTag(tagString) {
-        const content = tagString.substring(1, tagString.length - 1);
-        const parts = content.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
-        const tagName = parts.shift() || '';
+       parseTag(tagString) {
+        const content = tagString.substring(1, tagString.length - 1).trim();
+        const firstSpaceIndex = content.indexOf(' ');
+        
+        // タグ名と、それ以降の属性文字列に分割
+        const tagName = firstSpaceIndex === -1 ? content : content.substring(0, firstSpaceIndex);
+        const attributesString = firstSpaceIndex === -1 ? '' : content.substring(firstSpaceIndex + 1);
+
         const params = {};
-        parts.forEach(part => {
-            const [key, value] = part.split('=');
-            if (value) {
-                params[key] = value.replace(/"/g, '');
+        
+        // ★★★ 属性文字列をパースする、より強力な正規表現 ★★★
+        const regex = /(\w+)\s*=\s*("[^"]*"|'[^']*'|[^'"\s]+)/g;
+        let match;
+        while ((match = regex.exec(attributesString)) !== null) {
+            const key = match[1];
+            let value = match[2];
+            
+            // 値を囲む引用符があれば削除する
+            if (value.startsWith('"') && value.endsWith('"')) {
+                value = value.substring(1, value.length - 1);
+            } else if (value.startsWith("'") && value.endsWith("'")) {
+                value = value.substring(1, value.length - 1);
             }
-        });
+            params[key] = value;
+        }
+        
         return { tagName, params };
     }
     
