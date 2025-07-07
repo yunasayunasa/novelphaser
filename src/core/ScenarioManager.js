@@ -99,16 +99,31 @@ export default class ScenarioManager {
         });
     }
 
-    embedVariables(line) {
-        return line.replace(/&((f|sf)\.[a-zA-Z0-9_.-]+)/g, (match, exp) => {
+       embedVariables(line) {
+        console.log(`[embedVariables] 開始: line = "${line}"`);
+        
+        // 正規表現がマッチするかどうかをテスト
+        const regex = /&((f|sf)\.[a-zA-Z0-9_.-]+)/g;
+        if (!regex.test(line)) {
+            // console.log(`[embedVariables] マッチなし。そのまま返します。`);
+            return line; // マッチしなかったらログは出さずにすぐ返す
+        }
+        
+        console.log(`[embedVariables] 変数埋め込み候補が見つかりました。`);
+        return line.replace(regex, (match, exp) => {
+            console.log(`[embedVariables] マッチ部分: match="${match}", exp="${exp}"`);
             const value = this.stateManager.eval(exp);
+            console.log(`[embedVariables] stateManager.evalの結果: value =`, value);
+            
             if (value === undefined || value === null) {
-                return `(undef: ${exp})`; 
+                const undefinedText = `(undef: ${exp})`;
+                console.log(`[embedVariables] 値が未定義のため、"${undefinedText}" に置換します。`);
+                return undefinedText; 
             }
+            console.log(`[embedVariables] 値 "${value}" に置換します。`);
             return value;
         });
     }
-
     parseTag(tagString) {
         const content = tagString.substring(1, tagString.length - 1);
         const parts = content.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
