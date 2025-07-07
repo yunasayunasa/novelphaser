@@ -4,7 +4,7 @@
  * @param {Object} params - {layer, time}
  */
 export function handleFreeImage(manager, params) {
-    const layerName = params.layer || 'message';
+    const layerName = params.layer || 'cg';
     if (!layerName) { console.warn('[freeimage] layerは必須です。'); manager.next(); return; }
     
     const targetLayer = manager.layers[layerName];

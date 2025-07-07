@@ -5,7 +5,7 @@
  */
 export function handleImage(manager, params) {
     const storage = params.storage;
-    const layerName = params.layer || 'base'; // デフォルトは'base'レイヤー
+    const layerName = params.layer || 'cg'; // デフォルトは'cg'レイヤー
     if (!storage) { console.warn('[image] storageは必須です。'); manager.next(); return; }
 
     const targetLayer = manager.layers[layerName];

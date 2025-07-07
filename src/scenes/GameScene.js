@@ -40,7 +40,7 @@ export default class GameScene extends Phaser.Scene {
         this.soundManager = null;
         this.stateManager = null;
         this.messageWindow = null;
-        this.layer = { background: null, character: null, message: null };
+        this.layer = { background: null, character: null, cg: null, message: null };
         this.charaDefs = null;
         this.characters = {};
         this.configManager = null;
@@ -62,6 +62,7 @@ export default class GameScene extends Phaser.Scene {
         // --- レイヤー生成 ---
         this.layer.background = this.add.container(0, 0);
         this.layer.character = this.add.container(0, 0);
+        this.layer.cg = this.add.container(0, 0);
         this.layer.message = this.add.container(0, 0);
 
         // --- マネージャー/UIクラスの生成 (依存関係に注意) ---
