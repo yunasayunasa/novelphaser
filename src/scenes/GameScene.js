@@ -22,6 +22,10 @@ import { handleFlip } from '../handlers/flip.js';
 import { handleCharaJump } from '../handlers/chara_jump.js';
 import { handleEval } from '../handlers/eval.js';
 import { handleLog } from '../handlers/log.js';
+import { handleIf } from '../handlers/if.js';
+import { handleElsif } from '../handlers/elsif.js';
+import { handleElse } from '../handlers/else.js';
+import { handleEndif } from '../handlers/endif.js';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -82,6 +86,10 @@ export default class GameScene extends Phaser.Scene {
         this.scenarioManager.registerTag('chara_jump', handleCharaJump);
         this.scenarioManager.registerTag('eval', handleEval);
         this.scenarioManager.registerTag('log', handleLog);
+        this.scenarioManager.registerTag('if', handleIf);
+        this.scenarioManager.registerTag('elsif', handleElsif);
+        this.scenarioManager.registerTag('else', handleElse);
+        this.scenarioManager.registerTag('endif', handleEndif);
         
         // --- ゲーム開始 ---
         this.scenarioManager.load('scene1');
