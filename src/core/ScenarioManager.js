@@ -98,23 +98,23 @@ export default class ScenarioManager {
         }
     }
 
-       parse(line) {
-         let processedLine = this.embedVariables(line);
+         parse(line) {
+        // ★★★ 1. どんな行でも、まず変数埋め込みを試みる ★★★
+        const processedLine = this.embedVariables(line);
         const trimedLine = processedLine.trim();
 
-
-        // 1. 無視する行の判定
+        // 2. 無視する行の判定
         if (trimedLine.startsWith(';') || trimedLine.startsWith('*')) {
             this.next();
             return;
         }
 
-        // 2. 話者指定行の判定 (例: "yuna:こんにちは")
+        // 3. 話者指定行の判定
         const speakerMatch = trimedLine.match(/^([a-zA-Z0-9_]+):/);
         if (speakerMatch) {
             const speakerName = speakerMatch[1];
             const dialogue = trimedLine.substring(speakerName.length + 1).trim();
- // ★★★ 履歴を記録 ★★★
+
             this.stateManager.addHistory(speakerName, dialogue);
             this.highlightSpeaker(speakerName);
             
@@ -126,9 +126,8 @@ export default class ScenarioManager {
             return;
         }
 
-        // 3. タグ行の判定
+        // 4. タグ行の判定
         if (trimedLine.startsWith('[')) {
-            // [p]タグもここでまとめて処理できる
             const { tagName, params } = this.parseTag(trimedLine);
             const handler = this.tagHandlers.get(tagName);
     
@@ -141,10 +140,9 @@ export default class ScenarioManager {
             return;
         }
 
-        // 4. 上記のいずれでもなければ「地の文」と確定
-        // ★★★ 地の文も履歴として記録 ★★★
+        // 5. 上記のいずれでもなければ「地の文」と確定
         this.stateManager.addHistory(null, trimedLine);
-        this.highlightSpeaker(null); // 全員のハイライトを元に戻す
+        this.highlightSpeaker(null);
 
         this.isWaitingClick = true; 
         const wrappedLine = this.manualWrap(trimedLine);
