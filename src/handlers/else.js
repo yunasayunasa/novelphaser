@@ -11,5 +11,5 @@ export function handleElse(manager, params) {
         ifState.conditionMet = true; // elseが実行されるので、条件は満たされた扱い
         ifState.skipping = false;    // スキップを解除
     }
-    manager.next();
+    //manager.next();
 }

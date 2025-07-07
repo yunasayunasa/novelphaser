@@ -7,5 +7,5 @@ export function handleIf(manager, params) {
         skipping: !result     // 現在スキップ中か
     });
     
-    manager.next();
+   // manager.next();
 }

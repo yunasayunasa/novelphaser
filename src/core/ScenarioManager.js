@@ -56,24 +56,33 @@ export default class ScenarioManager {
         }
     }
 
-        parse(line) {
-        // 1. どんな行でも、まず変数埋め込みを試みる
+      parse(line) {
+        // --- 1. 変数埋め込み ---
         const processedLine = this.embedVariables(line);
         const trimedLine = processedLine.trim();
 
-        // 2. スキップモードかどうかを判定
+        // --- 2. 制御タグかどうかを判定 ---
+        // if,elsif,else,endif は、常にハンドラが呼ばれる必要がある
+        const { tagName, params } = this.parseTag(trimedLine);
+        const handler = this.tagHandlers.get(tagName);
+        const isControlTag = ['if', 'elsif', 'else', 'endif'].includes(tagName);
+
+        if (isControlTag) {
+            if (handler) {
+                handler(this, params);
+            }
+            this.next(); // 制御タグは処理したら必ず次に進む
+            return;
+        }
+
+        // --- 3. スキップ判定 ---
+        // 制御タグ以外の場合、スキップ状態をチェックする
         const ifState = this.ifStack.length > 0 ? this.ifStack[this.ifStack.length - 1] : null;
         if (ifState && ifState.skipping) {
-            // スキップモード中は、分岐タグ以外はすべて無視して次に進む
-            if (trimedLine.startsWith('[elsif') || trimedLine.startsWith('[else') || trimedLine.startsWith('[endif')) {
-                // 分岐タグの場合は、スキップせずにハンドラに処理を任せる
-            } else {
-                this.next();
-                return;
-            }
+            this.next(); // スキップモードなら何もせず次に進む
+            return;
         }
         
-        // --- ここから通常の実行フロー ---
 
         // 3. 行の種類を判定し、適切な処理に振り分ける
         if (trimedLine.startsWith(';') || trimedLine.startsWith('*')) {
@@ -94,10 +103,8 @@ export default class ScenarioManager {
                 this.messageWindow.showNextArrow();
             });
 
-        } else if (trimedLine.startsWith('[')) {
-            // タグ行
-            const { tagName, params } = this.parseTag(trimedLine);
-            const handler = this.tagHandlers.get(tagName);
+          } else if (trimedLine.startsWith('[')) {
+            // タグ行 (ifなどの制御タグは上で処理済み)
             if (handler) {
                 handler(this, params);
             } else {
