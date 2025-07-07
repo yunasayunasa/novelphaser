@@ -1,14 +1,17 @@
 /**
  * [cm] タグの処理
- * メッセージウィンドウのテキストをクリアする
+ * メッセージウィンドウのテキストをクリアし、クリックを待つ
  */
 export function handleClearMessage(manager, params) {
-    manager.messageWindow.setText('', false); // テロップを使わずに即時クリア
-    manager.messageWindow.hideNextArrow(); // クリック待ち矢印も消す
+    // 1. メッセージウィンドウ関連の処理
+    manager.messageWindow.setText('', false); // テキストを即時クリア
+    manager.messageWindow.hideNextArrow();    // 念のため矢印も消す
     
-    // 状態としてはクリック待ちではないので、フラグも更新しておく
-    manager.isWaitingClick = false;
-
-    // このタグは一瞬で終わる処理なので、すぐに次の行へ
-    manager.next();
+    // 2. 状態を「クリック待ち」に設定する
+    // これにより、テロップ表示中でもなく、通常のクリック待ちでもない、
+    // 新しい「cm待ち」状態になる。
+    manager.isWaitingClick = true;
+    
+    // ★★★ next() は呼ばない！ ★★★
+    // 次のクリックがonClick()をトリガーするのを待つ。
 }
