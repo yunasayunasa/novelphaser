@@ -7,7 +7,8 @@ export function handleLog(manager, params) {
     const exp = params.exp;
     if (!exp) {
         console.warn('[log] exp属性は必須です。');
-        manager.next();
+      //  manager.next();
+      manager.finishTagExecution();
         return;
     }
 
@@ -16,6 +17,6 @@ export function handleLog(manager, params) {
     const value = manager.stateManager.eval(exp);
 
     console.log(`[Log Tag]: ${exp} =`, value);
-
+manager.finishTagExecution();
     //manager.next();
 }

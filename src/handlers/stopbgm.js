@@ -3,6 +3,6 @@ export function handleStopBgm(manager, params) {
     manager.soundManager.stopBgm(time);
      // ★★★ 状態を更新 ★★★
     manager.stateManager.updateBgm(null);
-
+manager.finishTagExecution();
   //  manager.next();
 }

@@ -5,10 +5,16 @@
  */
 export function handleWalk(manager, params) {
     const name = params.name;
-    if (!name) { console.warn('[walk] nameは必須です。'); manager.next(); return; }
+    if (!name) { console.warn('[walk] nameは必須です。');
+        manager.finishTagExecution();
+        //manager.next(); return; 
+    }
     
     const chara = manager.scene.characters[name];
-    if (!chara) { console.warn(`[walk] キャラクター[${name}]が見つかりません。`); manager.next(); return; }
+    if (!chara) { console.warn(`[walk] キャラクター[${name}]が見つかりません。`);
+    manager.finishTagExecution();
+    //manager.next(); return;
+ }
 
     const time = Number(params.time) || 2000; // 歩く時間
     const x = params.x !== undefined ? Number(params.x) : chara.x;
@@ -38,6 +44,7 @@ export function handleWalk(manager, params) {
                 charaData.y = y;
                 manager.stateManager.updateChara(name, charaData);
             }
+            manager.finishTagExecution();
            // manager.next();
         }
     });

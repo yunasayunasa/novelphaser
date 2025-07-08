@@ -7,7 +7,8 @@ export function handleErase(manager, params) {
     const layerName = params.layer;
     if (!layerName) {
         console.warn('[er] layer属性は必須です。(例: character)');
-        manager.next();
+      //  manager.next();
+      manager.finishTagExecution();
         return;
     }
 
@@ -15,7 +16,8 @@ export function handleErase(manager, params) {
     const targetLayer = manager.layers[layerName];
     if (!targetLayer) {
         console.warn(`[er] 指定されたレイヤー[${layerName}]が見つかりません。`);
-        manager.next();
+      //  manager.next();
+      manager.finishTagExecution();
         return;
     }
     
@@ -33,6 +35,6 @@ export function handleErase(manager, params) {
         console.log('State Updated: キャラクターを全員消去しました。');
     }
     // 他のレイヤー（背景など）を消去した場合のstate更新も、必要ならここに追加
-
-    manager.next();
+manager.finishTagExecution();
+   // manager.next();
 }

@@ -7,7 +7,8 @@ export function handleDelay(manager, params) {
     const speed = params.speed;
     if (speed === undefined) {
         console.warn('[delay] speed属性は必須です。');
-        manager.next();
+       // manager.next();
+       manager.finishTagExecution();
         return;
     }
 
@@ -15,5 +16,6 @@ export function handleDelay(manager, params) {
     manager.messageWindow.currentTextDelay = Number(speed);
     
     console.log(`テキスト表示速度を ${speed}ms に変更しました。`);
-    manager.next();
+   // manager.next();
+   manager.finishTagExecution();
 }

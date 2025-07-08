@@ -5,10 +5,16 @@
  */
 export function handleFlip(manager, params) {
     const name = params.name;
-    if (!name) { console.warn('[flip] nameは必須です。'); manager.next(); return; }
+    if (!name) { console.warn('[flip] nameは必須です。'); 
+        manager.finishTagExecution();
+       // manager.next();
+         return; }
 
     const chara = manager.scene.characters[name];
-    if (!chara) { console.warn(`[flip] キャラクター[${name}]が見つかりません。`); manager.next(); return; }
+    if (!chara) { console.warn(`[flip] キャラクター[${name}]が見つかりません。`); 
+    manager.finishTagExecution();
+  //  manager.next(); 
+    return; }
 
     const time = Number(params.time) || 500;
     const halfTime = time / 2;
@@ -41,6 +47,7 @@ export function handleFlip(manager, params) {
         
         // すべてのTweenが完了した後に呼ばれる
         onComplete: () => {
+            manager.finishTagExecution();
            // manager.next();
         }
     });

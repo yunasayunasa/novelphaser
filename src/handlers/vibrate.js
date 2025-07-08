@@ -12,6 +12,7 @@ export function handleVibrate(manager, params) {
 
     // 揺れが終わるのを待ってから次に進む
     manager.scene.time.delayedCall(time, () => {
+        manager.finishTagExecution();
        // manager.next();
     });
 }

@@ -10,10 +10,12 @@ export function handleWait(manager, params) {
     if (time > 0) {
         // Phaserのタイマー機能を使う
         manager.scene.time.delayedCall(time, () => {
-            manager.next(); // 指定時間後に次の行へ
+            manager.finishTagExecution();
+           // manager.next(); // 指定時間後に次の行へ
         });
     } else {
         // timeが0以下の場合は、すぐに次の行へ
+        manager.finishTagExecution();
       //  manager.next();
     }
 }

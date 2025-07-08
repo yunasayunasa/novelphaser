@@ -7,10 +7,20 @@
 export function handleCharaJump(manager, params) {
     const name = params.name;
     // ★★★ エラーメッセージも修正 ★★★
-    if (!name) { console.warn('[chara_jump] nameは必須です。'); manager.next(); return; }
+    if (!name) { console.warn('[chara_jump] nameは必須です。'); 
+       
+       
+        //manager.next(); 
+        manager.finishTagExecution();
+        return;
+    manager.finishTagExecution();
+    }
 
     const chara = manager.scene.characters[name];
-    if (!chara) { console.warn(`[chara_jump] キャラクター[${name}]が見つかりません。`); manager.next(); return; }
+    if (!chara) { console.warn(`[chara_jump] キャラクター[${name}]が見つかりません。`);
+    manager.finishTagExecution();
+   // manager.next(); 
+    return; }
 
 
     const time = Number(params.time) || 500; // ジャンプ全体の時間(ms)
@@ -39,6 +49,7 @@ export function handleCharaJump(manager, params) {
             chara.y = originY;
             
             // 次のシナリオへ
+            manager.finishTagExecution();
             //manager.next();
         }
     });

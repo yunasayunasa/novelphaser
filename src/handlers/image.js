@@ -6,10 +6,16 @@
 export function handleImage(manager, params) {
     const storage = params.storage;
     const layerName = params.layer || 'cg'; // デフォルトは'cg'レイヤー
-    if (!storage) { console.warn('[image] storageは必須です。'); manager.next(); return; }
+    if (!storage) { console.warn('[image] storageは必須です。'); 
+       // manager.next();
+        manager.finishTagExecution();
+        return; }
 
     const targetLayer = manager.layers[layerName];
-    if (!targetLayer) { console.warn(`[image] レイヤー[${layerName}]が見つかりません。`); manager.next(); return; }
+    if (!targetLayer) { console.warn(`[image] レイヤー[${layerName}]が見つかりません。`); 
+    manager.finishTagExecution();
+   // manager.next();
+     return; }
 
     const time = Number(params.time) || 1000;
     const x = Number(params.x) || manager.scene.scale.width / 2;
@@ -29,6 +35,7 @@ export function handleImage(manager, params) {
 
     // アニメーションを待たずに次に進むこともできるが、待つ方が一般的
     manager.scene.time.delayedCall(time, () => {
-        manager.next();
+      //  manager.next();
+      manager.finishTagExecution();
     });
 }

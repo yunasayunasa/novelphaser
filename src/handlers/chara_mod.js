@@ -8,7 +8,8 @@ export function handleCharaMod(manager, params) {
     const face = params.face;
     if (!name || !face) {
         console.warn('[chara_mod] name属性とface属性は必須です。');
-        manager.next();
+      //  manager.next();
+      manager.finishTagExecution();
         return;
     }
 
@@ -17,7 +18,8 @@ export function handleCharaMod(manager, params) {
     const def = manager.characterDefs[name];
     if (!chara || !def) {
         console.warn(`[chara_mod] 変更対象のキャラクター[${name}]が見つかりません。`);
-        manager.next();
+      //  manager.next();
+      manager.finishTagExecution();
         return;
     }
 
@@ -25,7 +27,8 @@ export function handleCharaMod(manager, params) {
     const storage = def.face[face];
     if (!storage) {
         console.warn(`キャラクター[${name}]の表情[${face}]が見つかりません。`);
-        manager.next();
+       // manager.next();
+       manager.finishTagExecution();
         return;
     }
 
@@ -36,7 +39,8 @@ export function handleCharaMod(manager, params) {
     const currentState = manager.stateManager.getState().layers.characters[name];
     if (!currentState) {
         console.warn(`[chara_mod] 状態管理にキャラクター[${name}]が見つかりません。`);
-        manager.next();
+      //  manager.next();
+      manager.finishTagExecution();
         return;
     }
     const newCharaData = {

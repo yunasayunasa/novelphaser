@@ -7,14 +7,17 @@ export function handleCharaHide(manager, params) {
     const name = params.name;
     if (!name) {
         console.warn('[chara_hide] name属性は必須です。');
-        manager.next();
+       // manager.next();
+       manager.finishTagExecution();
         return;
     }
 
     const chara = manager.scene.characters[name];
     if (!chara) {
         console.warn(`[chara_hide] 非表示にしようとしたキャラクター[${name}]が見つかりません。`);
-        manager.next();
+        manager.finishTagExecution();
+        
+        //manager.next();
         return;
     }
 const onComplete = () => {
@@ -23,8 +26,8 @@ const onComplete = () => {
         
         // ★★★ 状態を更新 (nullを渡して削除) ★★★
         manager.stateManager.updateChara(name, null);
-        
-        manager.next();
+        manager.finishTagExecution();
+       // manager.next();
     };
 
 
@@ -39,13 +42,15 @@ const onComplete = () => {
             onComplete: () => {
                 chara.destroy();
                 delete manager.scene.characters[name];
-                manager.next();
+                manager.finishTagExecution();
+              //  manager.next();
                 onComplete;
             }
         });
     } else {
         chara.destroy();
         delete manager.scene.characters[name];
+        manager.finishTagExecution();
       //  manager.next();
     }
 }

@@ -5,10 +5,18 @@
  */
 export function handleFreeImage(manager, params) {
     const layerName = params.layer || 'cg';
-    if (!layerName) { console.warn('[freeimage] layerは必須です。'); manager.next(); return; }
+    if (!layerName) { console.warn('[freeimage] layerは必須です。'); 
+        //manager.next(); 
+        //return;
+        manager.finishTagExecution();
+        return;
+    }
     
     const targetLayer = manager.layers[layerName];
-    if (!targetLayer) { console.warn(`[freeimage] レイヤー[${layerName}]が見つかりません。`); manager.next(); return; }
+    if (!targetLayer) { console.warn(`[freeimage] レイヤー[${layerName}]が見つかりません。`);
+    manager.finishTagExecution();
+   // manager.next(); return; 
+}
 
     const time = Number(params.time) || 1000;
 
@@ -24,6 +32,7 @@ export function handleFreeImage(manager, params) {
     });
     
     manager.scene.time.delayedCall(time, () => {
-        manager.next();
+      //  manager.next();
+      manager.finishTagExecution();
     });
 }

@@ -17,5 +17,6 @@ export function handleElsif(manager, params) {
             ifState.skipping = true;     // 条件が合わないのでスキップ継続
         }
     }
+    manager.finishTagExecution();
     //manager.next();
 }

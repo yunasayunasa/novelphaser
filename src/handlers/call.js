@@ -6,7 +6,13 @@
 export async function handleCall(manager, params) {
     const storage = params.storage; // 呼び出すシナリオファイル名 (例: scene2.ks)
     const target = params.target;   // 呼び出し先のラベル名 (例: *start)
-    if (!storage) { console.warn('[call] storageは必須です。'); manager.next(); return; }
+    if (!storage) { console.warn('[call] storageは必須です。'); 
+        
+       // manager.next(); 
+        manager.finishTagExecution();
+        return; 
+    manager.finishTagExecution();
+    }
 
     // ★ 1. 戻るべき場所をコールスタックに積む
     // 現在のファイル名と、「次の行」の行番号を保存

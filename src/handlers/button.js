@@ -5,10 +5,16 @@
  */
 export function handleButton(manager, params) {
     const graphic = params.graphic;
-    if (!graphic) { console.warn('[button] graphic属性は必須です。'); manager.next(); return; }
+    if (!graphic) { console.warn('[button] graphic属性は必須です。'); 
+        //manager.next(); return; 
+        manager.finishTagExecution();
+    }
 
     const target = params.target;
-    if (!target) { console.warn('[button] target属性は必須です。'); manager.next(); return; }
+    if (!target) { console.warn('[button] target属性は必須です。'); 
+        //manager.next(); return; 
+        manager.finishTagExecution();
+        }
 
     const x = Number(params.x) || manager.scene.scale.width / 2;
     const y = Number(params.y) || manager.scene.scale.height / 2;
@@ -27,6 +33,6 @@ export function handleButton(manager, params) {
 
     // ★★★ GameSceneにボタンを登録して、後から消せるようにする ★★★
     manager.scene.uiButtons.push(buttonImage);
-
-    manager.next(); // ボタンを配置したら、すぐに次の行へ
+manager.finishTagExecution();
+    //manager.next(); // ボタンを配置したら、すぐに次の行へ
 }

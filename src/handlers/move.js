@@ -8,7 +8,8 @@ export function handleMove(manager, params) {
     const name = params.name;
     if (!name) {
         console.warn('[move] name属性は必須です。');
-        manager.next();
+      //  manager.next();
+      manager.finishTagExecution();
         return;
     }
     
@@ -16,7 +17,8 @@ export function handleMove(manager, params) {
     const chara = manager.scene.characters[name];
     if (!chara) {
         console.warn(`[move] 移動対象のキャラクター[${name}]が見つかりません。`);
-        manager.next();
+      //  manager.next();
+      manager.finishTagExecution();
         return;
     }
 
@@ -43,6 +45,7 @@ export function handleMove(manager, params) {
             }
             
             // 次のシナリオへ
+            manager.finishTagExecution();
            // manager.next();
         }
     });

@@ -7,14 +7,15 @@ export function handlePlaySe(manager, params) {
     const storage = params.storage;
     if (!storage) {
         console.warn('[playse] storage属性は必須です。');
-        manager.next();
+    //    manager.next();
+    manager.finishTagExecution();
         return;
     }
 
     const volume = Number(params.volume) || 1.0;
 
     manager.soundManager.playSe(storage, { volume: volume });
-
+manager.finishTagExecution();
     // SEは再生しっぱなしで、すぐに次の行へ進む
     //manager.next();
 }

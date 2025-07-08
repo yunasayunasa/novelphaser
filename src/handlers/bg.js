@@ -8,7 +8,8 @@ export function handleBg(manager, params) {
     const storage = params.storage;
     if (!storage) {
         console.warn('[bg] storage属性は必須です。');
-        manager.next();
+       // manager.next();
+       manager.finishTagExecution();
         return;
     }
 
@@ -56,7 +57,8 @@ export function handleBg(manager, params) {
         // アニメーションの完了を待ってから次に進む
         scene.time.delayedCall(time, () => {
     manager.stateManager.updateBg(storage);
-            manager.next();
+           // manager.next();
+           manager.finishTagExecution();
         });
     
 
@@ -67,6 +69,7 @@ export function handleBg(manager, params) {
             oldBg.destroy();
         }
         manager.stateManager.updateBg(storage);
+        manager.finishTagExecution();
         //manager.next();
     }
 }
