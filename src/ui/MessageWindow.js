@@ -70,7 +70,7 @@ export default class MessageWindow extends Container {
         this.windowImage.setPosition(gameWidth / 2, uiLayout.y);
 
         const textWidth = this.windowImage.displayWidth - (uiLayout.padding * 2);
-        const textHeight = this.windowImage.displayHeight - (ui.padding * 1.5); // ここもuiLayout.padding
+        const textHeight = this.windowImage.displayHeight - (uiLayout.padding * 1.5);
         
         this.textObject.setPosition(
             this.windowImage.x - (this.windowImage.displayWidth / 2) + uiLayout.padding,
