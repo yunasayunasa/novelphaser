@@ -39,15 +39,16 @@ export default class MessageWindow extends Container {
         const orientation = this.scene.scale.isPortrait ? 'portrait' : 'landscape';
         const layout = Layout[orientation];
         const uiLayout = layout.ui.messageWindow;
-        const gameWidth = this.scale.width;
+         this.windowImage.setPosition(gameWidth / 2, uiLayout.y);
 
-        this.windowImage.setPosition(gameWidth / 2, uiLayout.y);
-
-        const textWidth = this.windowImage.width - (uiLayout.padding * 2);
-        const textHeight = this.windowImage.height - (uiLayout.padding * 1.5);
+        // ★★★ .width -> .displayWidth に変更 ★★★
+        const textWidth = this.windowImage.displayWidth - (uiLayout.padding * 2);
+        const textHeight = this.windowImage.displayHeight - (uiLayout.padding * 1.5);
+        
         this.textObject.setPosition(
-            this.windowImage.x - (this.windowImage.width / 2) + uiLayout.padding,
-            this.windowImage.y - (this.windowImage.height / 2) + (uiLayout.padding / 2)
+            // ★★★ .width -> .displayWidth に変更 ★★★
+            this.windowImage.x - (this.windowImage.displayWidth / 2) + uiLayout.padding,
+            this.windowImage.y - (this.windowImage.displayHeight / 2) + (uiLayout.padding / 2)
         );
         this.textObject.setWordWrapWidth(textWidth, true);
         this.textObject.setFixedSize(textWidth, textHeight);
