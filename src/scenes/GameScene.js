@@ -74,7 +74,7 @@ export default class GameScene extends Phaser.Scene {
 
         // --- マネージャー/UIクラスの生成 (依存関係に注意) ---
         this.configManager = new ConfigManager();
-        this.sys.game.config.globals.configManager = this.configManager; // 正しい設定方法
+        //this.sys.game.config.globals.configManager = this.configManager; // 正しい設定方法
         this.stateManager = new StateManager();
         this.soundManager = new SoundManager(this, this.configManager);
         this.messageWindow = new MessageWindow(this, this.soundManager, this.configManager);
