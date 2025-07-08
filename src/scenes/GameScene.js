@@ -72,17 +72,17 @@ export default class GameScene extends Phaser.Scene {
         this.layer.cg = this.add.container(0, 0);
         this.layer.message = this.add.container(0, 0);
 
-        // --- マネージャー/UIクラスの生成 ---
-        // ★★★ グローバルなConfigManagerを取得 ★★★
-        this.configManager = new ConfigManager;
+            // --- マネージャー/UIクラスの生成 ---
+        this.configManager = this.sys.game.config.globals.configManager;
         this.stateManager = new StateManager();
         this.soundManager = new SoundManager(this, this.configManager);
         this.messageWindow = new MessageWindow(this, this.soundManager, this.configManager);
         
-        // ★★★ GameSceneが、MessageWindowの位置を決める ★★★
+        // ★ MessageWindowの位置をLayout.jsから設定
         const mwLayout = Layout.ui.messageWindow;
-         this.messageWindow.setPosition(mwLayout.x, mwLayout.y);
+        this.messageWindow.setPosition(mwLayout.x, mwLayout.y);
         this.layer.message.add(this.messageWindow);
+        
         this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager, this.stateManager, this.configManager);
         // --- タグハンドラの登録 ---
         this.scenarioManager.registerTag('chara_show', handleCharaShow);
@@ -123,9 +123,8 @@ export default class GameScene extends Phaser.Scene {
         this.scenarioManager.load('scene1');
         this.input.on('pointerdown', () => { this.scenarioManager.onClick(); });
         this.scenarioManager.next();
-         // ★★★ 背景専用のリサイズリスナーを追加 ★★★
-   
-}
+        console.log("GameScene: create 完了");
+    }
 
 
     

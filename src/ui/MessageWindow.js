@@ -1,52 +1,53 @@
-
 const Container = Phaser.GameObjects.Container;
 
 export default class MessageWindow extends Container {
     constructor(scene, soundManager, configManager) {
-        super(scene, 0, 0); // コンテナ自身の位置は(0,0)でOK
+        super(scene, 0, 0); // コンテナ自身の位置は(0,0)で初期化
         this.soundManager = soundManager;
         this.configManager = configManager;
         
-        // --- プロパティの初期化 ---
-        this.charByCharTimer = null;
+        // --- プロパティ初期化 ---
         this.isTyping = false;
         
-        // --- UI要素の生成 ---
+        // --- UI要素の生成 (相対座標で) ---
         this.windowImage = this.scene.add.image(0, 0, 'message_window').setOrigin(0.5);
         
-           const padding = 35;
+        const padding = 35;
         const textWidth = this.windowImage.width - (padding * 2);
         const textHeight = this.windowImage.height - (padding * 1.5);
         this.textObject = this.scene.add.text(
-            -this.windowImage.width / 2 + padding, // ウィンドウ左端から
-            -this.windowImage.height / 2 + padding, // ウィンドウ上端から
-            '', {
-            fontFamily: '"Noto Sans JP", sans-serif',
-            fontSize: '36px',
-            fill: '#ffffff'
-        });
-         this.textObject.setWordWrapWidth(textWidth, true).setFixedSize(textWidth, textHeight);
+            -this.windowImage.width / 2 + padding,
+            -this.windowImage.height / 2 + padding,
+            '', { fontFamily: '"Noto Sans JP", sans-serif', fontSize: '36px', fill: '#ffffff' }
+        ).setWordWrapWidth(textWidth, true).setFixedSize(textWidth, textHeight);
         
         this.nextArrow = this.scene.add.image(
-            this.windowImage.width / 2 - (padding * 1.5), // ウィンドウ右端から
-            this.windowImage.height / 2 - (padding * 1.5), // ウィンドウ下端から
+            this.windowImage.width / 2 - padding,
+            this.windowImage.height / 2 - padding,
             'next_arrow'
-        ).setScale(0.5);
+        ).setScale(0.5).setOrigin(0.5);
 
-        
-        // --- コンテナに要素を追加 ---
-           this.add([this.windowImage, this.textObject, this.nextArrow]);
-       
-        // --- 初期状態の設定 ---
+        // --- コンテナに追加 ---
+        this.add([this.windowImage, this.textObject, this.nextArrow]);
         this.hideNextArrow();
-        
-        // --- イベントリスナーの登録 ---
+
+        // --- コンフィグの初期値設定とリスナー登録 ---
+        const textSpeedValue = this.configManager.getValue('textSpeed');
+        this.currentTextDelay = 100 - textSpeedValue;
         this.configManager.on('change:textSpeed', (newValue) => {
             this.currentTextDelay = 100 - newValue;
         });
-        
-        // ★★★ シーンに自身を追加するのを忘れずに ★★★
-        this.scene.add.existing(this);
+
+        // --- 矢印アニメーションの生成 ---
+        this.arrowTween = this.scene.tweens.add({
+            targets: this.nextArrow,
+            y: this.nextArrow.y - 10,
+            duration: 400,
+            ease: 'Sine.easeInOut',
+            yoyo: true,
+            repeat: -1,
+            paused: true
+        });
     }
 
     
