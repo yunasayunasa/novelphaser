@@ -46,7 +46,7 @@ export default class UIScene extends Phaser.Scene {
         // ★ 最初のレイアウト適用
         this.applyLayout();
           // ★ リサイズイベントの監視
-        this.scale.on('resize', this.onResize, this);
+        this.scale.on('resize', this.applyLayout, this);
 
     }
 
