@@ -61,8 +61,10 @@ export default class UIScene extends Phaser.Scene {
     applyLayout(withAnimation = false) {
         const orientation = this.scale.isPortrait ? 'portrait' : 'landscape';
         const layout = Layout[orientation];
-        const gameWidth = this.layout.width;
-        const gameHeight = this.layout.height;
+        const gameWidth = layout.width;
+        const gameHeight = layout.height;
+          const uiLayout = layout.ui.menuButton;
+
 
         // メニューボタンの位置を更新 (あなたの希望に合わせて左下に)
         this.menuButton.setPosition(100, gameHeight - 50);
