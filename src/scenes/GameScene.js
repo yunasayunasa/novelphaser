@@ -74,7 +74,7 @@ export default class GameScene extends Phaser.Scene {
 
         // --- マネージャー/UIクラスの生成 (依存関係に注意) ---
         this.configManager = new ConfigManager();
-        this.sys.game.config.globals.configManager;
+        this.sys.game.config.globals.configManager = this.configManager; // 正しい設定方法
         this.stateManager = new StateManager();
         this.soundManager = new SoundManager(this, this.configManager);
         this.messageWindow = new MessageWindow(this, this.soundManager, this.configManager);
@@ -125,41 +125,33 @@ export default class GameScene extends Phaser.Scene {
         
         // 2. ゲーム開始時に、現在の画面サイズで一度レイアウトを強制的に適用する
         //    これがないと、リサイズするまで正しい位置に表示されない
-        this.onResize(this.scale);
+        this.onResize();
 
     }
 
          onResize() {
-        // 現在の画面の向きと、対応するレイアウト定義を取得
         const orientation = this.scale.isPortrait ? 'portrait' : 'landscape';
         const layout = Layout[orientation];
-
-        // --- 1. 背景の再配置 (特別扱い) ---
+        
+        // --- 背景の再配置 ---
         const bg = this.layer.background.getAt(0);
         if (bg) {
-            // 物理的なブラウザウィンドウのサイズを取得
-            const screenWidth = this.sys.game.canvas.width;
-            const screenHeight = this.sys.game.canvas.height;
-
-            // ★★★ 背景は、カメラの中央ではなく、物理画面の中央に配置 ★★★
-            bg.setPosition(screenWidth / 2, screenHeight / 2);
-            
-            // ★★★ 背景は、カメラのスクロールの影響を受けないようにする ★★★
+            const camera = this.cameras.main;
+            bg.setPosition(camera.width / 2, camera.height / 2); // カメラの中心に配置
             bg.setScrollFactor(0);
-
-            // ENVELOPモード風の拡縮計算
+            
+            // ★★★ カメラのサイズにフィットさせる ★★★
+            const camAspectRatio = camera.width / camera.height;
             const bgAspectRatio = bg.width / bg.height;
-            const screenAspectRatio = screenWidth / screenHeight;
 
-            if (bgAspectRatio > screenAspectRatio) {
-                bg.displayHeight = screenHeight;
-                bg.displayWidth = screenHeight * bgAspectRatio;
+            if (bgAspectRatio > camAspectRatio) {
+                bg.displayHeight = camera.height;
+                bg.displayWidth = camera.height * bgAspectRatio;
             } else {
-                bg.displayWidth = screenWidth;
-                bg.displayHeight = screenWidth / bgAspectRatio;
+                bg.displayWidth = camera.width;
+                bg.displayHeight = camera.width / bgAspectRatio;
             }
         }
-
         // --- 2. キャラクターの再配置 ---
         for (const name in this.characters) {
             const chara = this.characters[name];

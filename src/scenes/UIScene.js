@@ -65,13 +65,10 @@ export default class UIScene extends Phaser.Scene {
     }
 
        applyLayout(withAnimation = false) {
-        const orientation = this.scale.isPortrait ? 'portrait' : 'landscape';
-        const layout = Layout[orientation];
+        // ★★★ カメラのサイズを基準にする ★★★
+        const gameWidth = this.cameras.main.width;
+        const gameHeight = this.cameras.main.height;
         
-        // ★★★ 720x1280 の座標空間を使う ★★★
-        const gameWidth = layout.width;
-        const gameHeight = layout.height;
-
         // メニューボタンの位置
         this.menuButton.setPosition(100, gameHeight - 50);
 
@@ -85,7 +82,8 @@ export default class UIScene extends Phaser.Scene {
         const areaWidth = gameWidth - areaStartX - 50;
         const buttonMargin = areaWidth / buttons.length;
         buttons.forEach((button, index) => {
-            button.setX(areaStartX + (buttonMargin * index) + (buttonMargin / 2));
+            const buttonX = areaStartX + (buttonMargin * index) + (buttonMargin / 2);
+            button.setX(buttonX);
         });
 
         // パネル全体の位置
@@ -96,4 +94,5 @@ export default class UIScene extends Phaser.Scene {
             this.panel.y = targetY;
         }
     }
+
 }

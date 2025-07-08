@@ -50,17 +50,13 @@ export default class MessageWindow extends Container {
         this.scene.scale.on('resize', this.applyLayout, this);
     }
 
-       applyLayout() {
-        // 現在の向きとレイアウト定義を取得
+      applyLayout() {
+        const camera = this.scene.cameras.main;
         const orientation = this.scene.scale.isPortrait ? 'portrait' : 'landscape';
-        const layout = Layout[orientation];
-        const uiLayout = layout.ui.messageWindow;
+        const uiLayout = Layout[orientation].ui.messageWindow;
         
-        // ★★★ ゲーム世界の固定サイズを使う ★★★
-        const gameWidth = layout.width;
-
-        // 1. ウィンドウ画像の位置を更新
-        this.windowImage.setPosition(gameWidth / 2, uiLayout.y);
+        // ウィンドウ画像の位置
+        this.windowImage.setPosition(camera.width / 2, uiLayout.y);
 
         // 2. テキストオブジェクトの位置とサイズを更新
         // ★★★ .width と .height を使う ★★★
