@@ -2,9 +2,9 @@ import PreloadScene from './scenes/PreloadScene.js';
 import GameScene from './scenes/GameScene.js';
 import UIScene from './scenes/UIScene.js';
 import SaveLoadScene from './scenes/SaveLoadScene.js';
-import ConfigScene from './scenes/ConfigScene.js'; // これを追加
-import BacklogScene from './scenes/BacklogScene.js'; // これを追加
-
+import ConfigScene from './scenes/ConfigScene.js';
+import BacklogScene from './scenes/BacklogScene.js';
+import ConfigManager from './core/ConfigManager.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -12,10 +12,17 @@ const config = {
         mode: Phaser.Scale.FIT,
         parent: 'phaser-game',
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: 720,
-        height: 1280
+        width: 1280,
+        height: 720
     },
-    scene: [PreloadScene, GameScene, UIScene, SaveLoadScene, ConfigScene, BacklogScene]
+    scene: [PreloadScene, GameScene, UIScene, SaveLoadScene, ConfigScene, BacklogScene],
+    callbacks: {
+        preBoot: (game) => {
+            game.config.globals = {
+                configManager: new ConfigManager()
+            };
+        }
+    }
 };
 
 const game = new Phaser.Game(config);
