@@ -99,8 +99,9 @@ export default class ScenarioManager {
             this.isWaitingClick = true;
             this.messageWindow.setText(wrappedLine, true, () => {
                 this.messageWindow.showNextArrow();
-                retun;
+                
             });
+            return;
         } else if (trimedLine.startsWith('[')) {
             // タグ行
             const { tagName, params } = this.parseTag(trimedLine);
@@ -128,8 +129,9 @@ export default class ScenarioManager {
             const wrappedLine = this.manualWrap(trimedLine);
             this.messageWindow.setText(wrappedLine, true, () => {
                 this.messageWindow.showNextArrow();
-                return;
+                
             });
+            return;
         } else {
             // 空行
             this.next();
