@@ -54,7 +54,8 @@ export default class MessageWindow extends Container {
         const orientation = this.scene.scale.isPortrait ? 'portrait' : 'landscape';
         const layout = Layout[orientation];
         const uiLayout = layout.ui.messageWindow;
-        const gameWidth = this.scale.width;
+         // ★★★ this.scale -> this.scene.scale に修正 ★★★
+        const gameWidth = this.scene.scale.width; 
 
         this.windowImage.setPosition(gameWidth / 2, uiLayout.y);
 
