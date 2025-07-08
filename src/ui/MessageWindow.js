@@ -123,13 +123,62 @@ export default class MessageWindow extends Container {
     }
 
     setText(text, useTyping = true, onComplete = () => {}) {
-        // ... (このメソッドはあなたのコードのままでOK)
+        // 既存のテキストとタイマーをクリア
+        this.textObject.setText('');
+        if (this.charByCharTimer) {
+            this.charByCharTimer.remove();
+        }
+        
+        // テロップ表示を使わない条件を判定
+        if (!useTyping || text.length === 0 || this.currentTextDelay <= 0) {
+            this.textObject.setText(text);
+            this.isTyping = false;
+            onComplete();
+            return;
+        }
+        
+        // --- ここからテロップ表示処理 ---
+        this.isTyping = true;
+        let index = 0;
+        
+        const timerConfig = {
+            delay: this.currentTextDelay,
+            callback: () => {
+                // タイプ音を再生
+                this.soundManager.playSe('popopo');
+                // 文字を追加
+                this.textObject.text += timerConfig.fullText[index];
+                index++;
+                // 終了判定
+                if (index === timerConfig.fullText.length) {
+                    this.charByCharTimer.remove();
+                    this.isTyping = false;
+                    onComplete();
+                }
+            },
+            callbackScope: this,
+            loop: true,
+            fullText: text // カスタムプロパティとして全文を保存
+        };
+        
+        this.charByCharTimer = this.scene.time.addEvent(timerConfig);
     }
 
     skipTyping() {
-        // ... (このメソッドもあなたのコードのままでOK)
-    }
+        if (!this.isTyping) return;
 
+        // タイマーに保存した全文を取得
+        const fullText = this.charByCharTimer.fullText;
+        
+        this.textObject.setText(fullText);
+        this.charByCharTimer.remove();
+        this.isTyping = false;
+        
+        // ★ スキップ時は、テロップ完了時のコールバックを自分で呼ぶ必要がある
+        // ただし、onClickでシナリオが進まないように、isWaitingClickはtrueのまま
+        const onComplete = this.charByCharTimer.onComplete;
+        if(onComplete) onComplete();
+    }
     showNextArrow() {
         if (!this.nextArrow) return;
         this.nextArrow.setVisible(true);
