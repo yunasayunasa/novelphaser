@@ -89,17 +89,39 @@ export default class ScenarioManager {
         if (trimedLine.startsWith(';') || trimedLine.startsWith('*')) {
             this.next();
         } else if (trimedLine.match(/^([a-zA-Z0-9_]+):/)) {
-            // (省略なし)
+            // 話者指定行
+            const speakerMatch = trimedLine.match(/^([a-zA-Z0-9_]+):/);
+            const speakerName = speakerMatch[1];
+            const dialogue = trimedLine.substring(speakerName.length + 1).trim();
+            this.stateManager.addHistory(speakerName, dialogue);
+            this.highlightSpeaker(speakerName);
+            const wrappedLine = this.manualWrap(dialogue);
+            this.isWaitingClick = true;
+            this.messageWindow.setText(wrappedLine, true, () => {
+                this.messageWindow.showNextArrow();
+            });
         } else if (trimedLine.startsWith('[')) {
+            // タグ行
             const { tagName, params } = this.parseTag(trimedLine);
             const handler = this.tagHandlers.get(tagName);
             if (handler) {
                 this.isWaitingTag = true;
-                handler(this, params); // ハンドラが完了を通知する
-            } else { this.next(); }
+                handler(this, params);
+            } else {
+                console.warn(`未定義のタグです: [${tagName}]`);
+                this.next();
+            }
         } else if (trimedLine.length > 0) {
-            // (省略なし)
+            // 地の文
+            this.stateManager.addHistory(null, trimedLine);
+            this.highlightSpeaker(null);
+            this.isWaitingClick = true; 
+            const wrappedLine = this.manualWrap(trimedLine);
+            this.messageWindow.setText(wrappedLine, true, () => {
+                this.messageWindow.showNextArrow();
+            });
         } else {
+            // 空行
             this.next();
         }
     }
@@ -111,13 +133,17 @@ export default class ScenarioManager {
     
     async loadScenario(scenarioKey, targetLabel = null) {
         if (!this.scene.cache.text.has(scenarioKey)) {
-            await new Promise(resolve => { /* ... */ });
+            await new Promise(resolve => {
+                this.scene.load.text(scenarioKey, `assets/${scenarioKey}`);
+                this.scene.load.once('complete', resolve);
+                this.scene.load.start();
+            });
         }
         this.load(scenarioKey);
-        if (targetLabel) this.jumpTo(targetLabel);
+        if (targetLabel) {
+            this.jumpTo(targetLabel);
+        }
     }
-
-  
 
     jumpTo(target) {
         const labelName = target.substring(1);
@@ -148,15 +174,12 @@ export default class ScenarioManager {
         const regex = /(\w+)\s*=\s*("[^"]*"|'[^']*'|[^'"\s]+)/g;
         let match;
         while ((match = regex.exec(attributesString)) !== null) {
+            const key = match[1];
             let value = match[2];
             if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
                 value = value.substring(1, value.length - 1);
             }
             params[key] = value;
-        }
-        if (tagName === 'glink' && !params.text) {
-             const lastPart = content.substring(content.lastIndexOf(attributesString) + attributesString.length).trim();
-             if (lastPart) params.text = lastPart;
         }
         return { tagName, params };
     }
