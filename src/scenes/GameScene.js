@@ -73,11 +73,12 @@ export default class GameScene extends Phaser.Scene {
         this.layer.message = this.add.container(0, 0);
 
             // --- マネージャー/UIクラスの生成 ---
-        this.configManager = this.sys.game.config.globals.configManager;
+       this.configManager = new ConfigManager();
+        this.sys.registry.set('configManager', this.configManager);
         this.stateManager = new StateManager();
         this.soundManager = new SoundManager(this, this.configManager);
         this.messageWindow = new MessageWindow(this, this.soundManager, this.configManager);
-        
+         this.layer.message.add(this.messageWindow.setPosition(640, 600)); // 位置設定
         // ★ MessageWindowの位置をLayout.jsから設定
         const mwLayout = Layout.ui.messageWindow;
         this.messageWindow.setPosition(mwLayout.x, mwLayout.y);
