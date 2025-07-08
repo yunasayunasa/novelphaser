@@ -123,7 +123,9 @@ export default class GameScene extends Phaser.Scene {
         // --- ゲーム開始 ---
         this.scenarioManager.load('scene1');
         this.input.on('pointerdown', () => { this.scenarioManager.onClick(); });
-        this.scenarioManager.next();
+        setTimeout(() => {
+            this.scenarioManager.next();
+        }, 10); // 10ミリ秒後。ほぼ0秒後だが、createの同期処理を抜けるのに十分
         console.log("GameScene: create 完了");
     }
 
