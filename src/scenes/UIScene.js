@@ -45,7 +45,7 @@ export default class UIScene extends Phaser.Scene {
 
     togglePanel() {
         this.isPanelOpen = !this.isPanelOpen;
-        this.applyLayout(true); // アニメーション付きでレイアウトを更新
+       // this.applyLayout(true); // アニメーション付きでレイアウトを更新
     }
     
     openScene(sceneKey, data = {}) {
