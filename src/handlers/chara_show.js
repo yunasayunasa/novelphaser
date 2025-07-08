@@ -65,9 +65,6 @@ export function handleCharaShow(manager, params) {
     }
 
     const chara = manager.scene.add.image(x, y, storage);
-    // ★★★ キャラクター自身に 'pos' 情報を保存 ★★★
-    // posが指定されていない場合は、'center'をデフォルトとして保存
-    chara.setData('pos', params.pos || 'center');
     chara.setAlpha(0);
     manager.layers.character.add(chara);
     manager.scene.characters[name] = chara;
@@ -78,7 +75,7 @@ export function handleCharaShow(manager, params) {
         name: name,
         face: params.face || 'normal',
         storage: storage,
-         pos: params.pos || 'center', // posも保存
+        pos: params.pos,
         x: x,
         y: y
     };

@@ -1,22 +1,24 @@
-// 横画面(1280x720)を基準としたレイアウト定義
+// 画面サイズを引数に取り、各位置の座標を返すオブジェクト
 export const Layout = {
-    character: {
-        left:   { x: 320, y: 450, scale: 1 },
-        center: { x: 640, y: 450, scale: 1 },
-        right:  { x: 960, y: 450, scale: 1 }
+    // 縦向き (portrait) のレイアウト
+    portrait: {
+        width: 720,
+        height: 1280,
+        character: {
+            // Y座標は共通にしておくと綺麗に見える
+            left:   { x: 180, y: 800 },
+            center: { x: 360, y: 800 },
+            right:  { x: 540, y: 800 }
+        }
     },
-    ui: {
-        messageWindow: {
-            y: 600,
-            padding: 35
-        },
-        menuButton:    { // これはUISceneで直接指定しても良い
-            x: 1220,
-            y: 670
-        },
-        choiceButton: {
-            startY: 200,
-            stepY: 90
+    // 横向き (landscape) のレイアウト
+    landscape: {
+        width: 1280,
+        height: 720,
+        character: {
+            left:   { x: 280, y: 450 },
+            center: { x: 640, y: 450 },
+            right:  { x: 1000, y: 450 }
         }
     }
 };
