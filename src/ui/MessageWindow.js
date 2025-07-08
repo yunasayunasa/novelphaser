@@ -3,33 +3,15 @@ const Container = Phaser.GameObjects.Container;
 
 export default class MessageWindow extends Container {
     constructor(scene, soundManager, configManager) {
-        super(scene, 0, 0); // まず親クラスを初期化
+        super(scene, 0, 0); // コンテナ自身の位置は(0,0)でOK
         this.soundManager = soundManager;
         this.configManager = configManager;
-
+        
         // --- プロパティの初期化 ---
-        this.windowImage = null;
-        this.textObject = null;
-        this.nextArrow = null;
-        this.arrowTween = null;
         this.charByCharTimer = null;
         this.isTyping = false;
-        this.currentTextDelay = 50;
-
-        // ★★★ シーンに追加されたら、initializeメソッドを一度だけ呼ぶよう予約 ★★★
-        this.once('addedtoscene', this.initialize, this);
         
-        // ★★★ 最後に、自身をシーンに追加するよう要求する ★★★
-        this.scene.add.existing(this);
-    }
-
-    /**
-     * このコンテナがシーンに完全に追加された後に呼ばれる、本当の初期化処理
-     */
-    initialize() {
-        console.log("MessageWindow: シーンに追加され、初期化を開始します。");
-
-        // --- UI要素を生成 ---
+        // --- UI要素の生成 ---
         this.windowImage = this.scene.add.image(0, 0, 'message_window');
         this.textObject = this.scene.add.text(0, 0, '', {
             fontFamily: '"Noto Sans JP", sans-serif',
@@ -38,17 +20,65 @@ export default class MessageWindow extends Container {
         });
         this.nextArrow = this.scene.add.image(0, 0, 'next_arrow');
         
-        // --- 要素をコンテナに追加 ---
+        // --- コンテナに要素を追加 ---
         this.add([this.windowImage, this.textObject, this.nextArrow]);
 
-        // --- 初期レイアウトの適用とイベントリスナーの登録 ---
-       // this.applyLayout();
+        // --- レイアウトの適用 ---
+        this.applyLayout();
+
+        // --- 初期状態の設定 ---
         this.hideNextArrow();
+        
+        // --- イベントリスナーの登録 ---
         this.configManager.on('change:textSpeed', (newValue) => {
             this.currentTextDelay = 100 - newValue;
         });
-        //this.scene.scale.on('resize', this);
+        
+        // ★★★ シーンに自身を追加するのを忘れずに ★★★
+        this.scene.add.existing(this);
     }
+
+    applyLayout() {
+        const layout = Layout.ui.messageWindow;
+        const gameWidth = 1280; // 横画面の固定幅
+
+        // 1. ウィンドウ画像の位置
+        this.windowImage.setPosition(gameWidth / 2, layout.y);
+
+        // 2. テキストオブジェクトの位置とサイズ
+        const textWidth = this.windowImage.width - (layout.padding * 2);
+        const textHeight = this.windowImage.height - (layout.padding * 1.5);
+        this.textObject.setPosition(
+            this.windowImage.x - (this.windowImage.width / 2) + layout.padding,
+            this.windowImage.y - (this.windowImage.height / 2) + (layout.padding / 2)
+        );
+        this.textObject.setWordWrapWidth(textWidth, true);
+        this.textObject.setFixedSize(textWidth, textHeight);
+        
+        // 3. テキスト速度の初期値を設定
+        const textSpeedValue = this.configManager.getValue('textSpeed');
+        this.currentTextDelay = 100 - textSpeedValue;
+
+        // 4. クリック待ち矢印の位置
+        this.nextArrow.setPosition(
+            this.windowImage.x + (this.windowImage.width / 2) - (layout.padding * 1.5),
+            this.windowImage.y + (this.windowImage.height / 2) - (layout.padding * 1.5)
+        );
+        this.nextArrow.setScale(0.5);
+
+        // 5. 矢印のアニメーションを(再)生成
+        if (this.arrowTween) this.arrowTween.destroy(); // 古いTweenは完全に破棄
+        this.arrowTween = this.scene.tweens.add({
+            targets: this.nextArrow,
+            y: this.nextArrow.y - 10,
+            duration: 400,
+            ease: 'Sine.easeInOut',
+            yoyo: true,
+            repeat: -1,
+            paused: !this.nextArrow.visible
+        });
+    }
+
 
     
 

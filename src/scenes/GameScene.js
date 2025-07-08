@@ -42,17 +42,17 @@ import { Layout } from '../core/Layout.js';
 export default class GameScene extends Phaser.Scene {
     constructor() {
         super('GameScene');
+        // --- プロパティの初期化 ---
         this.scenarioManager = null;
         this.soundManager = null;
         this.stateManager = null;
         this.messageWindow = null;
+        this.configManager = null;
         this.layer = { background: null, character: null, cg: null, message: null };
         this.charaDefs = null;
         this.characters = {};
-        this.configManager = null;
-        this.choiceButtons = []; 
-        this.pendingChoices = []; // ★★★ 選択肢の一時保管場所 ★★★
-        this.uiButtons = [];
+        this.choiceButtons = [];
+        this.pendingChoices = [];
     }
 
     init(data) {
@@ -72,15 +72,14 @@ export default class GameScene extends Phaser.Scene {
         this.layer.cg = this.add.container(0, 0);
         this.layer.message = this.add.container(0, 0);
 
-        // --- マネージャー/UIクラスの生成 (依存関係に注意) ---
-        this.configManager = new ConfigManager();
-        //this.sys.game.config.globals.configManager = this.configManager; // 正しい設定方法
+        // --- マネージャー/UIクラスの生成 ---
+        // ★★★ グローバルなConfigManagerを取得 ★★★
+        this.configManager = this.sys.game.config.globals.configManager;
         this.stateManager = new StateManager();
         this.soundManager = new SoundManager(this, this.configManager);
         this.messageWindow = new MessageWindow(this, this.soundManager, this.configManager);
         this.layer.message.add(this.messageWindow);
         this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager, this.stateManager, this.configManager);
-        
         // --- タグハンドラの登録 ---
         this.scenarioManager.registerTag('chara_show', handleCharaShow);
         this.scenarioManager.registerTag('chara_hide', handleCharaHide);
@@ -121,40 +120,11 @@ export default class GameScene extends Phaser.Scene {
         this.input.on('pointerdown', () => { this.scenarioManager.onClick(); });
         this.scenarioManager.next();
          // ★★★ 背景専用のリサイズリスナーを追加 ★★★
-    this.scale.on('resize', () => {
-        const bg = this.layer.background.getAt(0);
-        if (bg) {
-            this.updateBackgroundLayout(bg);
-        }
-    }, this);
+   
 }
 
 
-     // GameSceneに、新しいメソッドとして追加
-updateBackgroundLayout(bg) {
-    // 物理画面のサイズを取得
-    const screenWidth = this.sys.game.canvas.width;
-    const screenHeight = this.sys.game.canvas.height;
-
-    // カメラの位置とサイズを取得（FITモードで拡縮された描画領域）
-    const camera = this.cameras.main;
-
-    // 背景をカメラの中心に配置
-    bg.setPosition(camera.centerX, camera.centerY);
-
-    // ENVELOP風の計算
-    const camAspectRatio = camera.width / camera.height;
-    const bgAspectRatio = bg.width / bg.height;
-
-    if (bgAspectRatio > camAspectRatio) {
-        bg.displayHeight = camera.height;
-        bg.displayWidth = camera.height * bgAspectRatio;
-    } else {
-        bg.displayWidth = camera.width;
-        bg.displayHeight = camera.height / bgAspectRatio;
-    }
-}
-
+    
     // GameSceneクラスの中に追加
 performSave(slot) {
     try {
@@ -292,8 +262,8 @@ function rebuildScene(manager, state) {
         if (!scene.textures.exists(state.layers.background)) {
             throw new Error(`背景テクスチャ[${state.layers.background}]がキャッシュにありません。`);
         }
-        const bg = scene.add.image(scene.scale.width / 2, scene.scale.height / 2, state.layers.background);
-        bg.setDisplaySize(scene.scale.width, scene.scale.height);
+         const bg = scene.add.image(640, 360, state.layers.background); // ★ 横画面中央に配置
+        // ★ setDisplaySizeは不要。背景画像のサイズを1280x720に合わせるのがベスト
         manager.layers.background.add(bg);
     }
     console.log("...背景復元完了");
