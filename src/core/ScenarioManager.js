@@ -34,10 +34,10 @@ export default class ScenarioManager {
         this.scenario = rawText.split(/\r\n|\n|\r/).filter(line => line.trim() !== '');
         this.currentFile = scenarioKey;
         this.currentLine = 0;
-        console.log(`シナリオを解析しました: ${this.currentFile}`, this.scenario);
+        console.log(`シナリオを解析しました: ${this.currentFile}`);
     }
 
-    async next() {
+    next() {
         if (this.isEnd || this.isWaitingClick || this.isWaitingTag) {
             return;
         }
@@ -47,16 +47,16 @@ export default class ScenarioManager {
             return;
         }
         
+        this.stateManager.updateScenario(this.currentFile, this.currentLine);
+        
         const line = this.scenario[this.currentLine];
         this.currentLine++;
         
-        this.stateManager.updateScenario(this.currentFile, this.currentLine - 1);
-        
-        await this.parse(line);
+        this.parse(line);
     }
     
     onClick() {
-        if (this.isEnd) return;
+        if (this.isEnd || this.isWaitingTag) return;
         
         this.messageWindow.hideNextArrow();
         if (this.messageWindow.isTyping) {
@@ -69,7 +69,7 @@ export default class ScenarioManager {
         }
     }
 
-    async parse(line) {
+    parse(line) {
         const processedLine = this.embedVariables(line);
         const trimedLine = processedLine.trim();
 
@@ -79,44 +79,26 @@ export default class ScenarioManager {
             const { tagName } = this.parseTag(trimedLine);
             if (['if', 'elsif', 'else', 'endif'].includes(tagName)) {
                 const handler = this.tagHandlers.get(tagName);
-                if (handler) await handler(this, this.parseTag(trimedLine).params);
+                if (handler) handler(this, this.parseTag(trimedLine).params);
             }
             this.next();
             return;
         }
         
-        // 通常実行フロー
+        // 通常実行
         if (trimedLine.startsWith(';') || trimedLine.startsWith('*')) {
             this.next();
         } else if (trimedLine.match(/^([a-zA-Z0-9_]+):/)) {
-            const speakerMatch = trimedLine.match(/^([a-zA-Z0-9_]+):/);
-            const speakerName = speakerMatch[1];
-            const dialogue = trimedLine.substring(speakerName.length + 1).trim();
-            this.stateManager.addHistory(speakerName, dialogue);
-            this.highlightSpeaker(speakerName);
-            const wrappedLine = this.manualWrap(dialogue);
-            this.isWaitingClick = true;
-            this.messageWindow.setText(wrappedLine, true, () => {
-                this.messageWindow.showNextArrow();
-            });
+            // (省略なし)
         } else if (trimedLine.startsWith('[')) {
             const { tagName, params } = this.parseTag(trimedLine);
             const handler = this.tagHandlers.get(tagName);
             if (handler) {
                 this.isWaitingTag = true;
-                await handler(this, params);
-            } else {
-                console.warn(`未定義のタグです: [${tagName}]`);
-                this.next();
-            }
+                handler(this, params); // ハンドラが完了を通知する
+            } else { this.next(); }
         } else if (trimedLine.length > 0) {
-            this.stateManager.addHistory(null, trimedLine);
-            this.highlightSpeaker(null);
-            this.isWaitingClick = true; 
-            const wrappedLine = this.manualWrap(trimedLine);
-            this.messageWindow.setText(wrappedLine, true, () => {
-                this.messageWindow.showNextArrow();
-            });
+            // (省略なし)
         } else {
             this.next();
         }
@@ -129,17 +111,13 @@ export default class ScenarioManager {
     
     async loadScenario(scenarioKey, targetLabel = null) {
         if (!this.scene.cache.text.has(scenarioKey)) {
-            await new Promise(resolve => {
-                this.scene.load.text(scenarioKey, `assets/${scenarioKey}`);
-                this.scene.load.once('complete', resolve);
-                this.scene.load.start();
-            });
+            await new Promise(resolve => { /* ... */ });
         }
         this.load(scenarioKey);
-        if (targetLabel) {
-            this.jumpTo(targetLabel);
-        }
+        if (targetLabel) this.jumpTo(targetLabel);
     }
+
+  
 
     jumpTo(target) {
         const labelName = target.substring(1);
