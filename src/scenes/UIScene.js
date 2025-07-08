@@ -44,7 +44,7 @@ export default class UIScene extends Phaser.Scene {
         
        
         // ★ 最初のレイアウト適用
-        this.applyLayout();
+      //  this.applyLayout();
           // ★ リサイズイベントの監視
         this.scale.on('resize', this.applyLayout, this);
 
@@ -52,7 +52,7 @@ export default class UIScene extends Phaser.Scene {
 
     togglePanel() {
         this.isPanelOpen = !this.isPanelOpen;
-        this.applyLayout(true); // アニメーション付きでレイアウトを更新
+      //  this.applyLayout(true); // アニメーション付きでレイアウトを更新
     }
     
     openScene(sceneKey, data = {}) {
