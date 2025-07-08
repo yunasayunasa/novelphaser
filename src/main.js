@@ -9,7 +9,7 @@ import BacklogScene from './scenes/BacklogScene.js'; // これを追加
 const config = {
     type: Phaser.AUTO,
     scale: {
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.ENVELOPE,
         parent: 'phaser-game',
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: 720,
