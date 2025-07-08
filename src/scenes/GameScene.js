@@ -103,8 +103,8 @@ export default class GameScene extends Phaser.Scene {
         this.scenarioManager.registerTag('else', handleElse);
         this.scenarioManager.registerTag('endif', handleEndif);
         this.scenarioManager.registerTag('s', handleStop);
-　　　　　this.scenarioManager.registerTag('cm', handleClearMessage);
-　　　　　this.scenarioManager.registerTag('er', handleErase);
+        this.scenarioManager.registerTag('cm', handleClearMessage);
+        this.scenarioManager.registerTag('er', handleErase);
         this.scenarioManager.registerTag('delay', handleDelay);
         this.scenarioManager.registerTag('image', handleImage);
         this.scenarioManager.registerTag('freeimage', handleFreeImage);
@@ -112,10 +112,43 @@ export default class GameScene extends Phaser.Scene {
         this.scenarioManager.registerTag('call', handleCall);
         this.scenarioManager.registerTag('return', handleReturn);
         
+ // 1. リサイズイベントのリスナーを登録
+        this.scale.on('resize', this.onResize, this);
+        
+        // 2. ゲーム開始時に、現在の画面サイズで一度レイアウトを強制的に適用する
+        //    これがないと、リサイズするまで正しい位置に表示されない
+        this.onResize();
+
         // --- ゲーム開始 ---
         this.scenarioManager.load('scene1');
         this.input.on('pointerdown', () => { this.scenarioManager.onClick(); });
         this.scenarioManager.next();
+    }
+
+     // ★★★ onResizeメソッドを新規追加 ★★★
+    onResize() {
+        console.log("GameScene: onResizeイベント発生！レイアウトを再適用します。");
+
+        // 表示中の全キャラクターの位置を、現在の画面向きに合わせて再計算・再配置
+        for (const name in this.characters) {
+            const chara = this.characters[name];
+            const charaData = this.stateManager.getState().layers.characters[name];
+
+            if (chara && charaData) {
+                const orientation = this.scale.isPortrait ? 'portrait' : 'landscape';
+                const layout = Layout[orientation];
+                let x, y;
+
+                if (charaData.pos && layout.character[charaData.pos]) {
+                    x = layout.character[charaData.pos].x;
+                    y = layout.character[charaData.pos].y;
+                } else {
+                    x = charaData.x;
+                    y = charaData.y;
+                }
+                chara.setPosition(x, y);
+            }
+        }
     }
 
     // GameSceneクラスの中に追加
@@ -167,14 +200,6 @@ clearChoiceButtons() {
     }
 }
 
-clearChoiceButtons() {
-    this.choiceButtons.forEach(button => button.destroy());
-    this.choiceButtons = [];
-    this.pendingChoices = []; // 念のためこちらもクリア
-    if (this.scenarioManager) {
-        this.scenarioManager.isWaitingChoice = false;
-    }
-}
 
 
     // GameSceneクラスの中に追加
