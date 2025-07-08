@@ -4,7 +4,6 @@ import UIScene from './scenes/UIScene.js';
 import SaveLoadScene from './scenes/SaveLoadScene.js';
 import ConfigScene from './scenes/ConfigScene.js'; // これを追加
 import BacklogScene from './scenes/BacklogScene.js'; // これを追加
-import ConfigManager from './core/ConfigManager.js';
 
 
 const config = {
@@ -13,17 +12,10 @@ const config = {
         mode: Phaser.Scale.FIT,
         parent: 'phaser-game',
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: 1280,
-        height: 720
+        width: 720,
+        height: 1280
     },
-    scene: [PreloadScene, GameScene, UIScene, SaveLoadScene, ConfigScene, BacklogScene],
-    callbacks: {
-        preBoot: (game) => {
-            game.config.globals = {
-                configManager: new ConfigManager()
-            };
-        }
-    }
+    scene: [PreloadScene, GameScene, UIScene, SaveLoadScene, ConfigScene, BacklogScene]
 };
 
 const game = new Phaser.Game(config);

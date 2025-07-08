@@ -1,6 +1,5 @@
 import ScenarioManager from '../core/ScenarioManager.js';
 import SoundManager from '../core/SoundManager.js';
-//import ResponsiveScene from './ResponsiveScene.js'; 
 import StateManager from '../core/StateManager.js';
 import MessageWindow from '../ui/MessageWindow.js';
 import { handleCharaShow } from '../handlers/chara_show.js';
@@ -36,23 +35,22 @@ import { handleFreeImage } from '../handlers/freeimage.js';
 import { handleButton } from '../handlers/button.js';
 import { handleCall } from '../handlers/call.js';
 import { handleReturn } from '../handlers/return.js';
-import { Layout } from '../core/Layout.js';
 
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
         super('GameScene');
-        // --- プロパティの初期化 ---
         this.scenarioManager = null;
         this.soundManager = null;
         this.stateManager = null;
         this.messageWindow = null;
-        this.configManager = null;
         this.layer = { background: null, character: null, cg: null, message: null };
         this.charaDefs = null;
         this.characters = {};
-        this.choiceButtons = [];
-        this.pendingChoices = [];
+        this.configManager = null;
+        this.choiceButtons = []; 
+        this.pendingChoices = []; // ★★★ 選択肢の一時保管場所 ★★★
+        this.uiButtons = [];
     }
 
     init(data) {
@@ -66,27 +64,20 @@ export default class GameScene extends Phaser.Scene {
     create() {
         this.cameras.main.setBackgroundColor('#000000');
         
-         // --- レイヤー生成 ---
+        // --- レイヤー生成 ---
         this.layer.background = this.add.container(0, 0);
         this.layer.character = this.add.container(0, 0);
         this.layer.cg = this.add.container(0, 0);
         this.layer.message = this.add.container(0, 0);
 
-        // --- マネージャー/UIクラスの生成と配置 ---
-        // 1. 依存されるものを先に作る
-        this.configManager = this.sys.game.config.globals.configManager; // main.jsのグローバル変数を取得
+        // --- マネージャー/UIクラスの生成 (依存関係に注意) ---
+        this.configManager = new ConfigManager();
         this.stateManager = new StateManager();
         this.soundManager = new SoundManager(this, this.configManager);
-        
-        // 2. MessageWindowを作り、正しい位置に一度だけ配置する
         this.messageWindow = new MessageWindow(this, this.soundManager, this.configManager);
-        const mwLayout = Layout.ui.messageWindow;
-        this.messageWindow.setPosition(mwLayout.x, mwLayout.y);
-        this.layer.message.add(this.messageWindow); // レイヤーへの追加も一度だけ
-
-        // 3. ScenarioManagerを作る
+        this.layer.message.add(this.messageWindow);
         this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager, this.stateManager, this.configManager);
-        this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager, this.stateManager, this.configManager);
+        
         // --- タグハンドラの登録 ---
         this.scenarioManager.registerTag('chara_show', handleCharaShow);
         this.scenarioManager.registerTag('chara_hide', handleCharaHide);
@@ -112,8 +103,8 @@ export default class GameScene extends Phaser.Scene {
         this.scenarioManager.registerTag('else', handleElse);
         this.scenarioManager.registerTag('endif', handleEndif);
         this.scenarioManager.registerTag('s', handleStop);
-        this.scenarioManager.registerTag('cm', handleClearMessage);
-        this.scenarioManager.registerTag('er', handleErase);
+　　　　　this.scenarioManager.registerTag('cm', handleClearMessage);
+　　　　　this.scenarioManager.registerTag('er', handleErase);
         this.scenarioManager.registerTag('delay', handleDelay);
         this.scenarioManager.registerTag('image', handleImage);
         this.scenarioManager.registerTag('freeimage', handleFreeImage);
@@ -121,16 +112,12 @@ export default class GameScene extends Phaser.Scene {
         this.scenarioManager.registerTag('call', handleCall);
         this.scenarioManager.registerTag('return', handleReturn);
         
-
         // --- ゲーム開始 ---
         this.scenarioManager.load('scene1');
         this.input.on('pointerdown', () => { this.scenarioManager.onClick(); });
         this.scenarioManager.next();
-        console.log("GameScene: create 完了");
     }
 
-
-    
     // GameSceneクラスの中に追加
 performSave(slot) {
     try {
@@ -180,6 +167,14 @@ clearChoiceButtons() {
     }
 }
 
+clearChoiceButtons() {
+    this.choiceButtons.forEach(button => button.destroy());
+    this.choiceButtons = [];
+    this.pendingChoices = []; // 念のためこちらもクリア
+    if (this.scenarioManager) {
+        this.scenarioManager.isWaitingChoice = false;
+    }
+}
 
 
     // GameSceneクラスの中に追加
@@ -268,8 +263,8 @@ function rebuildScene(manager, state) {
         if (!scene.textures.exists(state.layers.background)) {
             throw new Error(`背景テクスチャ[${state.layers.background}]がキャッシュにありません。`);
         }
-         const bg = scene.add.image(640, 360, state.layers.background); // ★ 横画面中央に配置
-        // ★ setDisplaySizeは不要。背景画像のサイズを1280x720に合わせるのがベスト
+        const bg = scene.add.image(scene.scale.width / 2, scene.scale.height / 2, state.layers.background);
+        bg.setDisplaySize(scene.scale.width, scene.scale.height);
         manager.layers.background.add(bg);
     }
     console.log("...背景復元完了");
@@ -283,9 +278,6 @@ function rebuildScene(manager, state) {
             throw new Error(`キャラクターテクスチャ[${charaData.storage}]がキャッシュにありません。`);
         }
         const chara = scene.add.image(charaData.x, charaData.y, charaData.storage);
-           // ★★★ ロード時もpos情報をセット ★★★
-        chara.setData('pos', charaData.pos);
-
         // ★★★ 必ずTintをリセットして明るい状態にする ★★★
         chara.setTint(0xffffff);
 

@@ -1,60 +1,95 @@
-import { Layout } from '../core/Layout.js';
-
 export default class UIScene extends Phaser.Scene {
     constructor() {
+        // key: このシーンを呼び出すための名前
+        // active: true にすることで、他のシーンと同時に自動で起動・表示される
         super({ key: 'UIScene', active: true });
-        this.panel = null;
-        this.isPanelOpen = false;
     }
 
-    create() {
-        console.log("UIScene: create 開始");
-        const gameWidth = 1280;
-        const gameHeight = 720;
-        
-        // --- 1. メインの「メニュー」ボタンを作成・配置 ---
-        const menuButton = this.add.text(100, gameHeight - 50, 'MENU', { fontSize: '36px', fill: '#fff' }).setOrigin(0.5).setInteractive();
+   create() {
+        console.log("UIScene: 作成されました。");
+        const gameWidth = this.scale.width;
+        const gameHeight = this.scale.height;
 
-        // --- 2. メニューパネルとボタンを作成 ---
-        this.panel = this.add.container(0, gameHeight + 100); // 初期位置は画面下
+        // --- 1. メニューパネル（ボタンの入れ物）を作成 ---
+        // 最初は画面の外に隠しておく
+        const panelY = gameHeight + 100; // 画面の下に隠れる位置
+        const panel = this.add.container(0, panelY);
+
+        // パネルの背景（半透明の黒）
         const panelBg = this.add.rectangle(gameWidth / 2, 0, gameWidth, 120, 0x000000, 0.8);
-        const saveButton = this.add.text(0, 0, 'セーブ', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
-        const loadButton = this.add.text(0, 0, 'ロード', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
-        const backlogButton = this.add.text(0, 0, '履歴', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
-        const configButton = this.add.text(0, 0, '設定', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
+        panel.add(panelBg);
         
-        // パネルに要素を追加
-        this.panel.add([panelBg, saveButton, loadButton, backlogButton, configButton]);
-        
-        // ボタンのレイアウト
+        // --- 2. パネル内の各ボタンを作成 ---
+        const buttonY = 0; // パネル内のY座標
+        const saveButton = this.add.text(gameWidth / 2 - 180, buttonY, 'セーブ', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
+        const loadButton = this.add.text(gameWidth / 2 - 50, buttonY, 'ロード', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
+        const configButton = this.add.text(gameWidth / 2 + 180, buttonY, '設定', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
+        // ★★★ パネルにバックログボタンを追加 ★★★
+        const backlogButton = this.add.text(gameWidth / 2 + 50, buttonY, '履歴', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
+        panel.add([saveButton, loadButton, backlogButton, configButton]);
+
+          // ★★★ ボタンのレイアウトを調整 ★★★
+       // ★★★ ここからレイアウト調整 ★★★
         const buttons = [saveButton, loadButton, backlogButton, configButton];
-        const areaStartX = 250;
-        const areaWidth = gameWidth - areaStartX - 100;
-        const buttonMargin = areaWidth / buttons.length;
-        buttons.forEach((button, index) => {
-            button.setX(areaStartX + (buttonMargin * index) + (buttonMargin / 2));
-        });
-
-        // --- 3. イベントリスナーを設定 ---
-        menuButton.on('pointerdown', () => {
-            this.isPanelOpen = !this.isPanelOpen;
-            const targetY = this.isPanelOpen ? gameHeight - 60 : gameHeight + 120;
-            this.tweens.add({ targets: this.panel, y: targetY, duration: 300, ease: 'Cubic.easeInOut' });
-        });
         
-        saveButton.on('pointerdown', () => this.openScene('SaveLoadScene', { mode: 'save' }));
-        loadButton.on('pointerdown', () => this.openScene('SaveLoadScene', { mode: 'load' }));
-        backlogButton.on('pointerdown', () => this.openScene('BacklogScene'));
-        configButton.on('pointerdown', () => this.openScene('ConfigScene'));
+        // ボタンを配置する領域の「開始X座標」と「幅」を決める
+        const areaStartX = 200; // 例: 画面左端から200pxの位置から配置を開始
+        const areaWidth = gameWidth - areaStartX - 50; // 配置領域の幅 (右端にも少し余白)
 
-        console.log("UIScene: create 完了");
-    }
+        const buttonMargin = areaWidth / (buttons.length); // 各ボタンに割り当てられる幅
 
-    openScene(sceneKey, data = {}) {
-        this.scene.pause('GameScene');
-        if (sceneKey === 'ConfigScene' || sceneKey === 'BacklogScene') {
-            this.scene.pause();
-        }
-        this.scene.launch(sceneKey, data);
+        buttons.forEach((button, index) => {
+            // 各ボタンのX座標を計算
+            const buttonX = areaStartX + (buttonMargin * index) + (buttonMargin / 2);
+            button.setX(buttonX);
+        });
+        // ★★★ ここまで ★★★
+        
+        
+        panel.add(buttons); // パネルにボタンを追加
+        // --- 3. メインの「メニュー」ボタンを作成 ---
+        // メッセージウィンドウの下の隙間あたりに配置
+        const menuButtonY = gameHeight - 50;
+        const menuButton = this.add.text(gameWidth / 10, menuButtonY, 'MENU', { fontSize: '36px', fill: '#fff' }).setOrigin(0.5).setInteractive();
+
+        // --- 4. ボタンの動作を定義 ---
+        let isPanelOpen = false;
+
+        menuButton.on('pointerdown', () => {
+            isPanelOpen = !isPanelOpen; // パネルの表示/非表示を切り替え
+            
+            const targetY = isPanelOpen ? gameHeight - 60 : gameHeight + 100; // 表示位置 or 隠れる位置
+
+            // パネルをスライドさせるアニメーション
+            this.tweens.add({
+                targets: panel,
+                y: targetY,
+                duration: 300,
+                ease: 'Cubic.easeInOut'
+            });
+        });
+
+        // パネル内の各ボタンの動作
+        saveButton.on('pointerdown', () => {
+            this.scene.pause('GameScene');
+            this.scene.launch('SaveLoadScene', { mode: 'save' });
+        });
+        loadButton.on('pointerdown', () => {
+            this.scene.pause('GameScene');
+            this.scene.launch('SaveLoadScene', { mode: 'load' });
+        });
+        configButton.on('pointerdown', () => {
+            this.scene.pause('GameScene');
+            this.scene.pause('UIScene'); // Configを開くときはUIも止める
+            this.scene.launch('ConfigScene');
+        });
+         // ★★★ バックログボタンの動作を定義 ★★★
+        backlogButton.on('pointerdown', () => {
+            this.scene.pause('GameScene');
+            this.scene.pause('UIScene');
+            this.scene.launch('BacklogScene');
+        });
     }
 }
+
+    
