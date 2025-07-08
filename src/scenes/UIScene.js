@@ -65,22 +65,19 @@ export default class UIScene extends Phaser.Scene {
     }
 
     applyLayout(withAnimation = false) {
-        const orientation = this.scale.isPortrait ? 'portrait' : 'landscape';
-        const layout = Layout[orientation];
-        const gameWidth = layout.width;
-        const gameHeight = layout.height;
-          const uiLayout = layout.ui.menuButton;
+        // ★★★ 現在の描画サイズを直接使う ★★★
+        const gameWidth = this.scale.width;
+        const gameHeight = this.scale.height;
 
-
-        // メニューボタンの位置を更新 (あなたの希望に合わせて左下に)
+        // ★★★ メニューボタンの位置を更新 ★★★
         this.menuButton.setPosition(100, gameHeight - 50);
 
-        // パネルの背景サイズを更新
+        // ★★★ パネルの背景サイズと位置を更新 ★★★
         const panelBg = this.panel.getAt(0);
         panelBg.setSize(gameWidth, 120).setPosition(gameWidth / 2, 0);
         
-        // パネル内のボタンを再配置
-        const buttons = [this.saveButton, this.loadButton, this.backlogButton, this.configButton];
+        // ★★★ パネル内のボタンを再配置 ★★★
+        const buttons = this.panel.list.slice(1);
         const areaStartX = 200;
         const areaWidth = gameWidth - areaStartX - 50;
         const buttonMargin = areaWidth / buttons.length;

@@ -56,14 +56,14 @@ export default class MessageWindow extends Container {
         if (!this.windowImage || !this.textObject) {
             return;
         }
-
-        const orientation = this.scene.scale.isPortrait ? 'portrait' : 'landscape';
+ const isPortrait = this.scale.isPortrait;
+        const orientation = isPortrait ? 'portrait' : 'landscape';
         const layout = Layout[orientation];
-        const uiLayout = layout.ui.messageWindow;
+        const uiLayout = Layout[orientation].ui.messageWindow;
          // ★★★ this.scale -> this.scene.scale に修正 ★★★
         // ★★★ ここで、widthとheightの両方を正しく取得 ★★★
-        const gameWidth = this.scene.scale.width;
-        const gameHeight = this.scene.scale.height;
+        const gameWidth = this.scale.width;
+        const gameHeight = this.scale.height;
 
         // これで、以降の計算でgameWidthとgameHeightが安全に使える
         
