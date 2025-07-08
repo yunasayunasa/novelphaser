@@ -81,7 +81,7 @@ export default class GameScene extends Phaser.Scene {
         
         // ★★★ GameSceneが、MessageWindowの位置を決める ★★★
         const mwLayout = Layout.landscape.ui.messageWindow;
-        this.messageWindow.setPosition(1280 / 2, mwLayout.y);
+         this.messageWindow.setPosition(mwLayout.x, mwLayout.y);
         this.layer.message.add(this.messageWindow);
         this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager, this.stateManager, this.configManager);
         // --- タグハンドラの登録 ---

@@ -12,7 +12,8 @@ export default class MessageWindow extends Container {
         this.isTyping = false;
         
         // --- UI要素の生成 ---
-        this.windowImage = this.scene.add.image(0, 0, 'message_window');
+        this.windowImage = this.scene.add.image(0, 0, 'message_window').setOrigin(0.5);
+        
            const padding = 35;
         const textWidth = this.windowImage.width - (padding * 2);
         const textHeight = this.windowImage.height - (padding * 1.5);
