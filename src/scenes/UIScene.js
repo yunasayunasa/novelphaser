@@ -3,7 +3,7 @@ import { Layout } from '../core/Layout.js';
 import ResponsiveScene from './ResponsiveScene.js'; // ★ インポート
 // ...
 
-export default class UIScene extends Phaser.Scene {
+export default class UIScene extends ResponsiveScene {
     constructor() {
         super({ key: 'UIScene', active: true });
 
