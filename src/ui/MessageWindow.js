@@ -71,6 +71,17 @@ export default class MessageWindow extends Container {
             repeat: -1,
             paused: !this.nextArrow.visible
         });
+          // ★★★ ここからデバッグ ★★★
+        console.log('--- applyLayout 完了 ---');
+        console.log('テキストオブジェクト:', this.textObject);
+        console.log(`テキスト座標: x=${this.textObject.x}, y=${this.textObject.y}`);
+        console.log(`テキスト表示状態: visible=${this.textObject.visible}, alpha=${this.textObject.alpha}`);
+        
+        // 強制的に表示させてみる
+        this.textObject.setText('ここに表示されるはず！');
+        this.textObject.setAlpha(1);
+        this.textObject.setVisible(true);
+        // ★★★ デバッグここまで ★★★
     }
 
     setText(text, useTyping = true, onComplete = () => {}) {
