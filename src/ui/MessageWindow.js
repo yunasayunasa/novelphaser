@@ -28,7 +28,30 @@ export default class MessageWindow extends Container {
         this.hideNextArrow();
         this.scene.add.existing(this);
 
+         // ★★★ シーンに追加された後に、初期化処理を行う ★★★
+        this.once('addedtoscene', this.initialize, this);
+        
+        // このコンテナをシーンに表示するよう要求
+        this.scene.add.existing(this);
+
         // --- イベントリスナー ---
+        this.configManager.on('change:textSpeed', (newValue) => {
+            this.currentTextDelay = 100 - newValue;
+        });
+        this.scene.scale.on('resize', this.applyLayout, this);
+    }
+
+      /**
+     * このコンテナがシーンに完全に追加された後に呼ばれる初期化メソッド
+     */
+    initialize() {
+        console.log("MessageWindow: シーンに追加され、初期化を開始します。");
+        // ★★★ ここで初めてレイアウトを適用する ★★★
+        this.applyLayout();
+        
+        this.hideNextArrow();
+        
+        // イベントリスナーの登録もここで行うのが最も安全
         this.configManager.on('change:textSpeed', (newValue) => {
             this.currentTextDelay = 100 - newValue;
         });
