@@ -88,7 +88,7 @@ export function handleCharaShow(manager, params) {
             alpha: 1,
             duration: time,
             ease: 'Linear',
-            onComplete: () => manager.finishTagExecution();
+            onComplete: () => manager.finishTagExecution()
                 //manager.next()
         });
     } else {
