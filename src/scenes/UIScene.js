@@ -22,7 +22,7 @@ export default class UIScene extends Phaser.Scene {
         const loadButton = this.add.text(0, 0, 'ロード', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
         const backlogButton = this.add.text(0, 0, '履歴', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
         const configButton = this.add.text(0, 0, '設定', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
-        
+        const menuButton = this.add.text(100, gameHeight - 50, 'MENU', { fontSize:'32px', fill: '#fff' }).setInteractive();
         this.panel = this.add.container(0, gameHeight + 120,  [panelBg, saveButton, loadButton, backlogButton, configButton]);
         
         // --- 2. メインの「メニュー」ボタンを作成 ---
