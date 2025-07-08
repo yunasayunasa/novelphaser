@@ -1,6 +1,6 @@
 import ScenarioManager from '../core/ScenarioManager.js';
 import SoundManager from '../core/SoundManager.js';
-import ResponsiveScene from './ResponsiveScene.js'; 
+//import ResponsiveScene from './ResponsiveScene.js'; 
 import StateManager from '../core/StateManager.js';
 import MessageWindow from '../ui/MessageWindow.js';
 import { handleCharaShow } from '../handlers/chara_show.js';
