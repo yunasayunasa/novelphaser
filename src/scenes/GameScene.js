@@ -129,46 +129,60 @@ export default class GameScene extends ResponsiveScene {
     }
 
          // ★★★ applyLayoutをonResizeに統合し、ロジックを強化 ★★★
-    onResize(gameSize) {
-        // gameSize引数は、リサイズイベントから渡されるオブジェクト
-        const width = gameSize.width;
-        const height = gameSize.height;
-        const isPortrait = height > width;
-
-        // --- ゲームの基準解像度そのものを変更する ---
-        const targetWidth = isPortrait ? Layout.portrait.width : Layout.landscape.width;
-        const targetHeight = isPortrait ? Layout.portrait.height : Layout.landscape.height;
-
-        // 現在の解像度が目標と違う場合のみ、リサイズを実行
-        if (this.scale.width !== targetWidth || this.scale.height !== targetHeight) {
-            this.scale.resize(targetWidth, targetHeight);
-            // resize後に再度このイベントが呼ばれるので、ここで終了
-            return;
-        }
-
-        console.log("Applying layout for " + (isPortrait ? "Portrait" : "Landscape"));
-        const orientation = isPortrait ? 'portrait' : 'landscape';
+        onResize() {
+        // 現在の画面の向きと、対応するレイアウト定義を取得
+        const orientation = this.scale.isPortrait ? 'portrait' : 'landscape';
         const layout = Layout[orientation];
 
-        // --- 各要素の再配置 ---
-        // 背景
+        // --- 1. 背景の再配置 (特別扱い) ---
         const bg = this.layer.background.getAt(0);
         if (bg) {
-            bg.setDisplaySize(targetWidth, targetHeight);
-            bg.setPosition(targetWidth / 2, targetHeight / 2); // 中央に配置
+            // 物理的な画面サイズを取得
+            const screenWidth = this.sys.game.canvas.width;
+            const screenHeight = this.sys.game.canvas.height;
+
+            // 背景画像の元のサイズとアスペクト比
+            const bgAspectRatio = bg.width / bg.height;
+            // 物理画面のアスペクト比
+            const screenAspectRatio = screenWidth / screenHeight;
+
+            // ★★★ ENVELOPモードと同じ計算で、画面を覆うようにリサイズ ★★★
+            if (bgAspectRatio > screenAspectRatio) {
+                // 背景が画面より横長の場合 → 高さを画面に合わせる
+                bg.displayHeight = screenHeight;
+                bg.displayWidth = screenHeight * bgAspectRatio;
+            } else {
+                // 背景が画面より縦長の場合 → 幅を画面に合わせる
+                bg.displayWidth = screenWidth;
+                bg.displayHeight = screenWidth / bgAspectRatio;
+            }
+            
+            // 画面の中央に配置
+            bg.setPosition(screenWidth / 2, screenHeight / 2);
+
+            // ★★★ 重要：背景はカメラのスクロールの影響を受けないようにする ★★★
+            bg.setScrollFactor(0);
         }
 
-        // キャラクターの再配置
+        // --- 2. キャラクターの再配置 (720x1280の座標空間内で行う) ---
         for (const name in this.characters) {
             const chara = this.characters[name];
-            const pos = chara.getData('pos'); 
+            const pos = chara.getData('pos');
+            
             if (pos && layout.character[pos]) {
-                const newPos = layout.character[pos];
-                chara.setPosition(newPos.x, newPos.y);
+                const newLayout = layout.character[pos];
+                chara.setPosition(newLayout.x, newLayout.y);
+                if (newLayout.scale !== undefined) {
+                    chara.setScale(newLayout.scale);
+                } else {
+                    chara.setScale(1); // スケール指定がなければ等倍に戻す
+                }
             }
         }
+        
+        // MessageWindowとUISceneは、それぞれのapplyLayoutで再配置されるので、
+        // ここで何かをする必要はありません。
     }
-// ...
     
 
     // GameSceneクラスの中に追加
