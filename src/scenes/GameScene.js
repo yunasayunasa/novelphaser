@@ -74,6 +74,7 @@ export default class GameScene extends ResponsiveScene {
 
         // --- マネージャー/UIクラスの生成 (依存関係に注意) ---
         this.configManager = new ConfigManager();
+        this.sys.game.config.globals.configManager;
         this.stateManager = new StateManager();
         this.soundManager = new SoundManager(this, this.configManager);
         this.messageWindow = new MessageWindow(this, this.soundManager, this.configManager);
@@ -119,7 +120,7 @@ export default class GameScene extends ResponsiveScene {
         
         // 2. ゲーム開始時に、現在の画面サイズで一度レイアウトを強制的に適用する
         //    これがないと、リサイズするまで正しい位置に表示されない
-        this.onResize();
+        this.onResize(this.scale);
 
         // --- ゲーム開始 ---
         this.scenarioManager.load('scene1');
@@ -127,38 +128,34 @@ export default class GameScene extends ResponsiveScene {
         this.scenarioManager.next();
     }
 
-     // ★★★ onResizeメソッドを新規追加 ★★★
+         // ★★★ applyLayoutをonResizeに統合し、ロジックを強化 ★★★
+    onResize(gameSize) {
+        // gameSize引数は、リサイズイベントから渡されるオブジェクト
+        const width = gameSize.width;
+        const height = gameSize.height;
+        const isPortrait = height > width;
 
-    // ...
-    // onResizeメソッドを、以下の全文で置き換えてください
-      applyLayout() {
-        const gameWidth = this.scale.width;
-        const gameHeight = this.scale.height;
-        
-        // --- 1. 現在の画面の向きを判定 ---
-        const isPortrait = this.scale.isPortrait;
-        
-        // --- 2. ゲームの基準解像度が、現在の画面の向きと合っているかチェック ---
-        // (ゲームの高さ > ゲームの幅) なら、ゲームは縦長モードと判断
-        const isGamePortrait = gameHeight > gameWidth;
+        // --- ゲームの基準解像度そのものを変更する ---
+        const targetWidth = isPortrait ? Layout.portrait.width : Layout.landscape.width;
+        const targetHeight = isPortrait ? Layout.portrait.height : Layout.landscape.height;
 
-        if ((isPortrait && !isGamePortrait) || (!isPortrait && isGamePortrait)) {
-            // ★★★ 向きが合っていない場合、基準解像度をリサイズする ★★★
-            // 縦横を入れ替える
-            this.scale.resize(gameHeight, gameWidth); 
-            // リサイズすると、このonResizeが再度呼ばれるので、一度処理を中断する
-            return; 
+        // 現在の解像度が目標と違う場合のみ、リサイズを実行
+        if (this.scale.width !== targetWidth || this.scale.height !== targetHeight) {
+            this.scale.resize(targetWidth, targetHeight);
+            // resize後に再度このイベントが呼ばれるので、ここで終了
+            return;
         }
 
-        // --- 3. 向きが合っている場合のみ、レイアウトの再適用を行う ---
         console.log("Applying layout for " + (isPortrait ? "Portrait" : "Landscape"));
         const orientation = isPortrait ? 'portrait' : 'landscape';
         const layout = Layout[orientation];
 
-        // 背景の再配置
+        // --- 各要素の再配置 ---
+        // 背景
         const bg = this.layer.background.getAt(0);
         if (bg) {
-            bg.setDisplaySize(gameWidth, gameHeight);
+            bg.setDisplaySize(targetWidth, targetHeight);
+            bg.setPosition(targetWidth / 2, targetHeight / 2); // 中央に配置
         }
 
         // キャラクターの再配置

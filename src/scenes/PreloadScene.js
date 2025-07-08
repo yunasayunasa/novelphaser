@@ -10,6 +10,10 @@ export default class PreloadScene extends Phaser.Scene {
     }
 
     create() {
+        // ★★★ グローバルなConfigManagerを取得 ★★★
+    this.configManager = this.sys.game.config.globals.configManager;
+    // ...
+
         console.log("PreloadScene: アセット定義を解析・ロードします。");
         const assetDefine = this.cache.json.get('asset_define');
         
