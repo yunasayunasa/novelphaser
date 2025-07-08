@@ -99,6 +99,7 @@ export default class ScenarioManager {
             this.isWaitingClick = true;
             this.messageWindow.setText(wrappedLine, true, () => {
                 this.messageWindow.showNextArrow();
+                retun;
             });
         } else if (trimedLine.startsWith('[')) {
             // タグ行
