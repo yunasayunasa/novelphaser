@@ -56,6 +56,9 @@ export default class ScenarioManager {
     }
     
   async  onClick() {
+      // ★★★ このログが表示されるかどうかが最重要 ★★★
+        console.log("--- onClick received! ---");
+        console.log(`isWaitingTag: ${this.isWaitingTag}, isWaitingClick: ${this.isWaitingClick}`);
         if (this.isEnd || this.isWaitingTag) return;
         
         this.messageWindow.hideNextArrow();
