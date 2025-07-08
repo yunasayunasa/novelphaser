@@ -127,34 +127,49 @@ export default class GameScene extends Phaser.Scene {
 
      // ★★★ onResizeメソッドを新規追加 ★★★
 
-    // ★★★ リサイズイベントの処理メソッドを新規作成 ★★★
+    // ...
+    // onResizeメソッドを、以下の全文で置き換えてください
     onResize() {
-        console.log("Resize event detected. Applying new layout.");
-        const orientation = this.scale.isPortrait ? 'portrait' : 'landscape';
-        const layout = Layout[orientation];
+        const gameWidth = this.scale.width;
+        const gameHeight = this.scale.height;
+        
+        // --- 1. 現在の画面の向きを判定 ---
+        const isPortrait = this.scale.isPortrait;
+        
+        // --- 2. ゲームの基準解像度が、現在の画面の向きと合っているかチェック ---
+        // (ゲームの高さ > ゲームの幅) なら、ゲームは縦長モードと判断
+        const isGamePortrait = gameHeight > gameWidth;
 
-        // --- 1. 背景の再配置 ---
-        // 背景レイヤーにある画像(常に1枚と仮定)のサイズを更新
-        const bg = this.layer.background.getAt(0);
-        if (bg) {
-            bg.setDisplaySize(this.scale.width, this.scale.height);
+        if ((isPortrait && !isGamePortrait) || (!isPortrait && isGamePortrait)) {
+            // ★★★ 向きが合っていない場合、基準解像度をリサイズする ★★★
+            // 縦横を入れ替える
+            this.scale.resize(gameHeight, gameWidth); 
+            // リサイズすると、このonResizeが再度呼ばれるので、一度処理を中断する
+            return; 
         }
 
-        // --- 2. キャラクターの再配置 ---
+        // --- 3. 向きが合っている場合のみ、レイアウトの再適用を行う ---
+        console.log("Applying layout for " + (isPortrait ? "Portrait" : "Landscape"));
+        const orientation = isPortrait ? 'portrait' : 'landscape';
+        const layout = Layout[orientation];
+
+        // 背景の再配置
+        const bg = this.layer.background.getAt(0);
+        if (bg) {
+            bg.setDisplaySize(gameWidth, gameHeight);
+        }
+
+        // キャラクターの再配置
         for (const name in this.characters) {
             const chara = this.characters[name];
-            // ★ キャラクターオブジェクトに保存された 'pos' 情報を参照
             const pos = chara.getData('pos'); 
-            
             if (pos && layout.character[pos]) {
                 const newPos = layout.character[pos];
-                // Tweenで滑らかに移動させることもできるが、まずは即時変更
                 chara.setPosition(newPos.x, newPos.y);
             }
         }
-        // MessageWindowとUISceneは、それぞれのクラス内でリサイズを検知して
-        // 自分自身を更新するので、GameSceneが気にする必要はない（これがクラス化の利点！）
     }
+// ...
     
 
     // GameSceneクラスの中に追加
