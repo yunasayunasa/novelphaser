@@ -62,7 +62,8 @@ export default class MessageWindow extends Container {
         const uiLayout = layout.ui.messageWindow;
          // ★★★ this.scale -> this.scene.scale に修正 ★★★
         const gameWidth = this.scene.scale.width; 
-
+        const gameHeight = this.scene.scale.Height; 
+        
         this.windowImage.setPosition(gameWidth / 2, uiLayout.y);
 
         const textWidth = this.windowImage.displayWidth - (uiLayout.padding * 2);
@@ -97,7 +98,7 @@ export default class MessageWindow extends Container {
         console.log(`--- MessageWindow applyLayout ---`);
         
         // ★★★ constを削除。gameHeightだけ新しく定義 ★★★
-        const gameHeight = this.scale.height; 
+        
         console.log(`画面サイズ: ${gameWidth} x ${gameHeight}`);
 
         // 1. ウィンドウ画像の状態
