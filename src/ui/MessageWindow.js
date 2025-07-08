@@ -47,7 +47,7 @@ export default class MessageWindow extends Container {
         this.configManager.on('change:textSpeed', (newValue) => {
             this.currentTextDelay = 100 - newValue;
         });
-        this.scene.scale.on('resize', this);
+        //this.scene.scale.on('resize', this);
     }
 
     
