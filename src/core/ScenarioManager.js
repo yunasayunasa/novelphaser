@@ -55,7 +55,7 @@ export default class ScenarioManager {
         await this.parse(line);
     }
     
-    onClick() {
+  async  onClick() {
         if (this.isEnd || this.isWaitingTag) return;
         
         this.messageWindow.hideNextArrow();
@@ -65,7 +65,7 @@ export default class ScenarioManager {
         }
         if (this.isWaitingClick) {
             this.isWaitingClick = false;
-            this.next();
+          await  this.next();
         }
     }
 
