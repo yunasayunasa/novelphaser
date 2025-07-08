@@ -126,9 +126,15 @@ export default class GameScene extends Phaser.Scene {
     }
 
      // ★★★ onResizeメソッドを新規追加 ★★★
-    onResize() {
-        console.log("GameScene: onResizeイベント発生！レイアウトを再適用します。");
 
+    onResize() {
+        console.log("GameScene: onResizeイベント -> MessageWindowのレイアウトを更新します。");
+        if (this.messageWindow) {
+            // ★★★ MessageWindowのメソッドを直接呼ぶのは、実はあまり良くない ★★★
+            // ★★★ イベントを発行する方式に切り替えるのがベスト ★★★
+            // しかし、まずはこれで動くか確認
+            this.messageWindow.applyLayout();
+        }
         // 表示中の全キャラクターの位置を、現在の画面向きに合わせて再計算・再配置
         for (const name in this.characters) {
             const chara = this.characters[name];

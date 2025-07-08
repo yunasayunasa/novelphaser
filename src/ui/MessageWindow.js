@@ -88,8 +88,9 @@ export default class MessageWindow extends Container {
         });
           // ★★★ ここからデバッグログを追加 ★★★
         console.log(`--- MessageWindow applyLayout ---`);
-        const gameWidth = this.scale.width;
-        const gameHeight = this.scale.height;
+        
+        // ★★★ constを削除。gameHeightだけ新しく定義 ★★★
+        const gameHeight = this.scale.height; 
         console.log(`画面サイズ: ${gameWidth} x ${gameHeight}`);
 
         // 1. ウィンドウ画像の状態
@@ -105,8 +106,7 @@ export default class MessageWindow extends Container {
           - 表示サイズ: ${this.textObject.displayWidth} x ${this.textObject.displayHeight}
           - 表示状態: visible=${this.textObject.visible}, alpha=${this.textObject.alpha}
           - テキスト内容: "${this.textObject.text}"`
-        );
-        // ★★★ デバッグログここまで ★★★
+       ); 
     }
 
     setText(text, useTyping = true, onComplete = () => {}) {
