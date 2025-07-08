@@ -39,7 +39,7 @@ import { handleReturn } from '../handlers/return.js';
 import { Layout } from '../core/Layout.js';
 
 
-export default class GameScene extends ResponsiveScene {
+export default class GameScene extends Phaser.Scene {
     constructor() {
         super('GameScene');
         this.scenarioManager = null;
