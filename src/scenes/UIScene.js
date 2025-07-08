@@ -12,19 +12,20 @@ export default class UIScene extends Phaser.Scene {
 
     create() {
         console.log("UIScene: 作成されました。");
-
+ // ★★★ 最初にレイアウト定義を取得 ★★★
+        const layout = Layout.landscape;
         // --- 1. メニューパネルと、その中のボタンを作成 ---
         // ここでは生成するだけで、位置はapplyLayoutで設定する
-        const panelBg = this.add.rectangle(0, 0, 0, 0, 0x000000, 0.8);
+         const panelBg = this.add.rectangle(layout.width / 2, 0, layout.width, 120, 0x000000, 0.8);
         const saveButton = this.add.text(0, 0, 'セーブ', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
         const loadButton = this.add.text(0, 0, 'ロード', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
         const backlogButton = this.add.text(0, 0, '履歴', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
         const configButton = this.add.text(0, 0, '設定', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
         
-        this.panel = this.add.container(0, 0, [panelBg, saveButton, loadButton, backlogButton, configButton]);
+        this.panel = this.add.container(0, layout.height + 120,  [panelBg, saveButton, loadButton, backlogButton, configButton]);
         
         // --- 2. メインの「メニュー」ボタンを作成 ---
-        this.menuButton = this.add.text(0, 0, 'MENU', { fontSize: '36px', fill: '#fff' }).setOrigin(0.5).setInteractive();
+         this.menuButton = this.add.text(100, layout.height - 50,  'MENU', { fontSize: '36px', fill: '#fff' }).setOrigin(0.5).setInteractive();
 
         // --- 3. イベントリスナーを設定 ---
         this.menuButton.on('pointerdown', this.togglePanel, this);
@@ -39,7 +40,7 @@ export default class UIScene extends Phaser.Scene {
 
     applyLayout(withAnimation = false) {
         // 横画面固定なので、常にlandscapeのレイアウトを参照する
-        const layout = Layout.landscape;
+       
         const gameWidth = layout.width;  // 1280
         const gameHeight = layout.height; // 720
 

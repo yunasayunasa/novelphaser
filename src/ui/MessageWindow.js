@@ -1,4 +1,4 @@
-import { Layout } from '../core/Layout.js';
+
 const Container = Phaser.GameObjects.Container;
 
 export default class MessageWindow extends Container {
@@ -13,19 +13,29 @@ export default class MessageWindow extends Container {
         
         // --- UI要素の生成 ---
         this.windowImage = this.scene.add.image(0, 0, 'message_window');
-        this.textObject = this.scene.add.text(0, 0, '', {
+           const padding = 35;
+        const textWidth = this.windowImage.width - (padding * 2);
+        const textHeight = this.windowImage.height - (padding * 1.5);
+        this.textObject = this.scene.add.text(
+            -this.windowImage.width / 2 + padding, // ウィンドウ左端から
+            -this.windowImage.height / 2 + padding, // ウィンドウ上端から
+            '', {
             fontFamily: '"Noto Sans JP", sans-serif',
             fontSize: '36px',
             fill: '#ffffff'
         });
-        this.nextArrow = this.scene.add.image(0, 0, 'next_arrow');
+         this.textObject.setWordWrapWidth(textWidth, true).setFixedSize(textWidth, textHeight);
+        
+        this.nextArrow = this.scene.add.image(
+            this.windowImage.width / 2 - (padding * 1.5), // ウィンドウ右端から
+            this.windowImage.height / 2 - (padding * 1.5), // ウィンドウ下端から
+            'next_arrow'
+        ).setScale(0.5);
+
         
         // --- コンテナに要素を追加 ---
-        this.add([this.windowImage, this.textObject, this.nextArrow]);
-
-        // --- レイアウトの適用 ---
-        this.applyLayout();
-
+           this.add([this.windowImage, this.textObject, this.nextArrow]);
+       
         // --- 初期状態の設定 ---
         this.hideNextArrow();
         
