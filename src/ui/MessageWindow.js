@@ -50,48 +50,7 @@ export default class MessageWindow extends Container {
         this.scene.scale.on('resize', this.applyLayout, this);
     }
 
-      applyLayout() {
-        const camera = this.scene.cameras.main;
-        const orientation = this.scene.scale.isPortrait ? 'portrait' : 'landscape';
-        const uiLayout = Layout[orientation].ui.messageWindow;
-        
-        // ウィンドウ画像の位置
-        this.windowImage.setPosition(camera.width / 2, uiLayout.y);
-
-        // 2. テキストオブジェクトの位置とサイズを更新
-        // ★★★ .width と .height を使う ★★★
-        const textWidth = this.windowImage.width - (uiLayout.padding * 2);
-        const textHeight = this.windowImage.height - (uiLayout.padding * 1.5);
-        
-        this.textObject.setPosition(
-            this.windowImage.x - (this.windowImage.width / 2) + uiLayout.padding,
-            this.windowImage.y - (this.windowImage.height / 2) + (uiLayout.padding / 2)
-        );
-        this.textObject.setWordWrapWidth(textWidth, true);
-        this.textObject.setFixedSize(textWidth, textHeight);
-
-        // 3. クリック待ち矢印の位置を更新
-        this.nextArrow.setPosition(
-            this.windowImage.x + (this.windowImage.width / 2) - (uiLayout.padding * 1.5),
-            this.windowImage.y + (this.windowImage.height / 2) - (uiLayout.padding * 1.5)
-        );
-        this.nextArrow.setScale(0.5);
-
-        // 4. 矢印のアニメーションを再生成
-        if (this.arrowTween) {
-            this.arrowTween.stop();
-            this.arrowTween.remove(); // 完全に削除
-        }
-        this.arrowTween = this.scene.tweens.add({
-            targets: this.nextArrow,
-            y: this.nextArrow.y - 10,
-            duration: 400,
-            ease: 'Sine.easeInOut',
-            yoyo: true,
-            repeat: -1,
-            paused: !this.nextArrow.visible
-        });
-    }
+    
 
     setText(text, useTyping = true, onComplete = () => {}) {
         // 既存のテキストとタイマーをクリア

@@ -64,35 +64,6 @@ export default class UIScene extends Phaser.Scene {
         this.scene.launch(sceneKey, data);
     }
 
-       applyLayout(withAnimation = false) {
-        // ★★★ カメラのサイズを基準にする ★★★
-        const gameWidth = this.cameras.main.width;
-        const gameHeight = this.cameras.main.height;
-        
-        // メニューボタンの位置
-        this.menuButton.setPosition(100, gameHeight - 50);
-
-        // パネルの背景
-        const panelBg = this.panel.getAt(0);
-        panelBg.setSize(gameWidth, 120).setPosition(gameWidth / 2, 0);
-        
-        // パネル内のボタン
-        const buttons = this.panel.list.slice(1);
-        const areaStartX = 200;
-        const areaWidth = gameWidth - areaStartX - 50;
-        const buttonMargin = areaWidth / buttons.length;
-        buttons.forEach((button, index) => {
-            const buttonX = areaStartX + (buttonMargin * index) + (buttonMargin / 2);
-            button.setX(buttonX);
-        });
-
-        // パネル全体の位置
-        const targetY = this.isPanelOpen ? gameHeight - 60 : gameHeight + 100;
-        if (withAnimation) {
-            this.tweens.add({ targets: this.panel, y: targetY, duration: 300, ease: 'Cubic.easeInOut' });
-        } else {
-            this.panel.y = targetY;
-        }
-    }
+      
 
 }

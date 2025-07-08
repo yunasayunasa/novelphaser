@@ -121,48 +121,37 @@ export default class GameScene extends Phaser.Scene {
         this.input.on('pointerdown', () => { this.scenarioManager.onClick(); });
         this.scenarioManager.next();
          // 1. リサイズイベントのリスナーを登録
-        this.scale.on('resize', this.onResize, this);
-        
-        // 2. ゲーム開始時に、現在の画面サイズで一度レイアウトを強制的に適用する
-        //    これがないと、リサイズするまで正しい位置に表示されない
-        this.onResize();
-
+          this.scale.on('resize', this.adjustCamera, this);
+        // ★★★ 起動時に一度カメラを調整 ★★★
+        this.adjustCamera(this.scale);
     }
 
-         onResize() {
-        const orientation = this.scale.isPortrait ? 'portrait' : 'landscape';
-        const layout = Layout[orientation];
-        
-        // --- 背景の再配置 ---
-        const bg = this.layer.background.getAt(0);
-        if (bg) {
-            const camera = this.cameras.main;
-            bg.setPosition(camera.width / 2, camera.height / 2); // カメラの中心に配置
-            bg.setScrollFactor(0);
-            
-            // ★★★ カメラのサイズにフィットさせる ★★★
-            const camAspectRatio = camera.width / camera.height;
-            const bgAspectRatio = bg.width / bg.height;
+            // ★★★ onResizeを削除し、adjustCameraメソッドを新設 ★★★
+    adjustCamera(gameSize) {
+        const { width, height } = gameSize; // 物理画面のサイズ
+        const isPortrait = height > width;
 
-            if (bgAspectRatio > camAspectRatio) {
-                bg.displayHeight = camera.height;
-                bg.displayWidth = camera.height * bgAspectRatio;
-            } else {
-                bg.displayWidth = camera.width;
-                bg.displayHeight = camera.width / bgAspectRatio;
-            }
+        const camera = this.cameras.main;
+        
+        // ★★★ ゲーム世界の固定サイズ (720x1280) ★★★
+        const gameWorldWidth = 720;
+        const gameWorldHeight = 1280;
+
+        // ENVELOPモードでは、カメラはゲーム世界より大きくなっている
+        // そのカメラの表示位置を調整して、見切れを防ぐ
+        if (isPortrait) {
+            // 縦画面の場合、上下が見切れる可能性がある
+            // カメラをゲーム世界の中央に合わせる
+            camera.setViewport(0, (height - (width / gameWorldWidth * gameWorldHeight)) / 2, width, width / gameWorldWidth * gameWorldHeight);
+        } else {
+            // 横画面の場合、左右が見切れる可能性がある
+            // カメラをゲーム世界の中央に合わせる
+            camera.setViewport((width - (height / gameWorldHeight * gameWorldWidth)) / 2, 0, height / gameWorldHeight * gameWorldWidth, height);
         }
-        // --- 2. キャラクターの再配置 ---
-        for (const name in this.characters) {
-            const chara = this.characters[name];
-            const pos = chara.getData('pos');
-            
-            if (pos && layout.character[pos]) {
-                const newLayout = layout.character[pos];
-                chara.setPosition(newLayout.x, newLayout.y);
-                chara.setScale(newLayout.scale !== undefined ? newLayout.scale : 1);
-            }
-        }
+        
+        // ★★★ UIやキャラクターの位置は、もう動かす必要がない ★★★
+        // なぜなら、ゲーム世界(720x1280)の見え方が変わるだけで、
+        // 座標空間そのものは不変だから
     }
     
 

@@ -10,7 +10,7 @@ import ConfigManager from './core/ConfigManager.js';
 const config = {
     type: Phaser.AUTO,
     scale: {
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.ENVELOPE,
         parent: 'phaser-game',
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: 720,
