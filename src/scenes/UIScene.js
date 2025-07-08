@@ -17,7 +17,7 @@ export default class UIScene extends Phaser.Scene {
         const gameHeight = 720;
         // --- 1. メニューパネルと、その中のボタンを作成 ---
         // ここでは生成するだけで、位置はapplyLayoutで設定する
-         const panelBg = this.add.rectangle(layout.width / 2, 0, layout.width, 120, 0x000000, 0.8);
+         const panelBg = this.add.rectangle(gamewidth / 2, 0, gamewidth, 120, 0x000000, 0.8);
         const saveButton = this.add.text(0, 0, 'セーブ', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
         const loadButton = this.add.text(0, 0, 'ロード', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
         const backlogButton = this.add.text(0, 0, '履歴', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
