@@ -51,6 +51,12 @@ export default class MessageWindow extends Container {
     }
 
     applyLayout() {
+          // ★★★ ガード節を追加 ★★★
+        // UI要素がまだ生成されていなければ、何もせずに終了
+        if (!this.windowImage || !this.textObject) {
+            return;
+        }
+
         const orientation = this.scene.scale.isPortrait ? 'portrait' : 'landscape';
         const layout = Layout[orientation];
         const uiLayout = layout.ui.messageWindow;
