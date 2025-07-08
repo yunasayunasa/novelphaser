@@ -120,40 +120,40 @@ export default class GameScene extends Phaser.Scene {
         this.scenarioManager.load('scene1');
         this.input.on('pointerdown', () => { this.scenarioManager.onClick(); });
         this.scenarioManager.next();
-         // 1. リサイズイベントのリスナーを登録
-          this.scale.on('resize', this.adjustCamera, this);
-        // ★★★ 起動時に一度カメラを調整 ★★★
-        this.adjustCamera(this.scale);
-    }
-
-            // ★★★ onResizeを削除し、adjustCameraメソッドを新設 ★★★
-    adjustCamera(gameSize) {
-        const { width, height } = gameSize; // 物理画面のサイズ
-        const isPortrait = height > width;
-
-        const camera = this.cameras.main;
-        
-        // ★★★ ゲーム世界の固定サイズ (720x1280) ★★★
-        const gameWorldWidth = 720;
-        const gameWorldHeight = 1280;
-
-        // ENVELOPモードでは、カメラはゲーム世界より大きくなっている
-        // そのカメラの表示位置を調整して、見切れを防ぐ
-        if (isPortrait) {
-            // 縦画面の場合、上下が見切れる可能性がある
-            // カメラをゲーム世界の中央に合わせる
-            camera.setViewport(0, (height - (width / gameWorldWidth * gameWorldHeight)) / 2, width, width / gameWorldWidth * gameWorldHeight);
-        } else {
-            // 横画面の場合、左右が見切れる可能性がある
-            // カメラをゲーム世界の中央に合わせる
-            camera.setViewport((width - (height / gameWorldHeight * gameWorldWidth)) / 2, 0, height / gameWorldHeight * gameWorldWidth, height);
+         // ★★★ 背景専用のリサイズリスナーを追加 ★★★
+    this.scale.on('resize', () => {
+        const bg = this.layer.background.getAt(0);
+        if (bg) {
+            this.updateBackgroundLayout(bg);
         }
-        
-        // ★★★ UIやキャラクターの位置は、もう動かす必要がない ★★★
-        // なぜなら、ゲーム世界(720x1280)の見え方が変わるだけで、
-        // 座標空間そのものは不変だから
+    }, this);
+}
+
+
+     // GameSceneに、新しいメソッドとして追加
+updateBackgroundLayout(bg) {
+    // 物理画面のサイズを取得
+    const screenWidth = this.sys.game.canvas.width;
+    const screenHeight = this.sys.game.canvas.height;
+
+    // カメラの位置とサイズを取得（FITモードで拡縮された描画領域）
+    const camera = this.cameras.main;
+
+    // 背景をカメラの中心に配置
+    bg.setPosition(camera.centerX, camera.centerY);
+
+    // ENVELOP風の計算
+    const camAspectRatio = camera.width / camera.height;
+    const bgAspectRatio = bg.width / bg.height;
+
+    if (bgAspectRatio > camAspectRatio) {
+        bg.displayHeight = camera.height;
+        bg.displayWidth = camera.height * bgAspectRatio;
+    } else {
+        bg.displayWidth = camera.width;
+        bg.displayHeight = camera.height / bgAspectRatio;
     }
-    
+}
 
     // GameSceneクラスの中に追加
 performSave(slot) {

@@ -10,19 +10,14 @@ import ConfigManager from './core/ConfigManager.js';
 const config = {
     type: Phaser.AUTO,
     scale: {
-        mode: Phaser.Scale.ENVELOPE,
+        mode: Phaser.Scale.FIT,
         parent: 'phaser-game',
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: 720,
         height: 1280
     },
     scene: [PreloadScene, GameScene, UIScene, SaveLoadScene, ConfigScene, BacklogScene],
-    // ★★★ グローバル変数領域を追加 ★★★
-    callbacks: {
-        preBoot: (game) => {
-            game.config.globals = {
-                configManager: new ConfigManager()
-            };}}
+   
 };
 
 const game = new Phaser.Game(config);

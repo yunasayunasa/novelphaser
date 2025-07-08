@@ -21,7 +21,8 @@ export function handleBg(manager, params) {
 
        // 新しい背景画像を作成
     const newBg = scene.add.image(gameWidth / 2, gameHeight / 2, storage);
-
+  // ★★★ GameSceneの背景更新メソッドを呼び出す ★★★
+    scene.updateBackgroundLayout(newBg);
     // ★★★ ここが重要 ★★★
     // 画像の表示サイズを、ゲーム画面のサイズに合わせる
     newBg.setDisplaySize(gameWidth, gameHeight);
