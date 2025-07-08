@@ -3,11 +3,33 @@ const Container = Phaser.GameObjects.Container;
 
 export default class MessageWindow extends Container {
     constructor(scene, soundManager, configManager) {
-        super(scene, 0, 0);
+        super(scene, 0, 0); // まず親クラスを初期化
         this.soundManager = soundManager;
         this.configManager = configManager;
 
-        // --- UI要素をプロパティとして定義 ---
+        // --- プロパティの初期化 ---
+        this.windowImage = null;
+        this.textObject = null;
+        this.nextArrow = null;
+        this.arrowTween = null;
+        this.charByCharTimer = null;
+        this.isTyping = false;
+        this.currentTextDelay = 50;
+
+        // ★★★ シーンに追加されたら、initializeメソッドを一度だけ呼ぶよう予約 ★★★
+        this.once('addedtoscene', this.initialize, this);
+        
+        // ★★★ 最後に、自身をシーンに追加するよう要求する ★★★
+        this.scene.add.existing(this);
+    }
+
+    /**
+     * このコンテナがシーンに完全に追加された後に呼ばれる、本当の初期化処理
+     */
+    initialize() {
+        console.log("MessageWindow: シーンに追加され、初期化を開始します。");
+
+        // --- UI要素を生成 ---
         this.windowImage = this.scene.add.image(0, 0, 'message_window');
         this.textObject = this.scene.add.text(0, 0, '', {
             fontFamily: '"Noto Sans JP", sans-serif',
@@ -15,43 +37,13 @@ export default class MessageWindow extends Container {
             fill: '#ffffff'
         });
         this.nextArrow = this.scene.add.image(0, 0, 'next_arrow');
-        this.arrowTween = null;
         
-        // --- テロップ関連のプロパティ ---
-        this.charByCharTimer = null;
-        this.isTyping = false;
-        this.currentTextDelay = 50;
-
-        // --- 初期化 ---
+        // --- 要素をコンテナに追加 ---
         this.add([this.windowImage, this.textObject, this.nextArrow]);
+
+        // --- 初期レイアウトの適用とイベントリスナーの登録 ---
         this.applyLayout();
         this.hideNextArrow();
-        this.scene.add.existing(this);
-
-         // ★★★ シーンに追加された後に、初期化処理を行う ★★★
-        this.once('addedtoscene', this.initialize, this);
-        
-        // このコンテナをシーンに表示するよう要求
-        this.scene.add.existing(this);
-
-        // --- イベントリスナー ---
-        this.configManager.on('change:textSpeed', (newValue) => {
-            this.currentTextDelay = 100 - newValue;
-        });
-        this.scene.scale.on('resize', this.applyLayout, this);
-    }
-
-      /**
-     * このコンテナがシーンに完全に追加された後に呼ばれる初期化メソッド
-     */
-    initialize() {
-        console.log("MessageWindow: シーンに追加され、初期化を開始します。");
-        // ★★★ ここで初めてレイアウトを適用する ★★★
-        this.applyLayout();
-        
-        this.hideNextArrow();
-        
-        // イベントリスナーの登録もここで行うのが最も安全
         this.configManager.on('change:textSpeed', (newValue) => {
             this.currentTextDelay = 100 - newValue;
         });
@@ -63,14 +55,12 @@ export default class MessageWindow extends Container {
         const layout = Layout[orientation];
         const uiLayout = layout.ui.messageWindow;
         const gameWidth = this.scale.width;
-         this.windowImage.setPosition(gameWidth / 2, uiLayout.y);
 
-        // ★★★ .width -> .displayWidth に変更 ★★★
+        this.windowImage.setPosition(gameWidth / 2, uiLayout.y);
+
         const textWidth = this.windowImage.displayWidth - (uiLayout.padding * 2);
         const textHeight = this.windowImage.displayHeight - (uiLayout.padding * 1.5);
-        
         this.textObject.setPosition(
-            // ★★★ .width -> .displayWidth に変更 ★★★
             this.windowImage.x - (this.windowImage.displayWidth / 2) + uiLayout.padding,
             this.windowImage.y - (this.windowImage.displayHeight / 2) + (uiLayout.padding / 2)
         );
@@ -81,8 +71,8 @@ export default class MessageWindow extends Container {
         this.currentTextDelay = 100 - textSpeedValue;
 
         this.nextArrow.setPosition(
-            this.windowImage.x + (this.windowImage.width / 2) - (uiLayout.padding * 1.5),
-            this.windowImage.y + (this.windowImage.height / 2) - (uiLayout.padding * 1.5)
+            this.windowImage.x + (this.windowImage.displayWidth / 2) - (uiLayout.padding * 1.5),
+            this.windowImage.y + (this.windowImage.displayHeight / 2) - (uiLayout.padding * 1.5)
         );
         this.nextArrow.setScale(0.5);
 
@@ -96,61 +86,18 @@ export default class MessageWindow extends Container {
             repeat: -1,
             paused: !this.nextArrow.visible
         });
-          // ★★★ ここからデバッグ ★★★
-        console.log('--- applyLayout 完了 ---');
-        console.log('テキストオブジェクト:', this.textObject);
-        console.log(`テキスト座標: x=${this.textObject.x}, y=${this.textObject.y}`);
-        console.log(`テキスト表示状態: visible=${this.textObject.visible}, alpha=${this.textObject.alpha}`);
-        
-        // 強制的に表示させてみる
-        this.textObject.setText('ここに表示されるはず！');
-        this.textObject.setAlpha(1);
-        this.textObject.setVisible(true);
-        // ★★★ デバッグここまで ★★★
     }
 
     setText(text, useTyping = true, onComplete = () => {}) {
-        this.textObject.setText('');
-        if (this.charByCharTimer) this.charByCharTimer.remove();
-        
-        if (!useTyping || text.length === 0 || this.currentTextDelay <= 0) {
-            this.textObject.setText(text);
-            this.isTyping = false;
-            onComplete();
-            return;
-        }
-        
-        this.isTyping = true;
-        let index = 0;
-        
-        const timerConfig = {
-            delay: this.currentTextDelay,
-            callback: () => {
-                this.soundManager.playSe('popopo');
-                this.textObject.text += timerConfig.fullText[index];
-                index++;
-                if (index === timerConfig.fullText.length) {
-                    this.charByCharTimer.remove();
-                    this.isTyping = false;
-                    onComplete();
-                }
-            },
-            callbackScope: this,
-            loop: true,
-            fullText: text
-        };
-        
-        this.charByCharTimer = this.scene.time.addEvent(timerConfig);
+        // ... (このメソッドはあなたのコードのままでOK)
     }
 
     skipTyping() {
-        if (!this.isTyping) return;
-        this.textObject.setText(this.charByCharTimer.getConfig().fullText);
-        this.charByCharTimer.remove();
-        this.isTyping = false;
+        // ... (このメソッドもあなたのコードのままでOK)
     }
 
     showNextArrow() {
+        if (!this.nextArrow) return;
         this.nextArrow.setVisible(true);
         if (this.arrowTween && this.arrowTween.isPaused()) {
             this.arrowTween.resume();
@@ -158,6 +105,7 @@ export default class MessageWindow extends Container {
     }
 
     hideNextArrow() {
+        if (!this.nextArrow) return;
         this.nextArrow.setVisible(false);
         if (this.arrowTween && this.arrowTween.isPlaying()) {
             this.arrowTween.pause();
@@ -165,6 +113,7 @@ export default class MessageWindow extends Container {
     }
 
     get textBoxWidth() {
+        if (!this.textObject) return 0;
         return this.textObject.width;
     }
 }
