@@ -72,11 +72,11 @@ export default class GameScene extends Phaser.Scene {
         this.stateManager = new StateManager();
         this.soundManager = new SoundManager(this, this.configManager);
         this.messageWindow = new MessageWindow(this, this.soundManager, this.configManager);
-        
+        this.layer.message.add(this.messageWindow);
         const mwLayout = Layout.ui.messageWindow;
         this.messageWindow.x = mwLayout.x; // setPosition(x, y) ではなく...
         this.messageWindow.y = mwLayout.y; // ...プロパティに直接代入する
-        this.layer.message.add(this.messageWindow);
+        
         
         this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager, this.stateManager, this.configManager);
         
