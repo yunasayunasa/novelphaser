@@ -37,7 +37,7 @@ export default class ScenarioManager {
         console.log(`シナリオを解析しました: ${this.currentFile}`);
     }
 
-    next() {
+  async  next() {
         if (this.isEnd || this.isWaitingClick || this.isWaitingTag) {
             return;
         }
@@ -52,7 +52,7 @@ export default class ScenarioManager {
         const line = this.scenario[this.currentLine];
         this.currentLine++;
         
-        this.parse(line);
+        await this.parse(line);
     }
     
     onClick() {
@@ -69,7 +69,7 @@ export default class ScenarioManager {
         }
     }
 
-    parse(line) {
+   async parse(line) {
         const processedLine = this.embedVariables(line);
         const trimedLine = processedLine.trim();
 
