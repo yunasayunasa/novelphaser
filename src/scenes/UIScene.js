@@ -64,29 +64,31 @@ export default class UIScene extends Phaser.Scene {
         this.scene.launch(sceneKey, data);
     }
 
-    applyLayout(withAnimation = false) {
-        // ★★★ 現在の描画サイズを直接使う ★★★
-        const gameWidth = this.scale.width;
-        const gameHeight = this.scale.height;
+       applyLayout(withAnimation = false) {
+        const orientation = this.scale.isPortrait ? 'portrait' : 'landscape';
+        const layout = Layout[orientation];
+        
+        // ★★★ 720x1280 の座標空間を使う ★★★
+        const gameWidth = layout.width;
+        const gameHeight = layout.height;
 
-        // ★★★ メニューボタンの位置を更新 ★★★
+        // メニューボタンの位置
         this.menuButton.setPosition(100, gameHeight - 50);
 
-        // ★★★ パネルの背景サイズと位置を更新 ★★★
+        // パネルの背景
         const panelBg = this.panel.getAt(0);
         panelBg.setSize(gameWidth, 120).setPosition(gameWidth / 2, 0);
         
-        // ★★★ パネル内のボタンを再配置 ★★★
+        // パネル内のボタン
         const buttons = this.panel.list.slice(1);
         const areaStartX = 200;
         const areaWidth = gameWidth - areaStartX - 50;
         const buttonMargin = areaWidth / buttons.length;
         buttons.forEach((button, index) => {
-            const buttonX = areaStartX + (buttonMargin * index) + (buttonMargin / 2);
-            button.setX(buttonX);
+            button.setX(areaStartX + (buttonMargin * index) + (buttonMargin / 2));
         });
 
-        // パネル全体の表示/非表示位置を更新
+        // パネル全体の位置
         const targetY = this.isPanelOpen ? gameHeight - 60 : gameHeight + 100;
         if (withAnimation) {
             this.tweens.add({ targets: this.panel, y: targetY, duration: 300, ease: 'Cubic.easeInOut' });

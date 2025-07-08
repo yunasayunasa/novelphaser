@@ -129,39 +129,42 @@ export default class GameScene extends Phaser.Scene {
 
     }
 
-        // ★★★ onResizeメソッドを、この最終版に置き換え ★★★
-    onResize(gameSize) {
-        const width = gameSize.width;
-        const height = gameSize.height;
-        const isPortrait = height > width;
+         onResize() {
+        // 現在の画面の向きと、対応するレイアウト定義を取得
+        const orientation = this.scale.isPortrait ? 'portrait' : 'landscape';
+        const layout = Layout[orientation];
 
-        // ターゲットとなる解像度をLayout.jsから取得
-        const targetWidth = isPortrait ? Layout.portrait.width : Layout.landscape.width;
-        const targetHeight = isPortrait ? Layout.portrait.height : Layout.landscape.height;
-
-        // 基準解像度自体を変更する必要があるかチェック
-        if (this.cameras.main.width !== targetWidth || this.cameras.main.height !== targetHeight) {
-            // ★★★ ゲーム世界のサイズを変更 ★★★
-            this.cameras.main.setSize(targetWidth, targetHeight);
-            if (this.physics) { // 物理エンジンがあれば、境界も更新
-                this.physics.world.setBounds(0, 0, targetWidth, targetHeight);
-            }
-        }
-        
-        // --- 各要素の再配置 ---
-        const layout = Layout[isPortrait ? 'portrait' : 'landscape'];
-        
-        // 背景の再配置 (常に画面いっぱいに)
+        // --- 1. 背景の再配置 (特別扱い) ---
         const bg = this.layer.background.getAt(0);
         if (bg) {
-            bg.setDisplaySize(targetWidth, targetHeight);
-            bg.setPosition(targetWidth / 2, targetHeight / 2);
+            // 物理的なブラウザウィンドウのサイズを取得
+            const screenWidth = this.sys.game.canvas.width;
+            const screenHeight = this.sys.game.canvas.height;
+
+            // ★★★ 背景は、カメラの中央ではなく、物理画面の中央に配置 ★★★
+            bg.setPosition(screenWidth / 2, screenHeight / 2);
+            
+            // ★★★ 背景は、カメラのスクロールの影響を受けないようにする ★★★
+            bg.setScrollFactor(0);
+
+            // ENVELOPモード風の拡縮計算
+            const bgAspectRatio = bg.width / bg.height;
+            const screenAspectRatio = screenWidth / screenHeight;
+
+            if (bgAspectRatio > screenAspectRatio) {
+                bg.displayHeight = screenHeight;
+                bg.displayWidth = screenHeight * bgAspectRatio;
+            } else {
+                bg.displayWidth = screenWidth;
+                bg.displayHeight = screenWidth / bgAspectRatio;
+            }
         }
 
-        // キャラクターの再配置
+        // --- 2. キャラクターの再配置 ---
         for (const name in this.characters) {
             const chara = this.characters[name];
             const pos = chara.getData('pos');
+            
             if (pos && layout.character[pos]) {
                 const newLayout = layout.character[pos];
                 chara.setPosition(newLayout.x, newLayout.y);

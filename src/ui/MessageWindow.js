@@ -50,45 +50,42 @@ export default class MessageWindow extends Container {
         this.scene.scale.on('resize', this.applyLayout, this);
     }
 
-    applyLayout() {
-          // ★★★ ガード節を追加 ★★★
-        // UI要素がまだ生成されていなければ、何もせずに終了
-        if (!this.windowImage || !this.textObject) {
-            return;
-        }
- const isPortrait = this.scale.isPortrait;
-        const orientation = isPortrait ? 'portrait' : 'landscape';
+       applyLayout() {
+        // 現在の向きとレイアウト定義を取得
+        const orientation = this.scene.scale.isPortrait ? 'portrait' : 'landscape';
         const layout = Layout[orientation];
-        const uiLayout = Layout[orientation].ui.messageWindow;
-         // ★★★ this.scale -> this.scene.scale に修正 ★★★
-        // ★★★ ここで、widthとheightの両方を正しく取得 ★★★
-        const gameWidth = this.scale.width;
-        const gameHeight = this.scale.height;
-
-        // これで、以降の計算でgameWidthとgameHeightが安全に使える
+        const uiLayout = layout.ui.messageWindow;
         
+        // ★★★ ゲーム世界の固定サイズを使う ★★★
+        const gameWidth = layout.width;
+
+        // 1. ウィンドウ画像の位置を更新
         this.windowImage.setPosition(gameWidth / 2, uiLayout.y);
 
-        const textWidth = this.windowImage.displayWidth - (uiLayout.padding * 2);
-        const textHeight = this.windowImage.displayHeight - (uiLayout.padding * 1.5);
+        // 2. テキストオブジェクトの位置とサイズを更新
+        // ★★★ .width と .height を使う ★★★
+        const textWidth = this.windowImage.width - (uiLayout.padding * 2);
+        const textHeight = this.windowImage.height - (uiLayout.padding * 1.5);
         
         this.textObject.setPosition(
-            this.windowImage.x - (this.windowImage.displayWidth / 2) + uiLayout.padding,
-            this.windowImage.y - (this.windowImage.displayHeight / 2) + (uiLayout.padding / 2)
+            this.windowImage.x - (this.windowImage.width / 2) + uiLayout.padding,
+            this.windowImage.y - (this.windowImage.height / 2) + (uiLayout.padding / 2)
         );
         this.textObject.setWordWrapWidth(textWidth, true);
         this.textObject.setFixedSize(textWidth, textHeight);
-        
-        const textSpeedValue = this.configManager.getValue('textSpeed');
-        this.currentTextDelay = 100 - textSpeedValue;
 
+        // 3. クリック待ち矢印の位置を更新
         this.nextArrow.setPosition(
-            this.windowImage.x + (this.windowImage.displayWidth / 2) - (uiLayout.padding * 1.5),
-            this.windowImage.y + (this.windowImage.displayHeight / 2) - (uiLayout.padding * 1.5)
+            this.windowImage.x + (this.windowImage.width / 2) - (uiLayout.padding * 1.5),
+            this.windowImage.y + (this.windowImage.height / 2) - (uiLayout.padding * 1.5)
         );
         this.nextArrow.setScale(0.5);
 
-        if (this.arrowTween) this.arrowTween.stop();
+        // 4. 矢印のアニメーションを再生成
+        if (this.arrowTween) {
+            this.arrowTween.stop();
+            this.arrowTween.remove(); // 完全に削除
+        }
         this.arrowTween = this.scene.tweens.add({
             targets: this.nextArrow,
             y: this.nextArrow.y - 10,
@@ -98,28 +95,6 @@ export default class MessageWindow extends Container {
             repeat: -1,
             paused: !this.nextArrow.visible
         });
-    
-          // ★★★ ここからデバッグログを追加 ★★★
-        console.log(`--- MessageWindow applyLayout ---`);
-        
-        // ★★★ constを削除。gameHeightだけ新しく定義 ★★★
-        
-        console.log(`画面サイズ: ${gameWidth} x ${gameHeight}`);
-
-        // 1. ウィンドウ画像の状態
-        console.log(`[Window Image]
-          - x, y: ${this.windowImage.x}, ${this.windowImage.y}
-          - 表示サイズ: ${this.windowImage.displayWidth} x ${this.windowImage.displayHeight}
-          - 表示状態: visible=${this.windowImage.visible}, alpha=${this.windowImage.alpha}`
-        );
-        
-        // 2. テキストオブジェクトの状態
-        console.log(`[Text Object]
-          - x, y: ${this.textObject.x}, ${this.textObject.y}
-          - 表示サイズ: ${this.textObject.displayWidth} x ${this.textObject.displayHeight}
-          - 表示状態: visible=${this.textObject.visible}, alpha=${this.textObject.alpha}
-          - テキスト内容: "${this.textObject.text}"`
-       ); 
     }
 
     setText(text, useTyping = true, onComplete = () => {}) {
