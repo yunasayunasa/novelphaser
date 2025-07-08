@@ -49,46 +49,7 @@ export default class MessageWindow extends Container {
         this.scene.add.existing(this);
     }
 
-    applyLayout() {
-        const layout = Layout.ui.messageWindow;
-        const gameWidth = 1280; // 横画面の固定幅
-
-        // 1. ウィンドウ画像の位置
-        this.windowImage.setPosition(gameWidth / 2, layout.y);
-
-        // 2. テキストオブジェクトの位置とサイズ
-        const textWidth = this.windowImage.width - (layout.padding * 2);
-        const textHeight = this.windowImage.height - (layout.padding * 1.5);
-        this.textObject.setPosition(
-            this.windowImage.x - (this.windowImage.width / 2) + layout.padding,
-            this.windowImage.y - (this.windowImage.height / 2) + (layout.padding / 2)
-        );
-        this.textObject.setWordWrapWidth(textWidth, true);
-        this.textObject.setFixedSize(textWidth, textHeight);
-        
-        // 3. テキスト速度の初期値を設定
-        const textSpeedValue = this.configManager.getValue('textSpeed');
-        this.currentTextDelay = 100 - textSpeedValue;
-
-        // 4. クリック待ち矢印の位置
-        this.nextArrow.setPosition(
-            this.windowImage.x + (this.windowImage.width / 2) - (layout.padding * 1.5),
-            this.windowImage.y + (this.windowImage.height / 2) - (layout.padding * 1.5)
-        );
-        this.nextArrow.setScale(0.5);
-
-        // 5. 矢印のアニメーションを(再)生成
-        if (this.arrowTween) this.arrowTween.destroy(); // 古いTweenは完全に破棄
-        this.arrowTween = this.scene.tweens.add({
-            targets: this.nextArrow,
-            y: this.nextArrow.y - 10,
-            duration: 400,
-            ease: 'Sine.easeInOut',
-            yoyo: true,
-            repeat: -1,
-            paused: !this.nextArrow.visible
-        });
-    }
+    
 
 
     
