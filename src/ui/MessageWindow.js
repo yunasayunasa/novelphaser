@@ -42,12 +42,12 @@ export default class MessageWindow extends Container {
         this.add([this.windowImage, this.textObject, this.nextArrow]);
 
         // --- 初期レイアウトの適用とイベントリスナーの登録 ---
-        this.applyLayout();
+       // this.applyLayout();
         this.hideNextArrow();
         this.configManager.on('change:textSpeed', (newValue) => {
             this.currentTextDelay = 100 - newValue;
         });
-        this.scene.scale.on('resize', this.applyLayout, this);
+        this.scene.scale.on('resize', this);
     }
 
     
