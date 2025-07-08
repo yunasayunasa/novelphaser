@@ -4,6 +4,7 @@ import UIScene from './scenes/UIScene.js';
 import SaveLoadScene from './scenes/SaveLoadScene.js';
 import ConfigScene from './scenes/ConfigScene.js'; // これを追加
 import BacklogScene from './scenes/BacklogScene.js'; // これを追加
+import ConfigManager from './core/ConfigManager.js';
 
 
 const config = {
