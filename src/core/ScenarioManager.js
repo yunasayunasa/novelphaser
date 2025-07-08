@@ -120,6 +120,7 @@ export default class ScenarioManager {
             const wrappedLine = this.manualWrap(trimedLine);
             this.messageWindow.setText(wrappedLine, true, () => {
                 this.messageWindow.showNextArrow();
+                return;
             });
         } else {
             // 空行
