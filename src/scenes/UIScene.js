@@ -1,6 +1,6 @@
 import { Layout } from '../core/Layout.js';
 
-import ResponsiveScene from './ResponsiveScene.js'; // ★ インポート
+//import ResponsiveScene from './ResponsiveScene.js'; // ★ インポート
 // ...
 
 export default class UIScene extends Phaser.Scene {
@@ -42,10 +42,11 @@ export default class UIScene extends Phaser.Scene {
         this.backlogButton.on('pointerdown', () => this.openScene('BacklogScene'));
         this.configButton.on('pointerdown', () => this.openScene('ConfigScene'));
         
-         // ★ リサイズイベントの監視
-        this.scale.on('resize', this.onResize, this);
+       
         // ★ 最初のレイアウト適用
         this.applyLayout();
+          // ★ リサイズイベントの監視
+        this.scale.on('resize', this.onResize, this);
 
     }
 
