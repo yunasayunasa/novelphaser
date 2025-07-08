@@ -61,13 +61,17 @@ export default class MessageWindow extends Container {
         const layout = Layout[orientation];
         const uiLayout = layout.ui.messageWindow;
          // ★★★ this.scale -> this.scene.scale に修正 ★★★
-        const gameWidth = this.scene.scale.width; 
-        const gameHeight = this.scene.scale.Height; 
+        // ★★★ ここで、widthとheightの両方を正しく取得 ★★★
+        const gameWidth = this.scene.scale.width;
+        const gameHeight = this.scene.scale.height;
+
+        // これで、以降の計算でgameWidthとgameHeightが安全に使える
         
         this.windowImage.setPosition(gameWidth / 2, uiLayout.y);
 
         const textWidth = this.windowImage.displayWidth - (uiLayout.padding * 2);
-        const textHeight = this.windowImage.displayHeight - (uiLayout.padding * 1.5);
+        const textHeight = this.windowImage.displayHeight - (ui.padding * 1.5); // ここもuiLayout.padding
+        
         this.textObject.setPosition(
             this.windowImage.x - (this.windowImage.displayWidth / 2) + uiLayout.padding,
             this.windowImage.y - (this.windowImage.displayHeight / 2) + (uiLayout.padding / 2)
@@ -94,6 +98,7 @@ export default class MessageWindow extends Container {
             repeat: -1,
             paused: !this.nextArrow.visible
         });
+    
           // ★★★ ここからデバッグログを追加 ★★★
         console.log(`--- MessageWindow applyLayout ---`);
         
