@@ -66,24 +66,26 @@ export default class GameScene extends Phaser.Scene {
     create() {
         this.cameras.main.setBackgroundColor('#000000');
         
-        // --- レイヤー生成 ---
+         // --- レイヤー生成 ---
         this.layer.background = this.add.container(0, 0);
         this.layer.character = this.add.container(0, 0);
         this.layer.cg = this.add.container(0, 0);
         this.layer.message = this.add.container(0, 0);
 
-            // --- マネージャー/UIクラスの生成 ---
-       this.configManager = new ConfigManager();
-        this.sys.registry.set('configManager', this.configManager);
+        // --- マネージャー/UIクラスの生成と配置 ---
+        // 1. 依存されるものを先に作る
+        this.configManager = this.sys.game.config.globals.configManager; // main.jsのグローバル変数を取得
         this.stateManager = new StateManager();
         this.soundManager = new SoundManager(this, this.configManager);
+        
+        // 2. MessageWindowを作り、正しい位置に一度だけ配置する
         this.messageWindow = new MessageWindow(this, this.soundManager, this.configManager);
-         this.layer.message.add(this.messageWindow.setPosition(640, 600)); // 位置設定
-        // ★ MessageWindowの位置をLayout.jsから設定
         const mwLayout = Layout.ui.messageWindow;
         this.messageWindow.setPosition(mwLayout.x, mwLayout.y);
-        this.layer.message.add(this.messageWindow);
-        
+        this.layer.message.add(this.messageWindow); // レイヤーへの追加も一度だけ
+
+        // 3. ScenarioManagerを作る
+        this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager, this.stateManager, this.configManager);
         this.scenarioManager = new ScenarioManager(this, this.layer, this.charaDefs, this.messageWindow, this.soundManager, this.stateManager, this.configManager);
         // --- タグハンドラの登録 ---
         this.scenarioManager.registerTag('chara_show', handleCharaShow);

@@ -17,7 +17,13 @@ const config = {
         height: 720
     },
     scene: [PreloadScene, GameScene, UIScene, SaveLoadScene, ConfigScene, BacklogScene],
-   
+    callbacks: {
+        preBoot: (game) => {
+            game.config.globals = {
+                configManager: new ConfigManager()
+            };
+        }
+    }
 };
 
 const game = new Phaser.Game(config);
