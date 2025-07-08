@@ -1,7 +1,10 @@
 import { Layout } from '../core/Layout.js';
 
 export default class ResponsiveScene extends Phaser.Scene {
-    
+    constructor(config) {
+        // 親であるPhaser.Sceneのコンストラクタを呼び出す
+        super(config);
+    }
     // 画面リサイズ時に呼ばれる共通処理
     onResize() {
         const gameWidth = this.scale.width;
