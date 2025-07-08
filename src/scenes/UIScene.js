@@ -23,10 +23,10 @@ export default class UIScene extends Phaser.Scene {
         const backlogButton = this.add.text(0, 0, '履歴', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
         const configButton = this.add.text(0, 0, '設定', { fontSize: '32px', fill: '#fff' }).setOrigin(0.5).setInteractive();
         
-        this.panel = this.add.container(0, gameheight + 120,  [panelBg, saveButton, loadButton, backlogButton, configButton]);
+        this.panel = this.add.container(0, gameHeight + 120,  [panelBg, saveButton, loadButton, backlogButton, configButton]);
         
         // --- 2. メインの「メニュー」ボタンを作成 ---
-         this.menuButton = this.add.text(100, gameheight - 50,  'MENU', { fontSize: '36px', fill: '#fff' }).setOrigin(0.5).setInteractive();
+         this.menuButton = this.add.text(100, gameHeight - 50,  'MENU', { fontSize: '36px', fill: '#fff' }).setOrigin(0.5).setInteractive();
 
         // --- 3. イベントリスナーを設定 ---
   menuButton.on('pointerdown', () => {
@@ -44,7 +44,7 @@ export default class UIScene extends Phaser.Scene {
 
 
     togglePanel() {
-        this.isPanelOpen = !this.isPanelOpen;
+       // this.isPanelOpen = !this.isPanelOpen;
        // this.applyLayout(true); // アニメーション付きでレイアウトを更新
     }
     
