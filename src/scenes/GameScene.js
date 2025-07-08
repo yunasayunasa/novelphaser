@@ -35,7 +35,7 @@ import { handleFreeImage } from '../handlers/freeimage.js';
 import { handleButton } from '../handlers/button.js';
 import { handleCall } from '../handlers/call.js';
 import { handleReturn } from '../handlers/return.js';
-
+import { Layout } from '../core/Layout.js';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
