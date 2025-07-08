@@ -127,35 +127,35 @@ export default class GameScene extends Phaser.Scene {
 
      // ★★★ onResizeメソッドを新規追加 ★★★
 
+    // ★★★ リサイズイベントの処理メソッドを新規作成 ★★★
     onResize() {
-        console.log("GameScene: onResizeイベント -> MessageWindowのレイアウトを更新します。");
-        if (this.messageWindow) {
-            // ★★★ MessageWindowのメソッドを直接呼ぶのは、実はあまり良くない ★★★
-            // ★★★ イベントを発行する方式に切り替えるのがベスト ★★★
-            // しかし、まずはこれで動くか確認
-            this.messageWindow.applyLayout();
+        console.log("Resize event detected. Applying new layout.");
+        const orientation = this.scale.isPortrait ? 'portrait' : 'landscape';
+        const layout = Layout[orientation];
+
+        // --- 1. 背景の再配置 ---
+        // 背景レイヤーにある画像(常に1枚と仮定)のサイズを更新
+        const bg = this.layer.background.getAt(0);
+        if (bg) {
+            bg.setDisplaySize(this.scale.width, this.scale.height);
         }
-        // 表示中の全キャラクターの位置を、現在の画面向きに合わせて再計算・再配置
+
+        // --- 2. キャラクターの再配置 ---
         for (const name in this.characters) {
             const chara = this.characters[name];
-            const charaData = this.stateManager.getState().layers.characters[name];
-
-            if (chara && charaData) {
-                const orientation = this.scale.isPortrait ? 'portrait' : 'landscape';
-                const layout = Layout[orientation];
-                let x, y;
-
-                if (charaData.pos && layout.character[charaData.pos]) {
-                    x = layout.character[charaData.pos].x;
-                    y = layout.character[charaData.pos].y;
-                } else {
-                    x = charaData.x;
-                    y = charaData.y;
-                }
-                chara.setPosition(x, y);
+            // ★ キャラクターオブジェクトに保存された 'pos' 情報を参照
+            const pos = chara.getData('pos'); 
+            
+            if (pos && layout.character[pos]) {
+                const newPos = layout.character[pos];
+                // Tweenで滑らかに移動させることもできるが、まずは即時変更
+                chara.setPosition(newPos.x, newPos.y);
             }
         }
+        // MessageWindowとUISceneは、それぞれのクラス内でリサイズを検知して
+        // 自分自身を更新するので、GameSceneが気にする必要はない（これがクラス化の利点！）
     }
+    
 
     // GameSceneクラスの中に追加
 performSave(slot) {
@@ -309,6 +309,9 @@ function rebuildScene(manager, state) {
             throw new Error(`キャラクターテクスチャ[${charaData.storage}]がキャッシュにありません。`);
         }
         const chara = scene.add.image(charaData.x, charaData.y, charaData.storage);
+           // ★★★ ロード時もpos情報をセット ★★★
+        chara.setData('pos', charaData.pos);
+
         // ★★★ 必ずTintをリセットして明るい状態にする ★★★
         chara.setTint(0xffffff);
 
