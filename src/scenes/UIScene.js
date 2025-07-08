@@ -1,5 +1,8 @@
 import { Layout } from '../core/Layout.js';
 
+import ResponsiveScene from './ResponsiveScene.js'; // ★ インポート
+// ...
+
 export default class UIScene extends Phaser.Scene {
     constructor() {
         super({ key: 'UIScene', active: true });
@@ -39,9 +42,11 @@ export default class UIScene extends Phaser.Scene {
         this.backlogButton.on('pointerdown', () => this.openScene('BacklogScene'));
         this.configButton.on('pointerdown', () => this.openScene('ConfigScene'));
         
-        // --- 4. 初期レイアウトの適用と、リサイズイベントの監視 ---
+         // ★ リサイズイベントの監視
+        this.scale.on('resize', this.onResize, this);
+        // ★ 最初のレイアウト適用
         this.applyLayout();
-        this.scale.on('resize', this.applyLayout, this);
+
     }
 
     togglePanel() {

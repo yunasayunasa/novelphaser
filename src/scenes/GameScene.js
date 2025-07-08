@@ -1,5 +1,6 @@
 import ScenarioManager from '../core/ScenarioManager.js';
 import SoundManager from '../core/SoundManager.js';
+import ResponsiveScene from './ResponsiveScene.js'; 
 import StateManager from '../core/StateManager.js';
 import MessageWindow from '../ui/MessageWindow.js';
 import { handleCharaShow } from '../handlers/chara_show.js';
@@ -37,7 +38,8 @@ import { handleCall } from '../handlers/call.js';
 import { handleReturn } from '../handlers/return.js';
 import { Layout } from '../core/Layout.js';
 
-export default class GameScene extends Phaser.Scene {
+
+export default class GameScene extends ResponsiveScene {
     constructor() {
         super('GameScene');
         this.scenarioManager = null;
@@ -129,7 +131,7 @@ export default class GameScene extends Phaser.Scene {
 
     // ...
     // onResizeメソッドを、以下の全文で置き換えてください
-    onResize() {
+      applyLayout() {
         const gameWidth = this.scale.width;
         const gameHeight = this.scale.height;
         
